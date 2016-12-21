@@ -1,0 +1,2 @@
+import {{themeName}} from './themes/{{themeName}}.js';
+export const themes = { {{themeName}} };

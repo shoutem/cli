@@ -1,0 +1,5 @@
+{
+  "name": "{{devName}}.{{extJson.name}}",
+  "version": "{{extJson.version}}",
+  "description": "{{extJson.description}}"
+}

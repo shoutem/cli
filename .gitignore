@@ -1,0 +1,16 @@
+# ignore dependencies
+/node_modules
+
+# ignore all logs
+*.log
+
+# ignore transpiled code
+/build
+
+# OSX stuff
+.DS_Store
+
+.idea/
+*.tgz
+
+.update-theme

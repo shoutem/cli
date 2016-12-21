@@ -1,0 +1,12 @@
+{
+  "title": "{{schemaName}}",
+  "properties": {
+    "name": {
+      "format": "single-line",
+      "title": "Name",
+      "type": "string"
+    }
+  },
+  "titleProperty": "name",
+  "type": "object"
+}
