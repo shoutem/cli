@@ -6,7 +6,7 @@ import url from 'url';
 import * as yarn from '../extension/yarn';
 import { ensureYarnInstalled } from '../extension/yarn';
 import { ensureNodeVersion } from '../extension/node';
-
+import { ensureDeveloperIsRegistered } from '../commands/register';
 import msg from '../user_messages';
 
 export default async (platform, appId, options = {}) => {
@@ -24,6 +24,8 @@ export default async (platform, appId, options = {}) => {
     throw new Error(msg.run.missingId());
   }
   config.serverApiEndpoint = url.parse(cliUrls.appManager).hostname;
+  const dev = await ensureDeveloperIsRegistered();
+  config.authorization = dev.apiToken;
   await mobileEnv.saveMobileConfig(config);
 
   console.log(msg.run.info(platform, config));
