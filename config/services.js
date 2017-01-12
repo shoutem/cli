@@ -10,6 +10,9 @@ const envValues = {
   dev: {
     host: 'dev.sauros.hr'
   },
+  qa: {
+    host: 'qa.sauros.hr'
+  },
   local: {
     host: process.env.SHOUTEM_CLI_HOST || 'dev.sauros.hr',
     appBuilder: process.env.SHOUTEM_CLI_APP_BUILDER,
