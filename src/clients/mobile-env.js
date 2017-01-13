@@ -6,25 +6,17 @@ import {
   mobileAppPackageJson
 } from './cli-paths';
 import { readJsonFile, writeJsonFile } from '../extension/data';
-import request from 'request-promise-native';
 import cliUrls from '../../config/services';
-import tarball from 'tarball-extract';
-import bluebird from 'bluebird';
-import tmp from 'tmp-promise';
 import path from 'path';
 import rimraf from 'rmfr';
 import msg from '../user_messages';
 import * as yarn from '../extension/yarn';
-
-const extractTarballDownloadAsync = bluebird.promisify(tarball.extractTarballDownload);
+import download from 'download';
 
 export async function installMobileEnv(tarbalUrl) {
-  const removeMobileEnvPromise = rimraf(await mobileEnvPath());
+  await rimraf(await mobileEnvPath());
 
-  const tmpDir = path.join((await tmp.dir()).path, 'package.tgz');
-
-  await removeMobileEnvPromise;
-  await extractTarballDownloadAsync(tarbalUrl, tmpDir, await mobileEnvPath(), {});
+  await download(tarbalUrl, await mobileEnvPath(), {extract: true, strip: 1});
   console.log(msg.env.info.downloaded());
 
   await yarn.install(path.join(await mobileAppPath(), 'build-script'));

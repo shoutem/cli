@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.38",
+  "version": "0.8.39",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -15,7 +15,8 @@
     "lint": "eslint ./ --ignore-pattern build/",
     "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",
     "update-theme": "node update-theme.js",
-    "shoutem": "node build/src/shoutem.js"
+    "shoutem": "node build/src/shoutem.js",
+    "postinstall": "node build/src/scripts/postinstall.js"
   },
   "author": "",
   "license": "ISC",
@@ -25,6 +26,7 @@
     "babel-preset-es2017": "^6.16.0",
     "bluebird": "^3.4.6",
     "command-exists": "^1.0.2",
+    "download": "^5.0.2",
     "fs-extra": "^1.0.0",
     "inquirer": "1.0.3",
     "lodash": "4.11.2",

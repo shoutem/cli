@@ -1,82 +1,85 @@
 import fs from 'fs';
 import os from 'os';
 import path from 'path';
-import rimraf from 'rimraf';
 import mzfs from 'mz/fs';
+import { serverEnvPath } from './cli-paths';
 
 export default class LocalDataClient {
   /*
     Collection of actions we need to do on user's file system.
   */
-  constructor(rootDir = '') {
-    this.dataDirPath = path.join(rootDir || os.homedir(), '.shoutem');
-    this.tokenFilePath = path.join(this.dataDirPath, 'api-token');
-    this.developerFilePath = path.join(this.dataDirPath, 'dev-info');
-    this.serverEnvNamePath = path.join(this.dataDirPath, 'server-env');
+  constructor() {
+    const dataDirPath = path.join(os.homedir(), '.shoutem');
 
     try {
-      fs.mkdirSync(this.dataDirPath);
+      fs.mkdirSync(dataDirPath);
     } catch (exc) {
       if (exc.code !== 'EEXIST') throw (exc);
     }
   }
 
-  getTokenFilePath() {
-    return this.tokenFilePath;
+  async getTokenFilePath() {
+    return path.join(await serverEnvPath(), 'api-token');
   }
 
-  getDeveloperFilePath() {
-    return this.developerFilePath;
+  async getDeveloperFilePath() {
+    return path.join(await serverEnvPath(), 'dev-info');
   }
 
   /*
     Fetches the API token from file system. `callback` will receive the token
     if user is logged in, and `null` otherwise.
   */
-  loadApiToken() {
+  async loadApiToken() {
     // If file doesn't exist, that's ok - user just isn't logged in.
     // But if any other error pops up, we can't handle it here.
-    return mzfs.readFile(this.tokenFilePath, 'utf8')
-      .catch(err => (err.code === 'ENOENT' ? null : Promise.reject(err)));
+    try {
+      return await mzfs.readFile(await this.getTokenFilePath(), 'utf8')
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return null;
+      }
+      throw err;
+    }
   }
 
   /*
     Saves the API token to file system.
   */
-  saveApiToken(token) {
-    return mzfs.writeFile(this.tokenFilePath, token, 'utf8')
-      .then(() => token);
+  async saveApiToken(token) {
+    await mzfs.writeFile(await this.getTokenFilePath(), token, 'utf8');
+    return token;
   }
 
   /*
     Reads developer information from file system. `callback` will receive the
     info if it exists, and `null` otherwise.
   */
-  loadDeveloper() {
-    return mzfs
-      .readFile(this.developerFilePath, 'utf8')
-      .catch(err => (err.code === 'ENOENT' ? null : Promise.reject(err)))
-      .then(JSON.parse);
+  async loadDeveloper() {
+    let content = null;
+
+    try {
+      content = await mzfs.readFile(await this.getDeveloperFilePath(), 'utf8');
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return null;
+      }
+      throw err;
+    }
+
+    return JSON.parse(content);
   }
 
   /*
     Saves developer information to file system.
   */
-  saveDeveloper(developer) {
+  async saveDeveloper(developer) {
     if (developer) {
-      return mzfs
-        .writeFile(this.developerFilePath, JSON.stringify(developer), 'utf8')
-        .then(() => developer);
+      await mzfs.writeFile(await this.getDeveloperFilePath(), JSON.stringify(developer), 'utf8');
+      return developer;
     }
-    return mzfs.unlink(this.developerFilePath)
-      .then(() => null)
-      .catch(err => (err.code === 'ENOENT' ? null : Promise.reject(err)));
-  }
-
-  /*
-    Clears all locally saved data.
-  */
-  clearAllData(callback) {
-    rimraf(this.dataDirPath, callback);
+    await mzfs.unlink(await this.getDeveloperFilePath());
+    return null;
   }
 }
+

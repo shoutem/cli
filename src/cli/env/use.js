@@ -1,5 +1,5 @@
 import { setHostEnvName } from '../../clients/server-env';
-import { logout } from '../../commands/logout';
+import { ensureDeveloperIsRegistered } from '../../commands/register';
 import msg from '../../user_messages';
 
 export const description = 'Manages server environment used by cli';
@@ -10,8 +10,7 @@ const production = {
   description: 'Switch to shoutem live env',
   async handler() {
     await setHostEnvName('production');
-    console.log(msg.use.complete('production'));
-    logout();
+    console.log(msg.use.complete('production', await ensureDeveloperIsRegistered()));
   }
 };
 
@@ -20,8 +19,7 @@ const dev = {
   description: 'Switch to sauros dev env',
   async handler() {
     await setHostEnvName('dev');
-    console.log(msg.use.complete('dev'));
-    logout();
+    console.log(msg.use.complete('dev', await ensureDeveloperIsRegistered()));
   }
 };
 
@@ -30,8 +28,7 @@ const local = {
   description: 'Use api endpoints set in OS env variables',
   async handler() {
     await setHostEnvName('local');
-    console.log(msg.use.complete('local'));
-    logout();
+    console.log(msg.use.complete('local', await ensureDeveloperIsRegistered()));
   }
 };
 
@@ -40,8 +37,7 @@ const beta = {
   description: 'Switch to using aperfector dev env',
   async handler() {
     await setHostEnvName('beta');
-    console.log(msg.use.complete('beta'));
-    logout();
+    console.log(msg.use.complete('beta', await ensureDeveloperIsRegistered()));
   }
 };
 

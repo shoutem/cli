@@ -95,9 +95,9 @@ export default {
     complete: () => 'Extension successfully unlinked. Please, kill the packager before running the app.'
   },
   use: {
-    complete: serverEnv => `Using server \`${serverEnv}\``,
+    complete: (serverEnv, developer) => `Using server \`${serverEnv}\` as user ${developer.name}.`,
     invalidEnv: serverEnv => `${serverEnv} is not a valid option\nRun shoutem use -h for possible options.`,
-    show: serverEnv => `Using server \`${serverEnv}\`:`
+    show: serverEnv => `Using server \`${serverEnv}\`:`,
   },
   run: {
     missingId: () => 'Shoutem app id is required for the first run.',

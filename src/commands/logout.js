@@ -2,18 +2,14 @@
 import LocalDataClient from '../clients/local-data';
 import fs from 'mz/fs';
 
-export function logout() {
+export async function logout() {
   const client = new LocalDataClient();
 
-  const deletePromise = [
-    client.getTokenFilePath(),
-    client.getDeveloperFilePath()
-  ]
-  .map(file => fs.unlink(file))
-  .map(unlinkPromise => unlinkPromise.catch(err => err.code === 'ENOENT'
-    ? Promise.resolve()
-    : Promise.reject(err))
-  );
+  try {
+    await fs.unlink(await client.getTokenFilePath());
+  } catch (err) {}
 
-  return Promise.all(deletePromise);
+  try {
+    await fs.unlink(await client.getDeveloperFilePath());
+  } catch (err) {}
 }

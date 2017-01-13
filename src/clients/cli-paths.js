@@ -15,13 +15,21 @@ export async function lastErrorPath() {
 
 export async function mobileEnvPath() {
   const hostEnvName = getHostEnvName();
-  const envPath = path.join(await localStoragePath(), 'mobile-env', hostEnvName);
+  const envPath = path.join(await localStoragePath(), hostEnvName, 'app');
   await mkdirp(envPath);
   return envPath;
 }
 
+export async function serverEnvPath() {
+  const hostEnvName = getHostEnvName();
+  const envPath = path.join(await localStoragePath(), hostEnvName, 'server');
+  await mkdirp(envPath);
+
+  return envPath;
+}
+
 export async function mobileAppPath() {
-  return path.join(await mobileEnvPath(), 'package');
+  return mobileEnvPath();
 }
 
 export async function mobileAppConfigPath() {
