@@ -61,7 +61,7 @@ export function selectMobileAppVersion(mobileAppRegistry) {
     return tags.dev;
   }
 
-  if (hostEnv === 'beta') {
+  if (hostEnv === 'beta' || hostEnv === 'qa') {
     return tags.beta;
   }
 

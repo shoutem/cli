@@ -34,10 +34,20 @@ const local = {
 
 const beta = {
   command: 'beta',
-  description: 'Switch to using aperfector dev env',
+  description: 'Switch to using aperfector beta env',
   async handler() {
     await setHostEnvName('beta');
     console.log(msg.use.complete('beta', await ensureDeveloperIsRegistered()));
+  }
+};
+
+const qa = {
+  command: 'qa',
+  description: 'Switch to using sauros qa env',
+  async handler() {
+    await setHostEnvName('qa');
+    console.log(msg.use.complete('qa'));
+    logout();
   }
 };
 
@@ -47,5 +57,6 @@ export function builder(use) {
     .command(dev)
     .command(local)
     .command(beta)
+    .command(qa)
     .strict();
 }
