@@ -46,8 +46,7 @@ const qa = {
   description: 'Switch to using sauros qa env',
   async handler() {
     await setHostEnvName('qa');
-    console.log(msg.use.complete('qa'));
-    logout();
+    console.log(msg.use.complete('qa', await ensureDeveloperIsRegistered()));
   }
 };
 
