@@ -23,7 +23,12 @@ export async function createTemplateIfNotExists(templatePath, templateContext, d
   return template;
 }
 
-export async function instantiateTemplatePath(localTemplatePath, destinationPath, context) {
+async function instantiateTemplatePathRec(localTemplatePath, destinationPath, context) {
+  if (localTemplatePath.endsWith('template-initialization.js')) {
+    return null;
+  }
+  destinationPath = Mustache.render(destinationPath, context);
+
   const templatePath = path.join(templatesDirectory, localTemplatePath);
   const templatePathState = await fs.lstat(templatePath);
   if (templatePathState.isDirectory()) {
@@ -32,7 +37,7 @@ export async function instantiateTemplatePath(localTemplatePath, destinationPath
     await Promise.all(files.map(file => {
       const src = path.join(localTemplatePath, file);
       const dest = path.join(destinationPath, file);
-      return instantiateTemplatePath(src, dest, context);
+      return instantiateTemplatePathRec(src, dest, context);
     }));
   } else if (templatePathState.isFile()) {
     if (await pathExists(destinationPath)) {
@@ -41,5 +46,16 @@ export async function instantiateTemplatePath(localTemplatePath, destinationPath
     const templateContent = await fs.readFile(templatePath, 'utf8');
     const fileContent = await Mustache.render(templateContent, context);
     await fs.writeFile(destinationPath, fileContent);
+  }
+}
+
+export async function instantiateTemplatePath(localTemplatePath, destinationPath, context) {
+  await instantiateTemplatePathRec(localTemplatePath, destinationPath, context);
+
+  const templateInitializationPath = path.join(templatesDirectory, localTemplatePath, 'template-initialization.js');
+  try {
+    return await require(templateInitializationPath)(localTemplatePath, destinationPath, context);
+  } catch (err) {
+    return { error };
   }
 }

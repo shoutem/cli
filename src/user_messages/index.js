@@ -52,7 +52,7 @@ export default {
   },
   page: {
     add: {
-      complete: result => `File \`${result.path}\` was created!`
+      complete: ({ pageName, path }) => `Page ${pageName} is created in \`${ path }\` folder!`
     }
   },
   publish: {
