@@ -12,11 +12,19 @@ import rimraf from 'rmfr';
 import msg from '../user_messages';
 import * as yarn from '../extension/yarn';
 import download from 'download';
+import fs from 'mz/fs';
 
-export async function installMobileEnv(tarbalUrl) {
+export async function uncommentBuildDir() {
+  const buildGradlePath = path.join(await mobileAppPath(), 'android', 'build.gradle');
+  let buildGradle = await fs.readFile(buildGradlePath, 'utf-8');
+  buildGradle = buildGradle.replace('//<CLI> buildDir', 'buildDir');
+  await fs.writeFile(buildGradlePath, buildGradle);
+}
+
+export async function installMobileEnv(tarballUrl) {
   await rimraf(await mobileEnvPath());
 
-  await download(tarbalUrl, await mobileEnvPath(), {extract: true, strip: 1});
+  await download(tarballUrl, await mobileEnvPath(), {extract: true, strip: 1});
   console.log(msg.env.info.downloaded());
 
   await yarn.install(path.join(await mobileAppPath(), 'build-script'));
@@ -26,6 +34,10 @@ export async function installMobileEnv(tarbalUrl) {
   config.appId = null;
   config.serverApiEndpoint = cliUrls.appManager;
   await saveMobileConfig(config);
+
+  if (process.platform === 'win32') {
+    await uncommentBuildDir();
+  }
 }
 
 export async function loadMobileConfig() {
