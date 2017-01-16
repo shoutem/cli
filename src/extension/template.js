@@ -12,17 +12,6 @@ export function load(pathWithSlashes, templateContext) {
   return Mustache.render(template, templateContext);
 }
 
-export async function createTemplateIfNotExists(templatePath, templateContext, destinationPath) {
-  if (await pathExists(destinationPath)) {
-    throw new Error(`File ${destinationPath} already exists.`);
-  }
-
-  const template = load(templatePath, templateContext);
-  await fs.writeFile(destinationPath, template);
-
-  return template;
-}
-
 async function instantiateTemplatePathRec(localTemplatePath, destinationPath, context) {
   if (localTemplatePath.endsWith('template-initialization.js')) {
     return null;
