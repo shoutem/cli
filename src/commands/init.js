@@ -1,17 +1,11 @@
 /* eslint no-console: 0 */
-import fs from 'fs';
 import path from 'path';
-
 import _ from 'lodash';
 import inquirer from 'inquirer';
-import bluebird from 'bluebird';
-import touch from 'touch';
 import mzfs from 'mz/fs';
-import { saveExtensionJsonAsync } from '../extension/data';
-
+import { instantiateTemplatePath } from '../extension/template';
 import { ensureDeveloperIsRegistered } from './register';
-import { load } from '../extension/template';
-
+import * as yarn from '../extension/yarn';
 import msg from '../user_messages';
 
 
@@ -54,60 +48,6 @@ export async function promptExtensionInit(extName) {
   };
 }
 
-export function savePackageJson(devName, extJson) {
-  const appTemplate = load('init/app-package.json.template', { devName, extJson });
-  const serverTemplate = load('init/server-package.json.template', { devName, extJson });
-
-  return Promise.all([
-    mzfs.writeFile(path.join(cwd(), 'app', 'package.json'),  appTemplate, 'utf8'),
-    mzfs.writeFile(path.join(cwd(), 'server', 'package.json'),  serverTemplate, 'utf8'),
-  ]).then(() => extJson);
-}
-
-export async function saveExtensionDataToFiles(devName, extName) {
-  const extJson = await promptExtensionInit(extName);
-  await saveExtensionJsonAsync(extJson);
-  await savePackageJson(devName, extJson);
-}
-
-const dirs = [
-  'app',
-  'server',
-];
-
-const files = [
-  ['extension.json'],
-  ['app', 'index.js'],
-  ['app', 'package.json'],
-];
-
-export function createScaffold() {
-  const dirPaths = dirs.map(d => path.join(cwd(), d));
-  const filePaths = files.map(f => path.join(cwd(), ...f));
-
-  return bluebird.map(dirPaths, dir => mzfs.mkdir(dir))
-    .then(() => bluebird.map(filePaths, path => touch(path)));
-}
-
-export async function createTemplateFiles() {
-  const templates = [
-    {
-      string: load('./init/app-index.js.template'),
-      path: ['app', 'index.js'],
-    },
-    {
-      string: load('./init/app-const.js.template'),
-      path: ['app', 'const.js'],
-    },
-  ];
-
-  await Promise.all(templates.map(t => {
-    const templatePath = path.join(cwd(), ...t.path);
-    return mzfs.writeFile(templatePath, t.string, 'utf8');
-  }));
-}
-
-
 async function ensureWorkingDirIsEmpty() {
   const files = await mzfs.readdir(cwd());
 
@@ -118,8 +58,10 @@ async function ensureWorkingDirIsEmpty() {
 
 export async function initExtension(extName) {
   await ensureWorkingDirIsEmpty();
+  await yarn.ensureYarnInstalled();
   const developer = await ensureDeveloperIsRegistered();
-  await createScaffold();
-  await saveExtensionDataToFiles(developer.name, extName);
-  await createTemplateFiles();
+  const extJson = await promptExtensionInit(extName);
+  await instantiateTemplatePath('init', cwd(), {devName: developer.name, extJson});
+  await yarn.install(path.join(cwd(), 'server'));
+  await yarn.install(path.join(cwd(), 'app'));
 }

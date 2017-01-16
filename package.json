@@ -10,7 +10,7 @@
     "shoutem": "./build/src/shoutem.js"
   },
   "scripts": {
-    "build": "npm run clean && babel ./ --out-dir ./build --presets es2015,es2017 --source-maps --copy-files --ignore ./node_modules,./build/ ",
+    "build": "npm run clean && babel ./ --out-dir ./build --presets es2015,es2017 --source-maps --copy-files --ignore ./node_modules,./build/,./templates/",
     "clean": "rimraf ./build",
     "lint": "eslint ./ --ignore-pattern build/",
     "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",

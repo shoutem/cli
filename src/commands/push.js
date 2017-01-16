@@ -36,27 +36,19 @@ function setExtNameVersionInPackageJson(extName, version) {
   ]);
 }
 
-export function uploadExtension(opts = {}) {
-  const getDev = ensureDeveloperIsRegistered();
-  const getExtJson = getDev.then(() => utils.loadExtensionJsonAsync());
+export async function uploadExtension(opts = {}) {
+  const dev = await ensureDeveloperIsRegistered();
+  const extJson = await utils.loadExtensionJsonAsync();
+  await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version);
+  const packResult = await shoutemPack(process.cwd(), { packToTempDir: true, nobuild: opts.nobuild });
 
-  const pack = Promise.all([getDev, getExtJson])
-    .then(([dev, extJson]) => setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version))
-    .then(() => shoutemPack(process.cwd(), { packToTempDir: true, nobuild: opts.nobuild }));
+  const stream = fs.createReadStream(packResult.package);
+  const id = utils.getExtensionCanonicalName(dev.name, extJson.name, extJson.version);
+  const extensionManager = new ExtensionManagerClient(dev.apiToken);
 
-  const upload = Promise.all([getDev, getExtJson, pack])
-    .then(([dev, extJson, packResult]) => {
-      const stream = fs.createReadStream(packResult.package);
-      const id = utils.getExtensionCanonicalName(dev.name, extJson.name, extJson.version);
-      const extensionManager = new ExtensionManagerClient(dev.apiToken);
+  console.log(msg.push.uploadingInfo(extJson));
+  const extensionId = await extensionManager.uploadExtension(id, stream);
+  await mzfs.unlink(packResult.package);
 
-      console.log(msg.push.uploadingInfo(extJson));
-      return extensionManager.uploadExtension(id, stream);
-    });
-
-  const deletePkg = Promise.all([pack, upload])
-    .then(([fname, ]) => mzfs.unlink(fname.package));
-
-  return Promise.all([upload, deletePkg, pack, getExtJson])
-    .then(([extensionId, , packResult, extJson]) => ({ extensionId, packResult, extJson }));
+  return { extensionId, packResult, extJson };
 }
