@@ -15,6 +15,5 @@ import rimraf from 'rmfr';
       rimraf(path.join(cliHome, 'last-error.json'))
     ]);
   } catch (err) {
-    console.error(err);
   }
 })();

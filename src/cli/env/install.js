@@ -33,12 +33,12 @@ export async function handler(args) {
 
     if (!args.force && localVersion === targetVersion) {
       console.log(msg.env.update.alreadyLatest(localVersion));
-      return;
+      return null;
     }
 
     if (!registry.versions[targetVersion]) {
       console.error(`Version ${targetVersion} does not exist.`);
-      return;
+      return null;
     }
 
     const tarballUrl = registry.versions[targetVersion].dist.tarball;

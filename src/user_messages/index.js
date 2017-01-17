@@ -138,5 +138,8 @@ export default {
   },
   node: {
     outdated: minVersion => `Your node version is too old. Please update node to version ${minVersion} or newer`
+  },
+  version: {
+    updateRequired: () => 'You are running an outdated version of shoutem CLI.\nPlease update to latest version by running `npm install -g @shoutem/cli` or `sudo npm install -g @shoutem/cli`'
   }
 }

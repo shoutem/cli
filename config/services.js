@@ -33,4 +33,5 @@ export default {
   extensionManager: env.extensionManager || `http://extensions.${env.host}`,
   legacyService: env.legacyService || `http://api.${env.host}`,
   mobileAppUri: env.mobileAppUri || 'http://registry.npmjs.org/@shoutem%2fmobile-app',
+  cliAppUri: 'http://registry.npmjs.org/@shoutem%2fcli'
 };
