@@ -4,8 +4,8 @@ import inquirer from 'inquirer';
 import LocalDataClient from '../clients/local-data';
 import { AuthServiceClient } from '../clients/auth-service';
 import die from '../extension/die';
-
 import msg from '../user_messages';
+import { ExtensionManagerClient } from '../clients/extension-manager';
 
 function promptUserCredentials() {
   console.log(msg.login.credentialsPrompt());
@@ -40,7 +40,7 @@ export function loginUser() {
     });
 }
 
-export function ensureUserIsLoggedIn() {
+export async function ensureUserIsLoggedIn() {
   /*
     If user is logged in, `callback` receives his/her current API token. Otherwise,
     user will be prompted to log in, and `callback` will receive a fresh token.
@@ -50,7 +50,19 @@ export function ensureUserIsLoggedIn() {
   */
   const localDataClient = new LocalDataClient();
 
-  return localDataClient.loadApiToken()
-    .then(currentToken => currentToken || loginUser())
-    .catch(loginError => die(loginError));
+  try {
+    const apiToken = await localDataClient.loadApiToken();
+
+    if (apiToken) {
+      const extManager = new ExtensionManagerClient(apiToken);
+      try {
+        await extManager.getDeveloper();
+        return apiToken;
+      } catch (err) {
+      }
+    }
+    return await loginUser();
+  } catch (err) {
+    await die(err);
+  }
 }
