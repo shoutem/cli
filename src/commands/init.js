@@ -1,5 +1,4 @@
 /* eslint no-console: 0 */
-import path from 'path';
 import _ from 'lodash';
 import inquirer from 'inquirer';
 import mzfs from 'mz/fs';
@@ -61,7 +60,5 @@ export async function initExtension(extName) {
   await yarn.ensureYarnInstalled();
   const developer = await ensureDeveloperIsRegistered();
   const extJson = await promptExtensionInit(extName);
-  await instantiateTemplatePath('init', cwd(), {devName: developer.name, extJson});
-  await yarn.install(path.join(cwd(), 'server'));
-  await yarn.install(path.join(cwd(), 'app'));
+  await instantiateTemplatePath('init', cwd(), { devName: developer.name, extJson });
 }

@@ -16,6 +16,6 @@ export async function handler(args) {
     await initExtension(name);
     console.log(msg.init.complete())
   } catch (err) {
-    handleError(err);
+    await handleError(err);
   }
 }

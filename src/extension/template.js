@@ -44,7 +44,7 @@ export async function instantiateTemplatePath(localTemplatePath, destinationPath
   const templateInitializationPath = path.join(templatesDirectory, localTemplatePath, 'template-initialization.js');
   try {
     return await require(templateInitializationPath)(localTemplatePath, destinationPath, context);
-  } catch (err) {
+  } catch (error) {
     return { error };
   }
 }
