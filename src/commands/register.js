@@ -38,20 +38,14 @@ export async function exitError(err) {
   process.exit(1);
 }
 
-export function ensureDeveloperIsRegistered() {
-  const tokenPromise = ensureUserIsLoggedIn();
+export async function ensureDeveloperIsRegistered() {
+  const apiToken = await ensureUserIsLoggedIn();
 
-  let devInfoPromise = tokenPromise
-    .then(userApiToken => getDeveloper(userApiToken));
+  let devInfo = (await getDeveloper(apiToken)) || (await registerDeveloper(apiToken));
 
-  devInfoPromise = Promise.all([tokenPromise, devInfoPromise])
-    .then(([apiToken, devInfo]) => devInfo || registerDeveloper(apiToken));
-
-  return Promise.all([tokenPromise, devInfoPromise])
-    .then(([userApiToken, dev]) => ({
-      apiToken: userApiToken,
-      name: dev.name,
-      id: dev.id,
-    }))
-    .catch(err => exitError(err));
+  return {
+    apiToken,
+    name: devInfo.name,
+    id: devInfo.id
+  };
 }

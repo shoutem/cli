@@ -78,7 +78,10 @@ export default class LocalDataClient {
       await mzfs.writeFile(await this.getDeveloperFilePath(), JSON.stringify(developer), 'utf8');
       return developer;
     }
-    await mzfs.unlink(await this.getDeveloperFilePath());
+    try {
+      await mzfs.unlink(await this.getDeveloperFilePath());
+    } catch (err) {
+    }
     return null;
   }
 }
