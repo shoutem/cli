@@ -12,6 +12,12 @@ export async function getVersion(npmUrl, tag) {
 }
 
 export async function isLatest(npmUrl, currentVersion) {
-  const latestVersion = await getVersion(npmUrl, 'latest');
-  return semver.gte(currentVersion, latestVersion);
+  try {
+    const latestVersion = await getVersion(npmUrl, 'latest');
+    return semver.gte(currentVersion, latestVersion);
+  } catch (err) {
+
+    // to allow usage of CLI if npmjs is down
+    return true;
+  }
 }

@@ -1,7 +1,7 @@
 import os from 'os';
 import path from 'path';
 import fs from 'fs';
-import writefile from 'writefile';
+import mzfs from 'mz/fs';
 
 const serverEnvNamePath = path.join(os.homedir(), '.shoutem', 'server-env');
 
@@ -14,5 +14,5 @@ export function getHostEnvName() {
 }
 
 export async function setHostEnvName(name) {
-  await writefile(serverEnvNamePath, name);
+  await mzfs.writeFile(serverEnvNamePath, name);
 }
