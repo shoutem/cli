@@ -103,7 +103,8 @@ export default {
     missingId: () => 'Shoutem app id is required for the first run.',
     info: (platform, config) => `Running ${platform} shoutem app with id ${config.appId}`,
     complete: platform => `Finished running ${platform} app.`,
-    missingConfig: () => 'Mobile environment wasn\'t correctly installed. Please run `shoutem env install -f` to reinstall'
+    missingConfig: () => 'Mobile environment wasn\'t correctly installed. Please run `shoutem env install -f` to reinstall',
+    killPackagerAndAdb: () => 'Could not clean up the build directory. Please check that react-packager and adb are not running'
   },
   show: {
     missingEnv: () => 'No shoutem env was set. Please run shoutem env install.',

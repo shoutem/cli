@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.47",
+  "version": "0.8.48",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -21,6 +21,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@shoutem/platform-build": "0.0.1",
     "async": "2.0.0-rc.3",
     "babel-polyfill": "^6.16.0",
     "bluebird": "^3.4.6",

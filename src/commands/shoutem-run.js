@@ -1,34 +1,65 @@
 /* eslint no-console: "off" */
-import * as mobileEnv from '../clients/mobile-env';
-import { mobileAppPath } from '../clients/cli-paths';
+import { getPlatformsPath, getPlatformBuildPath, getPlatformConfigPath, mobileAppConfigPath } from '../clients/cli-paths';
 import cliUrls from '../../config/services';
 import url from 'url';
 import * as yarn from '../extension/yarn';
 import { ensureYarnInstalled } from '../extension/yarn';
 import { ensureNodeVersion } from '../extension/node';
 import { ensureDeveloperIsRegistered } from '../commands/register';
+import { readJsonFile, writeJsonFile } from '../extension/data';
+import path from 'path';
 import msg from '../user_messages';
 
 export default async (platform, appId, options = {}) => {
   await ensureNodeVersion();
   await ensureYarnInstalled();
 
-  const config = await mobileEnv.loadMobileConfig();
-  if (!config) {
-    throw new Error(msg.run.missingConfig());
-  }
-
-  if (appId) {
-    config.appId = appId;
-  } else if (!config.appId) {
-    throw new Error(msg.run.missingId());
-  }
-  config.serverApiEndpoint = url.parse(cliUrls.appManager).hostname;
+  const serverApiEndpoint = url.parse(cliUrls.appManager).hostname;
   const dev = await ensureDeveloperIsRegistered();
-  config.authorization = dev.apiToken;
-  await mobileEnv.saveMobileConfig(config);
+  const platformPath = options.platformBuild || getPlatformBuildPath(path.join(__dirname, '..', '..', '..'));
 
-  console.log(msg.run.info(platform, config));
-  await yarn.run(await mobileAppPath(), `run-${platform}`);
-  console.log(msg.run.complete(platform));
+  try {
+    await yarn.run(platformPath, 'clean');
+  } catch (err) {
+    console.log(msg.run.killPackagerAndAdb());
+    return null;
+  }
+
+  const mobileAppConfig = await readJsonFile(await mobileAppConfigPath()) || {};
+  Object.assign(mobileAppConfig, {
+      platform,
+      appId,
+      serverApiEndpoint,
+      authorization: dev.apiToken,
+      configurationFilePath: await getPlatformConfigPath(),
+      platformsDirectory: await getPlatformsPath(),
+      excludePackages: [],
+      production: false,
+      offlineMode: false,
+      debug: true,
+      extensionsJsPath: './extensions.js',
+      baseAppId: '2470',
+      cacheFolder: './cached-bundles',
+      cacheBaseApp: false,
+      skipNativeDependencies: false,
+      workingDirectories: mobileAppConfig.workingDirectories || []
+    }
+  );
+
+  // due to limitation of win32 file path length
+  if (process.platform === 'win32') {
+    mobileAppConfig.buildDirectory = 'c:\\shoutem-tmp';
+  }
+
+  await writeJsonFile(mobileAppConfig, await mobileAppConfigPath());
+
+  await yarn.run(platformPath, 'configure', [
+    '--',
+    `--configPath ${await mobileAppConfigPath()}`
+  ]);
+
+  await yarn.run(platformPath, 'run', [
+    '--',
+    `--platform ${platform}`
+  ]);
 }

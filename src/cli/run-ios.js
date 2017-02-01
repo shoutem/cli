@@ -4,6 +4,12 @@ import msg from '../user_messages';
 
 export const description = 'Run shoutem application on ios platform';
 export const command = 'run-ios [appId]';
+export const builder = {
+  platformBuild: {
+    alias: 'p',
+    description: 'use external platform build tool'
+  }
+};
 
 export async function handler(args) {
   try {

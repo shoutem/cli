@@ -20,7 +20,6 @@ const envValues = {
     authService: process.env.SHOUTEM_CLI_AUTH_SERVICE,
     extensionManager: process.env.SHOUTEM_CLI_EXTENSION_MANAGER,
     legacyService: process.env.SHOUTEM_CLI_LEGACY_SERVICE,
-    mobileAppUri: process.env.SHOUTEM_MOBILE_APP_URI,
   }
 };
 
@@ -32,6 +31,5 @@ export default {
   authService: env.authService || `http://api.${env.host}`,
   extensionManager: env.extensionManager || `http://extensions.${env.host}`,
   legacyService: env.legacyService || `http://api.${env.host}`,
-  mobileAppUri: env.mobileAppUri || 'http://registry.npmjs.org/@shoutem%2fmobile-app',
   cliAppUri: 'http://registry.npmjs.org/@shoutem%2fcli'
 };

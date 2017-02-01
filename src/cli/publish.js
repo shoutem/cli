@@ -1,5 +1,4 @@
 /* eslint no-console: 0 */
-import _ from 'lodash';
 import msg from '../user_messages';
 import { publishExtension } from '../commands/publish';
 import { handleError } from '../extension/error-handler';

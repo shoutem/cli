@@ -15,7 +15,7 @@ export async function lastErrorPath() {
 
 export async function mobileEnvPath() {
   const hostEnvName = getHostEnvName();
-  const envPath = path.join(await localStoragePath(), hostEnvName, 'app');
+  const envPath = path.join(await localStoragePath(), hostEnvName, 'client');
   await mkdirp(envPath);
   return envPath;
 }
@@ -32,14 +32,24 @@ export async function mobileAppPath() {
   return mobileEnvPath();
 }
 
-export async function mobileAppConfigPath() {
-  return path.join(await mobileAppPath(), 'config.json');
-}
-
-export async function mobileAppConfigTemplatePath() {
-  return path.join(await mobileAppPath(), 'config.template.json');
-}
-
 export async function mobileAppPackageJson() {
   return path.join(await mobileAppPath(), 'package.json');
+}
+
+export async function getPlatformsPath() {
+  const platformsPath = path.join(await localStoragePath(), 'platforms');
+  await mkdirp(platformsPath);
+  return platformsPath;
+}
+
+export function getPlatformBuildPath(cliRoot) {
+  return path.join(cliRoot, 'node_modules', '@shoutem', 'platform-build');
+}
+
+export async function getPlatformConfigPath() {
+  return path.join(await getPlatformsPath(), 'runtime-configuration.json');
+}
+
+export async function mobileAppConfigPath() {
+  return path.join(await mobileAppPath(), 'build-config.json');
 }
