@@ -15,7 +15,7 @@ export async function handler(args) {
   try {
     if (process.platform !== 'darwin') {
       console.log(msg.ios.notOnMac());
-      return;
+      return null;
     }
     await ensureCocoaPodsInstalled();
     await shoutemRunCommand('ios', args.appId, args)

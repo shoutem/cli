@@ -18,11 +18,15 @@ export default async (platform, appId, options = {}) => {
   const dev = await ensureDeveloperIsRegistered();
   const platformPath = options.platformBuild || getPlatformBuildPath(path.join(__dirname, '..', '..', '..'));
 
+  console.log(platformPath);
+
   try {
     await yarn.run(platformPath, 'clean');
   } catch (err) {
-    console.log(msg.run.killPackagerAndAdb());
-    return null;
+      console.log(err);
+      console.log(msg.run.killPackagerAndAdb());
+      return null;
+
   }
 
   const mobileAppConfig = await readJsonFile(await mobileAppConfigPath()) || {};
@@ -33,16 +37,8 @@ export default async (platform, appId, options = {}) => {
       authorization: dev.apiToken,
       configurationFilePath: await getPlatformConfigPath(),
       platformsDirectory: await getPlatformsPath(),
-      excludePackages: [],
-      production: false,
-      offlineMode: false,
-      debug: true,
-      extensionsJsPath: './extensions.js',
-      baseAppId: '2470',
-      cacheFolder: './cached-bundles',
-      cacheBaseApp: false,
-      skipNativeDependencies: false,
-      workingDirectories: mobileAppConfig.workingDirectories || []
+      workingDirectories: mobileAppConfig.workingDirectories || [],
+      excludePackages: ['shoutem.code-push']
     }
   );
 
