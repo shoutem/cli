@@ -9,6 +9,7 @@ import { ensureDeveloperIsRegistered } from '../commands/register';
 import { readJsonFile, writeJsonFile } from '../extension/data';
 import path from 'path';
 import msg from '../user_messages';
+import fs from 'mz/fs';
 
 export default async (platform, appId, options = {}) => {
   await ensureNodeVersion();
@@ -24,10 +25,11 @@ export default async (platform, appId, options = {}) => {
       console.log(err);
       console.log(msg.run.killPackagerAndAdb());
       return null;
-
   }
 
   const mobileAppConfig = await readJsonFile(await mobileAppConfigPath()) || {};
+  const buildDirectory = path.join(await getPlatformsPath(), 'build');
+
   Object.assign(mobileAppConfig, {
       platform,
       appId,
@@ -36,14 +38,10 @@ export default async (platform, appId, options = {}) => {
       configurationFilePath: await getPlatformConfigPath(),
       platformsDirectory: await getPlatformsPath(),
       workingDirectories: mobileAppConfig.workingDirectories || [],
-      excludePackages: ['shoutem.code-push']
+      excludePackages: ['shoutem.code-push'],
+      buildDirectory
     }
   );
-
-  // due to limitation of win32 file path length
-  if (process.platform === 'win32') {
-    mobileAppConfig.buildDirectory = 'c:\\shoutem-tmp';
-  }
 
   await writeJsonFile(mobileAppConfig, await mobileAppConfigPath());
 
@@ -52,8 +50,19 @@ export default async (platform, appId, options = {}) => {
     `--configPath ${await mobileAppConfigPath()}`
   ]);
 
+  if (process.platform === 'win32') {
+    await uncommentBuildDir(buildDirectory);
+  }
+
   await yarn.run(platformPath, 'run', [
     '--',
     `--platform ${platform}`
   ]);
+}
+
+async function uncommentBuildDir(buildDirectory) {
+  const buildGradlePath = path.join(buildDirectory, 'android', 'build.gradle');
+  let buildGradle = await fs.readFile(buildGradlePath, 'utf-8');
+  buildGradle = buildGradle.replace('//<CLI> buildDir', 'buildDir');
+  await fs.writeFile(buildGradlePath, buildGradle);
 }

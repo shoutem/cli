@@ -14,12 +14,7 @@ import * as yarn from '../extension/yarn';
 import download from 'download';
 import fs from 'mz/fs';
 
-export async function uncommentBuildDir() {
-  const buildGradlePath = path.join(await mobileAppPath(), 'android', 'build.gradle');
-  let buildGradle = await fs.readFile(buildGradlePath, 'utf-8');
-  buildGradle = buildGradle.replace('//<CLI> buildDir', 'buildDir');
-  await fs.writeFile(buildGradlePath, buildGradle);
-}
+
 
 export async function installMobileEnv(tarballUrl) {
   await rimraf(await mobileEnvPath());
