@@ -18,8 +18,6 @@ export default async (platform, appId, options = {}) => {
   const dev = await ensureDeveloperIsRegistered();
   const platformPath = options.platformBuild || getPlatformBuildPath(path.join(__dirname, '..', '..', '..'));
 
-  console.log(platformPath);
-
   try {
     await yarn.run(platformPath, 'clean');
   } catch (err) {
