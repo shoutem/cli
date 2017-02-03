@@ -1,4 +1,4 @@
-import show from '../../commands/show.js';
+import show from '../commands/show.js';
 
 export const command = 'show';
 export const description = 'Show current mobile environment and list of linked extensions';

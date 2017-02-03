@@ -39,8 +39,8 @@ export default {
     complete: () => 'Extension uninstalled.'
   },
   link: {
-    alreadyLinked: () => 'Extension already linked',
-    complete: () => 'Extension successfully linked. Please, kill the packager before running the app.'
+    alreadyLinked: () => 'Directory already linked',
+    complete: () => 'Directory successfully linked. Please, kill the packager before running the app.'
   },
   login: {
     complete: dev => `Registered as \`${dev.name}\`.`,
@@ -91,8 +91,8 @@ export default {
     }
   },
   unlink: {
-    notLinked: () => 'This extension is not linked to the mobile environment. There is nothing to unlink.',
-    complete: () => 'Extension successfully unlinked. Please, kill the packager before running the app.'
+    notLinked: () => 'This directory is not linked to the mobile environment. There is nothing to unlink.',
+    complete: () => 'Directory successfully unlinked. Please, kill the packager before running the app.'
   },
   use: {
     complete: (serverEnv, developer) => `Using server \`${serverEnv}\`` + (developer ? ` as user ${developer.name}.` : '.'),
@@ -113,9 +113,9 @@ export default {
     missingApp: () => 'No shoutem app is currently used.',
     missingExtensions: () => 'No local extension is currently linked',
     listExtensions(extensionsInfo) {
-      return 'Linked extensions:\n' +
+      return 'Linked directories:\n' +
         extensionsInfo
-          .map(ext => `  ${ext.name} v${ext.version} @${ext.dir}`)
+          .map(ext => `  ${extensionsInfo}`)
           .join('\n')
     }
   },

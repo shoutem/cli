@@ -1,20 +1,22 @@
 /* eslint no-console: "off" */
 import path from 'path';
-import { mobileAppConfigPath } from '../../clients/cli-paths';
-import { ensureInExtensionDir, readJsonFile, writeJsonFile } from '../../extension/data';
-import msg from '../../user_messages';
+import { mobileAppConfigPath } from '../clients/cli-paths';
+import { getExtensionRootDir, readJsonFile, writeJsonFile } from '../extension/data';
+import msg from '../user_messages';
 
 export const description = 'Unlink working directory extension from mobile environment';
 export const command = 'unlink';
 export async function handler() {
-  const clientExtPath = path.join(ensureInExtensionDir(), 'app');
+  const extensionDir = getExtensionRootDir();
+  const workingDir = extensionDir ? path.join(extensionDir, 'app') : process.cwd();
+
   const config = await readJsonFile(await mobileAppConfigPath());
 
-  const extensionDirIndex = config.workingDirectories.indexOf(clientExtPath);
+  const extensionDirIndex = (config.workingDirectories || []).indexOf(workingDir);
 
   if (extensionDirIndex < 0) {
     console.log(msg.unlink.notLinked());
-    return;
+    return null;
   }
 
   config.workingDirectories.splice(extensionDirIndex, 1);

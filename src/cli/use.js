@@ -1,6 +1,6 @@
-import { setHostEnvName } from '../../clients/server-env';
-import msg from '../../user_messages';
-import LocalDataClient from '../../clients/local-data';
+import { setHostEnvName } from '../clients/server-env';
+import msg from '../user_messages';
+import LocalDataClient from '../clients/local-data';
 
 export const description = 'Manages server environment used by cli';
 export const command = 'use <server>';
