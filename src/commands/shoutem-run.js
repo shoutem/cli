@@ -39,7 +39,8 @@ export default async (platform, appId, options = {}) => {
       platformsDirectory: await getPlatformsPath(),
       workingDirectories: mobileAppConfig.workingDirectories || [],
       excludePackages: ['shoutem.code-push'],
-      buildDirectory
+      buildDirectory,
+      debug: !options.release
     }
   );
 
@@ -54,10 +55,18 @@ export default async (platform, appId, options = {}) => {
     await uncommentBuildDir(buildDirectory);
   }
 
-  await yarn.run(platformPath, 'run', [
+  const runOptions = [
     '--',
     `--platform ${platform}`
-  ]);
+  ];
+  if (options.device) {
+    runOptions.push(`--device ${options.device}`);
+  }
+  if (options.simulator) {
+    runOptions.push(`--simulator ${options.device}`);
+  }
+
+  await yarn.run(platformPath, 'run', runOptions);
 }
 
 async function uncommentBuildDir(buildDirectory) {
