@@ -60,10 +60,10 @@ export default async (platform, appId, options = {}) => {
     `--platform ${platform}`
   ];
   if (options.device) {
-    runOptions.push(`--device ${options.device}`);
+    runOptions.push(`--device "${options.device}"`);
   }
   if (options.simulator) {
-    runOptions.push(`--simulator ${options.device}`);
+    runOptions.push(`--simulator "${options.simulator}"`);
   }
 
   await yarn.run(platformPath, 'run', runOptions);
