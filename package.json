@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.54",
+  "version": "0.8.55",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -47,6 +47,7 @@
     "tmp-promise": "^1.0.2",
     "underscore": "^1.8.3",
     "urijs": "1.18.0",
+    "yargonaut": "^1.1.2",
     "yargs": "^6.3.0"
   },
   "devDependencies": {

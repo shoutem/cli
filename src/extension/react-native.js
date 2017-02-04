@@ -35,3 +35,9 @@ export async function run(cwd, platform) {
     {cwd, stdio: 'inherit'}
   );
 }
+
+export async function killPackager() {
+  if (process.platform !== 'win32') {
+    await exec("lsof -n -i4TCP:8081 | sed '1 d' | awk '{print $2}' | xargs kill -9");
+  }
+}

@@ -20,13 +20,13 @@ export async function install(cwd = process.cwd()) {
   await spawn('yarn', ['install'], {cwd, stdio: 'inherit'});
 }
 
-export async function run(cwd, task, taskArgs = null) {
+export async function run(cwd, task, taskArgs = null, stdio = 'inherit') {
   await ensureYarnInstalled();
-  const opts = {cwd, stdio: 'inherit'};
+  const opts = {cwd, stdio };
 
   if (taskArgs) {
-    await spawn('yarn', ['run', task, '--', ...taskArgs], opts);
+    return await spawn('yarn', ['run', task, '--', ...taskArgs], opts);
   } else {
-    await spawn('yarn', ['run', task], opts);
+    return await spawn('yarn', ['run', task], opts);
   }
 }

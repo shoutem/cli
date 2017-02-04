@@ -1,5 +1,10 @@
 #!/usr/bin/env node
 import 'babel-polyfill';
+
+require('yargonaut')
+  .helpStyle('green.underline')
+  .errorsStyle('red.bold');
+
 import yargs from 'yargs';
 import { version } from '../package.json';
 import { isLatest } from './extension/npmjs';
@@ -22,4 +27,3 @@ import msg from '../src/user_messages';
     console.log(msg.version.updateRequired());
   }
 })();
-

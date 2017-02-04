@@ -1,6 +1,6 @@
 import request from 'request';
 import URI from 'urijs';
-
+import bluebird from 'bluebird';
 import services from '../../config/services';
 
 
@@ -29,9 +29,10 @@ export class LegacyServiceClient {
 
     this.prepareGetLatestAppsRequest.bind(this);
     this.getLatestApps.bind(this);
+    this.getLatestAppsAsync.bind(this);
   }
 
-  prepareGetLatestAppsRequest(limit = 5) {
+  prepareGetLatestAppsRequest(limit = 20) {
     return {
       json: true,
       method: 'GET',
@@ -65,5 +66,9 @@ export class LegacyServiceClient {
 
       return callback(new LegacyServiceError(settings, res.statusCode, body));
     });
+  }
+
+  async getLatestAppsAsync() {
+    return bluebird.promisify(callback => this.getLatestApps(callback))();
   }
 }
