@@ -10,7 +10,7 @@ export async function handler(args) {
   const name = args.name;
   if (!isValidExtensionName(name)) {
     console.log(msg.init.invalidName(name));
-    return;
+    return null;
   }
   try {
     await initExtension(name);

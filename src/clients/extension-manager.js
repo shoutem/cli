@@ -223,4 +223,25 @@ export class ExtensionManagerClient {
       return callback(new ExtensionManagerError(settings, res.statusCode, body));
     });
   }
+
+  async getPlatforms() {
+    const requestOptions = {
+      json: true,
+      method: 'GET',
+      uri: new URI(this.serviceUri).segment('/v1/platforms').toString(),
+      headers: {
+        Accept: 'application/vnd.api+json',
+        Authorization: `Bearer ${this.apiToken}`,
+      },
+      simple: false,
+      resolveWithFullResponse: true,
+    };
+
+    const res = await request2(requestOptions);
+    if (res.statusCode !== 200 && res.statusCode !== 201) {
+      throw new ExtensionManagerError(requestOptions, res.statusCode, res.body);
+    }
+
+    return res.body.data;
+  }
 }

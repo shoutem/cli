@@ -9,7 +9,7 @@ export const builder = {
   },
   release: {
     alias: 'r',
-    description: 'true for release build, false for debug build',
+    description: 'create a release build',
     type: 'boolean'
   },
   device: {

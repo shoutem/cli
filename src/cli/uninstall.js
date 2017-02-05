@@ -46,6 +46,6 @@ export async function handler(args) {
 
     console.log(msg.uninstall.complete());
   } catch (err) {
-    handleError(err);
+    await handleError(err);
   }
 }

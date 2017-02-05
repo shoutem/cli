@@ -16,13 +16,8 @@ export const command = 'install';
 export const builder = {
   app: {
     alias: 'a',
-    description: 'install local extension to an app',
+    description: 'app id to install current extension to',
     requiresArg: true
-  },
-  extension: {
-    alias: 'e',
-    description: 'install a specific extension',
-    requiresArg: true,
   },
   new: {
     alias: 'n',

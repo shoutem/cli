@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.55",
+  "version": "0.8.57",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -10,7 +10,7 @@
     "shoutem": "./build/src/shoutem.js"
   },
   "scripts": {
-    "build": "npm run clean && babel ./ --out-dir ./build --presets es2015,es2017 --source-maps --copy-files --ignore ./node_modules,./build/,./templates/",
+    "build": "npm run clean && babel ./ --out-dir ./build --plugins transform-object-rest-spread --presets es2015,es2017 --source-maps --copy-files --ignore ./node_modules,./build/,./templates/",
     "clean": "rimraf ./build",
     "lint": "eslint ./ --ignore-pattern build/",
     "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",
@@ -53,6 +53,7 @@
   "devDependencies": {
     "babel-cli": "^6.8.0",
     "babel-plugin-rewire": "1.0.0-rc-2",
+    "babel-plugin-transform-object-rest-spread": "^6.22.0",
     "babel-preset-es2015": "^6.16.0",
     "babel-preset-es2017": "^6.16.0",
     "chai": "3.5.0",

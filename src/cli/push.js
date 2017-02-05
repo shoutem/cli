@@ -25,6 +25,6 @@ export async function handler(args) {
       console.log(msg.push.complete())
     }
   } catch (err) {
-    handleError(err);
+    await handleError(err);
   }
 }

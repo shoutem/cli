@@ -6,6 +6,8 @@ import { instantiateTemplatePath } from '../extension/template';
 import { ensureDeveloperIsRegistered } from './register';
 import * as yarn from '../extension/yarn';
 import msg from '../user_messages';
+import { ExtensionManagerClient } from '../clients/extension-manager';
+import { ensureUserIsLoggedIn } from './login'
 
 
 export function cwd() {
@@ -17,6 +19,12 @@ export async function promptExtensionInit(extName) {
   /* eslint no-param-reassign: 0 */
   const name = _.kebabCase(extName);
   const title = _.upperFirst(extName.toLowerCase());
+
+  const apiToken = await ensureUserIsLoggedIn();
+  const extClient = new ExtensionManagerClient(apiToken);
+  const platforms = await extClient.getPlatforms();
+  const platformVersions = platforms.map(p => p.attributes.version);
+
   const version = '0.0.1';
 
   const questions = [{
@@ -33,18 +41,18 @@ export async function promptExtensionInit(extName) {
   }, {
     name: 'description',
     message: 'Description',
+  }, {
+    type: 'list',
+    name: 'platform',
+    message: 'Shoutem platform version',
+    choices: platformVersions,
+    default: _.first(platformVersions)
   }];
 
   console.log(msg.init.requestInfo());
-
   const answer = await inquirer.prompt(questions);
 
-  return {
-    name,
-    title: answer.title,
-    version: answer.version,
-    description: answer.description,
-  };
+  return { name, ...answer };
 }
 
 async function ensureWorkingDirIsEmpty() {

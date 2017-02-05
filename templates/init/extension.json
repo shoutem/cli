@@ -2,5 +2,6 @@
   "name": "{{extJson.name}}",
   "title": "{{extJson.title}}",
   "version": "{{extJson.version}}",
-  "description": "{{extJson.description}}"
+  "description": "{{extJson.description}}",
+  "platform": "{{extJson.platform}}"
 }

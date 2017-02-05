@@ -5,15 +5,14 @@ import {
   mobileAppConfigTemplatePath,
   mobileAppPackageJson
 } from './cli-paths';
-import { readJsonFile, writeJsonFile } from '../extension/data';
+import { readJsonFile, writeJsonFile, pathExists } from '../extension/data';
 import cliUrls from '../../config/services';
 import path from 'path';
 import rimraf from 'rmfr';
 import msg from '../user_messages';
 import * as yarn from '../extension/yarn';
 import download from 'download';
-import fs from 'mz/fs';
-
+import bluebird from 'bluebird';
 
 
 export async function installMobileEnv(tarballUrl) {
@@ -45,4 +44,11 @@ export async function saveMobileConfig(config) {
 
 export async function loadMobilePackageJson() {
   return await readJsonFile(await mobileAppPackageJson());
+}
+
+export async function unlinkDeletedWorkingDirectories() {
+  const config = await loadMobileConfig() || {};
+  const directories = config.workingDirectories || [];
+  config.workingDirectories = await bluebird.filter(directories, pathExists);
+  await saveMobileConfig(config);
 }

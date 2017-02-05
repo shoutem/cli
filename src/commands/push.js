@@ -4,6 +4,7 @@ import path from 'path';
 import mzfs from 'mz/fs';
 
 import { ExtensionManagerClient } from '../clients/extension-manager';
+import { ensureInExtensionDir } from '../extension/data';
 import { ensureDeveloperIsRegistered } from './register';
 import * as utils from '../extension/data';
 
@@ -15,7 +16,7 @@ import msg from '../user_messages';
 async function setPackageNameVersion(path, name, version) {
   const data = await utils.readJsonFile(path);
   if (data == null) {
-    return;
+    return null;
   }
 
   data.name = name;
@@ -37,10 +38,12 @@ function setExtNameVersionInPackageJson(extName, version) {
 }
 
 export async function uploadExtension(opts = {}) {
+  const extensionDir = ensureInExtensionDir();
   const dev = await ensureDeveloperIsRegistered();
+
   const extJson = await utils.loadExtensionJsonAsync();
   await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version);
-  const packResult = await shoutemPack(process.cwd(), { packToTempDir: true, nobuild: opts.nobuild });
+  const packResult = await shoutemPack(extensionDir, { packToTempDir: true, nobuild: opts.nobuild });
 
   const stream = fs.createReadStream(packResult.package);
   const id = utils.getExtensionCanonicalName(dev.name, extJson.name, extJson.version);

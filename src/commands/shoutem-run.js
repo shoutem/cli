@@ -3,7 +3,7 @@ import { getPlatformsPath, getPlatformBuildPath, getPlatformConfigPath, mobileAp
 import cliUrls from '../../config/services';
 import url from 'url';
 import * as yarn from '../extension/yarn';
-import { ensureYarnInstalled } from '../extension/yarn';
+import { unlinkDeletedWorkingDirectories } from '../clients/mobile-env';
 import { ensureNodeVersion } from '../extension/node';
 import { ensureDeveloperIsRegistered } from '../commands/register';
 import { readJsonFile, writeJsonFile } from '../extension/data';
@@ -18,8 +18,10 @@ const _ = require('lodash');
 
 export default async (platform, appId, options = {}) => {
   await ensureNodeVersion();
-  await ensureYarnInstalled();
+  await yarn.ensureYarnInstalled();
   await killPackager();
+
+  await unlinkDeletedWorkingDirectories();
 
   const serverApiEndpoint = url.parse(cliUrls.appManager).hostname;
   const dev = await ensureDeveloperIsRegistered();

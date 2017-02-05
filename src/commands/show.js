@@ -1,10 +1,12 @@
 /* eslint no-console: "off" */
-import { loadMobileConfig } from '../clients/mobile-env';
+import { loadMobileConfig, unlinkDeletedWorkingDirectories } from '../clients/mobile-env';
 import { getHostEnvName } from '../clients/server-env';
 import apisConfig from '../../config/services';
 import msg from '../user_messages';
 
 export default async function() {
+  await unlinkDeletedWorkingDirectories();
+
   const serverEnv = getHostEnvName();
 
   if (serverEnv !== 'production') {
