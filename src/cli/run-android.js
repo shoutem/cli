@@ -5,7 +5,13 @@ export const command = 'run-android [appId]';
 export const builder = {
   platformBuild: {
     alias: 'p',
-    description: 'use external platform build tool'
+    description: 'use external platform build tool',
+    requiresArg: true
+  },
+  mobileApp: {
+    alias: 'm',
+    description: 'use external mobile app (ignores platform settings)',
+    requiresArg: true
   },
   release: {
     alias: 'r',
@@ -14,7 +20,8 @@ export const builder = {
   },
   device: {
     alias: 'd',
-    description: 'run app on a specific device'
+    description: 'run app on a specific device',
+    requiresArg: true
   }
 };
 export function handler(args) {

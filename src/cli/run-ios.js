@@ -10,7 +10,13 @@ export const command = 'run-ios [appId]';
 export const builder = {
   platformBuild: {
     alias: 'p',
-    description: 'use external platform build tool'
+    description: 'use external platform build tool',
+    requiresArg: true
+  },
+  mobileApp: {
+    alias: 'm',
+    description: 'use external mobile app (ignores platform settings)',
+    requiresArg: true
   },
   release: {
     alias: 'r',
@@ -19,11 +25,13 @@ export const builder = {
   },
   device: {
     alias: 'd',
-    description: 'run app on a specific device'
+    description: 'run app on a specific device',
+    requiresArg: true
   },
   simulator: {
     alias: 's',
-    description: 'run app on a specific simulator'
+    description: 'run app on a specific simulator',
+    requiresArg: true
   }
 };
 

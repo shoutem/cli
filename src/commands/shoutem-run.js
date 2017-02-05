@@ -25,8 +25,14 @@ export default async (platform, appId, options = {}) => {
 
   const serverApiEndpoint = url.parse(cliUrls.appManager).hostname;
   const dev = await ensureDeveloperIsRegistered();
-  const platformPath = options.platformBuild || getPlatformBuildPath(path.join(__dirname, '..', '..', '..'));
 
+  // platform path not needed if using local mobile app
+  const platformPath =
+    options.mobileApp ?
+    null :
+    options.platformBuild || getPlatformBuildPath(path.join(__dirname, '..', '..', '..'));
+
+  // read global mobile-app config used for current server env
   const mobileAppConfig = await readJsonFile(await mobileAppConfigPath()) || {};
 
   const { apiToken } = await ensureDeveloperIsRegistered();
@@ -47,15 +53,19 @@ export default async (platform, appId, options = {}) => {
     })).appId;
   }
 
-  try {
-    await yarn.run(platformPath, 'clean');
-  } catch (err) {
+  // clean is needed only when using platform's client
+  if (platformPath) {
+    try {
+      await yarn.run(platformPath, 'clean');
+    } catch (err) {
       console.log(err);
       console.log(msg.run.killPackagerAndAdb());
       return null;
+    }
   }
 
-  const buildDirectory = path.join(await getPlatformsPath(), 'build');
+  // if using local client, it is also used as a build directory
+  const buildDirectory = options.mobileApp || path.join(await getPlatformsPath(), 'build');
 
   Object.assign(mobileAppConfig, {
       platform,
@@ -73,11 +83,20 @@ export default async (platform, appId, options = {}) => {
 
   await writeJsonFile(mobileAppConfig, await mobileAppConfigPath());
 
-  await yarn.run(platformPath, 'configure', [
+  // config.json on the client build dir is required for client's configure script
+  // also, scripts have their own package.json
+  if (!platformPath) {
+    await writeJsonFile(mobileAppConfig, path.join(buildDirectory, 'config.json'));
+    await yarn.install(path.join(buildDirectory, 'scripts'));
+  }
+
+  await yarn.run(platformPath || buildDirectory, 'configure', [
     '--',
     `--configPath ${await mobileAppConfigPath()}`
   ]);
 
+
+  // android run script requires android binaries to be stored near the system's root
   if (process.platform === 'win32') {
     await uncommentBuildDir(buildDirectory);
   }
@@ -94,13 +113,22 @@ export default async (platform, appId, options = {}) => {
   }
 
   console.log('Running the app, this may take a minute...');
-  const runResult = await yarn.run(platformPath, 'run', runOptions, 'default');
+  const runResult = await yarn.run(platformPath || buildDirectory, 'run', runOptions, 'default');
   console.log(runResult);
   if (runResult.indexOf('Code signing is required for product type') > 0) {
-    const runtimeConfig = await readJsonFile(await getPlatformConfigPath());
-    const platform =_.find(runtimeConfig.included, { type: 'shoutem.core.platform-installations' });
-    const version = _.get(platform, 'attributes.mobileAppVersion');
-    const xcodeProjectPath = path.join(await getPlatformsPath(), `v${version}`, 'ios', 'ShoutemApp.xcodeproj');
+
+    let xcodeProjectPath;
+    // if platform is used
+    // last runtime configuration is required to get the mobile-app directory
+    if (platformPath) {
+      const runtimeConfig = await readJsonFile(await getPlatformConfigPath());
+      const platform =_.find(runtimeConfig.included, { type: 'shoutem.core.platform-installations' });
+      const version = _.get(platform, 'attributes.mobileAppVersion');
+      xcodeProjectPath = path.join(await getPlatformsPath(), `v${version}`, 'ios', 'ShoutemApp.xcodeproj');
+    } else {
+      xcodeProjectPath = path.join(buildDirectory, 'ios', 'ShoutemApp.xcodeproj');
+    }
+
     console.log('Select ShoutemApp target from xcode and activate "Automatically manage signing", ' +
       'select a provisioning profile and then rerun `shoutem run-ios`.');
     await exec(`open ${xcodeProjectPath}`);
