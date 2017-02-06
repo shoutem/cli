@@ -5,13 +5,6 @@ import rimraf from 'rmfr';
 import { spawn } from 'superspawn';
 
 (async () => {
-
-  // platform-build requires write permission while client is built
-  if (process.platform !== 'win32' && process.env.SUDO_UID) {
-    const platformBuildPath = path.join(__dirname, '..', '..', '..', 'node_modules', '@shoutem', 'platform-build');
-    await spawn('chmod', ['-R', '0777', platformBuildPath], { stdio: 'inherit' });
-  }
-
   const cliHome = path.join(os.homedir(), '.shoutem');
 
   try {

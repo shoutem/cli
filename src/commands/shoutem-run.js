@@ -2,7 +2,8 @@
 import { getPlatformsPath, getPlatformBuildPath, getPlatformConfigPath, mobileAppConfigPath } from '../clients/cli-paths';
 import cliUrls from '../../config/services';
 import url from 'url';
-import * as yarn from '../extension/yarn';
+import * as npm from '../extension/npm';
+import { ensureYarnInstalled } from '../extension/yarn';
 import { unlinkDeletedWorkingDirectories } from '../clients/mobile-env';
 import { ensureNodeVersion } from '../extension/node';
 import { ensureDeveloperIsRegistered } from '../commands/register';
@@ -17,8 +18,8 @@ import { killPackager } from '../extension/react-native';
 const _ = require('lodash');
 
 export default async (platform, appId, options = {}) => {
+  await ensureYarnInstalled();
   await ensureNodeVersion();
-  await yarn.ensureYarnInstalled();
   await killPackager();
 
   await unlinkDeletedWorkingDirectories();
@@ -59,9 +60,10 @@ export default async (platform, appId, options = {}) => {
   // clean is needed only when using platform's client
   if (platformPath) {
     try {
-      await yarn.run(platformPath, 'clean', [
+      await npm.run(platformPath, 'clean', [
         '--',
-        `--buildDirectory ${buildDirectory}`
+        '--buildDirectory',
+        buildDirectory
       ]);
     } catch (err) {
       console.log(err);
@@ -90,14 +92,14 @@ export default async (platform, appId, options = {}) => {
   // also, scripts have their own package.json
   if (!platformPath) {
     await writeJsonFile(mobileAppConfig, path.join(buildDirectory, 'config.json'));
-    await yarn.install(path.join(buildDirectory, 'scripts'));
+    await npm.install(path.join(buildDirectory, 'scripts'));
   }
 
-  await yarn.run(platformPath || buildDirectory, 'configure', [
+  await npm.run(platformPath || buildDirectory, 'configure', [
     '--',
-    `--configPath ${await mobileAppConfigPath()}`
+    '--configPath',
+    await mobileAppConfigPath()
   ]);
-
 
   // android run script requires android binaries to be stored near the system's root
   if (process.platform === 'win32') {
@@ -106,18 +108,22 @@ export default async (platform, appId, options = {}) => {
 
   const runOptions = [
     '--',
-    `--platform ${platform}`,
-    `--buildDirectory ${buildDirectory}`
+    '--platform',
+    platform,
+    '--buildDirectory',
+    buildDirectory
   ];
   if (options.device) {
-    runOptions.push(`--device "${options.device}"`);
+    runOptions.push('--device');
+    runOptions.push(options.device);
   }
   if (options.simulator) {
-    runOptions.push(`--simulator "${options.simulator}"`);
+    runOptions.push('--simulator');
+    runOptions.push(options.simulator);
   }
 
   console.log('Running the app, this may take a minute...');
-  const runResult = await yarn.run(platformPath || buildDirectory, 'run', runOptions, 'default');
+  const runResult = await npm.run(platformPath || buildDirectory, 'run', runOptions, 'default');
   console.log(runResult);
   if (runResult.indexOf('Code signing is required for product type') > 0) {
 
@@ -135,7 +141,7 @@ export default async (platform, appId, options = {}) => {
 
     console.log('Select ShoutemApp target from xcode and activate "Automatically manage signing", ' +
       'select a provisioning profile and then rerun `shoutem run-ios`.');
-    await exec(`open ${xcodeProjectPath}`);
+    await exec(`open "${xcodeProjectPath}"`);
   }
 }
 
