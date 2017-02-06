@@ -106,10 +106,10 @@ export default async (platform, appId, options = {}) => {
     `--platform ${platform}`
   ];
   if (options.device) {
-    runOptions.push(`--device "${options.device.replace(' ', '\\ ')}"`);
+    runOptions.push(`--device "${options.device}"`);
   }
   if (options.simulator) {
-    runOptions.push(`--simulator "${options.simulator.replace(' ', '\\ ')}"`);
+    runOptions.push(`--simulator "${options.simulator}"`);
   }
 
   console.log('Running the app, this may take a minute...');
