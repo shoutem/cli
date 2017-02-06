@@ -53,19 +53,22 @@ export default async (platform, appId, options = {}) => {
     })).appId;
   }
 
+  // if using local client, it is also used as a build directory
+  const buildDirectory = options.mobileApp || path.join(await getPlatformsPath(), 'build');
+
   // clean is needed only when using platform's client
   if (platformPath) {
     try {
-      await yarn.run(platformPath, 'clean');
+      await yarn.run(platformPath, 'clean', [
+        '--',
+        `--buildDirectory ${buildDirectory}`
+      ]);
     } catch (err) {
       console.log(err);
       console.log(msg.run.killPackagerAndAdb());
       return null;
     }
   }
-
-  // if using local client, it is also used as a build directory
-  const buildDirectory = options.mobileApp || path.join(await getPlatformsPath(), 'build');
 
   Object.assign(mobileAppConfig, {
       platform,
@@ -103,7 +106,8 @@ export default async (platform, appId, options = {}) => {
 
   const runOptions = [
     '--',
-    `--platform ${platform}`
+    `--platform ${platform}`,
+    `--buildDirectory ${buildDirectory}`
   ];
   if (options.device) {
     runOptions.push(`--device "${options.device}"`);

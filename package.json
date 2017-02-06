@@ -21,7 +21,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@shoutem/platform-build": "0.0.4",
+    "@shoutem/platform-build": "0.0.5",
     "async": "2.0.0-rc.3",
     "babel-polyfill": "^6.16.0",
     "bluebird": "^3.4.6",
