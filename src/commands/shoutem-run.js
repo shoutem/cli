@@ -82,7 +82,9 @@ export default async (platform, appId, options = {}) => {
       workingDirectories: mobileAppConfig.workingDirectories || [],
       excludePackages: ['shoutem.code-push'],
       buildDirectory,
-      debug: !options.release
+      debug: !options.release,
+      offlineMode: true,
+      extensionsJsPath: "./extensions.js"
     }
   );
 
