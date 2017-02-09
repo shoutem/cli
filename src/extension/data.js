@@ -77,7 +77,9 @@ export function loadExtensionJson(callback) {
     .catch(err => callback(err));
 }
 
-export const loadExtensionJsonAsync = bluebird.promisify(loadExtensionJson);
+export async function loadExtensionJsonAsync(rootPath = ensureInExtensionDir()) {
+  return await readJsonFile(path.join(rootPath, 'extension.json'));
+}
 
 export function saveExtensionJson(extJson, callback) {
   const root = ensureInExtensionDir();

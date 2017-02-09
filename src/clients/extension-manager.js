@@ -208,20 +208,43 @@ export class ExtensionManagerClient {
         Accept: 'application/vnd.api+json',
         Authorization: `Bearer ${this.apiToken}`,
       },
+      simple: false,
+      resolveWithFullResponse: true,
+    };
+  }
+
+  prepareExtensionGetRequest(canonicalName) {
+    return {
+      json: true,
+      method: 'GET',
+      uri: new URI(this.serviceUri).segment(`/v1/extensions/${canonicalName}`).toString(),
+      headers: {
+        Accept: 'application/vnd.api+json',
+        Authorization: `Bearer ${this.apiToken}`,
+      },
+      simple: false,
+      resolveWithFullResponse: true,
     };
   }
 
   /*
     Publish extension with given `canonicalName`.
   */
-  publishExtension(canonicalName, callback) {
+  async publishExtension(canonicalName) {
+    const { statusCode, body } = await request2(this.prepareExtensionGetRequest(canonicalName));
+    if (statusCode === 200 && body.data.attributes.published) {
+      throw new Error('Can\'t publish because current version is already published');
+    }
+
     const settings = this.preparePublishExtensionRequest(canonicalName);
 
-    request(settings, (err, res, body) => {
-      if (err) return callback(err);
-      if (res.statusCode === 200 || res.statusCode === 201) return callback(null, null);
-      return callback(new ExtensionManagerError(settings, res.statusCode, body));
-    });
+    const res = await request2(settings);
+    //console.log(JSON.stringify(res.body));
+    if (res.statusCode === 200 || res.statusCode === 201) {
+      return (res.body || {}).data;
+    } else {
+      throw new ExtensionManagerError(settings, res.statusCode, res.body);
+    }
   }
 
   async getPlatforms() {

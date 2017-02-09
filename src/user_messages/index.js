@@ -64,7 +64,8 @@ export default {
     complete: () => 'Success!',
     missingPackageJson: list => `Warning: directories ${list} couldn't be pushed due to missing package.json.`,
     failureSuggestion: () => 'Warning: Check whether both server and app directory have a valid package.json file.',
-    uploadingInfo: extJson => `Uploading \`${extJson.title}\` extension to Shoutem...`
+    uploadingInfo: (extJson, env) =>
+      `Uploading \`${extJson.title}\` extension to ${env === 'production' ? 'Shoutem' : env}...`
   },
   schema: {
     add: {
