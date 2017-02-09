@@ -14,6 +14,11 @@ export function cwd() {
   return process.cwd();
 }
 
+function generateNoPatchSemver(version) {
+  const [a, b] = version.split('.');
+  return [a, b, '*'].join('.');
+}
+
 export async function promptExtensionInit(extName) {
   /* eslint no-confusing-arrow: 0 */
   /* eslint no-param-reassign: 0 */
@@ -24,6 +29,9 @@ export async function promptExtensionInit(extName) {
   const extClient = new ExtensionManagerClient(apiToken);
   const platforms = await extClient.getPlatforms();
   const platformVersions = platforms.map(p => p.attributes.version);
+
+  const firstChoice = generateNoPatchSemver(_.first(platformVersions));
+  const platformChoices = [firstChoice, ...platformVersions];
 
   const version = '0.0.1';
 
@@ -45,8 +53,8 @@ export async function promptExtensionInit(extName) {
     type: 'list',
     name: 'platform',
     message: 'Shoutem platform version',
-    choices: platformVersions,
-    default: _.first(platformVersions)
+    choices: platformChoices,
+    default: firstChoice
   }];
 
   console.log(msg.init.requestInfo());
