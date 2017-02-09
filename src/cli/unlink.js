@@ -10,7 +10,7 @@ export async function handler() {
   const extensionDir = getExtensionRootDir();
   const workingDir = extensionDir ? path.join(extensionDir, 'app') : process.cwd();
 
-  const config = await readJsonFile(await mobileAppConfigPath());
+  const config = await readJsonFile(await mobileAppConfigPath()) || {};
 
   const extensionDirIndex = (config.workingDirectories || []).indexOf(workingDir);
 

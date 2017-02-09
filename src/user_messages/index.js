@@ -93,7 +93,10 @@ export default {
   },
   unlink: {
     notLinked: () => 'This directory is not linked to the mobile environment. There is nothing to unlink.',
-    complete: () => 'Directory successfully unlinked. Please, kill the packager before running the app.'
+    complete: () => 'Directory successfully unlinked. Please, kill the packager before running the app.',
+    all: {
+      complete: () => 'Directories successfully unlinked. Please, kill the packager before running the app.',
+    },
   },
   use: {
     complete: (serverEnv, developer) => `Using server \`${serverEnv}\`` + (developer ? ` as user ${developer.name}.` : '.'),
