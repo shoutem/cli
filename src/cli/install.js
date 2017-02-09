@@ -22,7 +22,7 @@ export const builder = {
   new: {
     alias: 'n',
     description: 'install to a new app with given name',
-    requiresArg: true
+    type: 'string'
   }
 };
 
@@ -44,6 +44,9 @@ export function handler(program) {
     } else {
       installLocalExtension(appId, handleInstall);
     }
+  }
+  if (program.new === '') {
+    program.new = 'My Blank App';
   }
 
   if (program.new) {
