@@ -112,12 +112,7 @@ export default {
     app: config => `Currently used shoutem app id: ${config.appId}`,
     missingApp: () => 'No shoutem app is currently used.',
     missingExtensions: () => 'No local extension is currently linked',
-    listExtensions(extensionsInfo) {
-      return 'Linked directories:\n' +
-        extensionsInfo
-          .map(ext => `  ${extensionsInfo}`)
-          .join('\n')
-    }
+    listExtensions: paths => 'Linked directories:\n' + paths.map(path => `  ${path}`).join('\n'),
   },
   pack: {
     missingBuildTask: dir => `Skipping build for \`${dir}\` due to missing build task`
