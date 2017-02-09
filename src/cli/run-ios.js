@@ -4,6 +4,7 @@ import msg from '../user_messages';
 import { listIosSimulators, listIosDevices } from '../extension/device';
 import { prompt } from 'inquirer';
 import commandExists from '../extension/command-exists';
+import * as cache from '../extension/cache';
 
 export const description = 'Run shoutem application on ios platform';
 export const command = 'run-ios [appId]';
@@ -47,15 +48,24 @@ export async function handler(args) {
     if (!args.simulator && !args.device) {
       const iosDevices = await listIosDevices();
       const iosSimulators = await listIosSimulators();
+      const allDevices = [...iosDevices, ...iosSimulators];
+
+      let defaultIosDevice = await cache.getValue('default_ios_device');
+      if (allDevices.indexOf(defaultIosDevice) < 0) {
+        defaultIosDevice = null;
+      }
 
       const { device } = await prompt({
         type: 'list',
         name: 'device',
         message: 'Select a device',
-        choices: [...iosDevices, ...iosSimulators],
-        default: iosDevices[0] || 'iPhone 6',
+        choices: allDevices,
+        default: defaultIosDevice || iosDevices[0] || 'iPhone 6',
         pageSize: 20
       });
+
+      await cache.setValue('default_ios_device', device);
+
       if (iosDevices.indexOf(device) > -1) {
         if (!await commandExists('ios-deploy')) {
           console.log('ios-deploy is not installed.\nInstall it ' +

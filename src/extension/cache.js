@@ -9,20 +9,19 @@ async function getCacheFilePath(key) {
   return path.join(cacheDir, encodeURIComponent(typeof key === 'string' ? key : JSON.stringify(key)));
 }
 
-async function getValue(key) {
+export async function getValue(key) {
   const cached = await readJsonFile(await getCacheFilePath(key)) || {};
-  if (cached.expiration > new Date().getTime()) {
+  if (!cached.expiration || cached.expiration > new Date().getTime()) {
     return cached.value;
   } else {
     return null;
   }
 }
 
-async function setValue(key, value, expirationSeconds) {
-  await writeJsonFile({
-    expiration: new Date().getTime() + expirationSeconds * 1000,
-    value
-  }, await getCacheFilePath(key));
+export async function setValue(key, value, expirationSeconds) {
+  const expiration = expirationSeconds ? new Date().getTime() + expirationSeconds * 1000 : null;
+
+  await writeJsonFile({ expiration, value }, await getCacheFilePath(key));
 
   return value;
 }
