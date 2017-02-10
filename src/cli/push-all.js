@@ -12,6 +12,11 @@ export const builder = {
   noconfirm: {
     type: 'boolean',
     description: 'Push extensions without asking for confirmation'
+  },
+  without: {
+    type: 'array',
+    description: 'Directory to skip. Can be passed multiple times for skipping multiple directories',
+    requiresArg: true,
   }
 };
 export async function handler(args) {

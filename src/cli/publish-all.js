@@ -14,6 +14,11 @@ export const builder = {
   nopush: {
     type: 'boolean',
     description: 'Publish extensions without pushing them first. Use this option carefully!'
+  },
+  without: {
+    type: 'array',
+    description: 'Directory to skip. Can be passed multiple times for skipping multiple directories',
+    requiresArg: true,
   }
 };
 export async function handler(args) {

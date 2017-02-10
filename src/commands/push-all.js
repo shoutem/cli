@@ -1,6 +1,7 @@
 /* eslint no-console: 0 */
 import { uploadExtension } from '../commands/push';
 import msg from '../user_messages';
+import _ from 'lodash';
 import { pathExists } from '../extension/data';
 import fs from 'mz/fs';
 import bluebird from 'bluebird';
@@ -9,42 +10,38 @@ import { prompt } from 'inquirer';
 import { getHostEnvName } from '../clients/server-env';
 
 export async function pushAll(args) {
-  const dirFiles = await fs.readdir(process.cwd());
+  const dirFiles = _.difference(await fs.readdir(process.cwd()), args.without || []);
   const extPaths = await bluebird.filter(dirFiles, f => pathExists(path.join(f, 'extension.json')));
-  console.log('About to push following extensions:');
-  console.log(extPaths.map(e => `  ${e}`).join('\n'));
-
-  const pushed = [];
-  const notPushed = [];
 
   if (extPaths.length === 0) {
     console.log('No extensions found in current directory.');
+    return [];
   }
 
-  for (const extPath of extPaths) {
-    const { shouldPush } = args.noconfirm || await prompt({
-      type: 'confirm',
-      name: 'shouldPush',
-      message: `Push ${extPath} to ${getHostEnvName()}?`,
-      default: false
-    });
-    if (args.noconfirm || shouldPush) {
+  let { pathsToPush } = args.noconfirm || await prompt({
+    type: 'checkbox',
+    name: 'pathsToPush',
+    message: `Check extensions you want to push to ${getHostEnvName()}?`,
+    choices: extPaths,
+    pageSize: 25
+  });
+  pathsToPush = pathsToPush || extPaths;
+
+  for (const extPath of pathsToPush) {
       await uploadExtension(args, extPath);
-      pushed.push(extPath);
       console.log(msg.push.complete());
-    } else {
-      notPushed.push(extPath);
-    }
   }
 
-  if (pushed.length > 0) {
-    console.log(`Pushed:`);
-    console.log(pushed.map(e => `  ${e}`).join('\n'));
+  if (pathsToPush.length > 0) {
+    console.log(`\nPushed:`);
+    console.log(pathsToPush.map(e => `  ${e}`).join('\n'));
   }
+
+  const notPushed = _.difference(extPaths, pathsToPush);
   if (notPushed.length > 0) {
     console.log(`Not pushed:`);
     console.log(notPushed.map(e => `  ${e}`).join('\n'));
   }
 
-  return pushed;
+  return pathsToPush;
 }
