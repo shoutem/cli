@@ -1,8 +1,8 @@
 import request from 'request';
+import request2 from 'request-promise';
 import URI from 'urijs';
 import bluebird from 'bluebird';
 import services from '../../config/services';
-
 
 export class LegacyServiceError {
   /*
@@ -70,5 +70,28 @@ export class LegacyServiceClient {
 
   async getLatestAppsAsync() {
     return bluebird.promisify(callback => this.getLatestApps(callback))();
+  }
+
+  async getApp(appId) {
+    const settings = {
+      json: true,
+      resolveWithFullResponse: true,
+      method: 'GET',
+      uri: new URI(this.serviceUri).segment(`/v1/apps/${appId}`).toString(),
+      headers: {
+        Accept: 'application/vnd.api+json',
+        Authorization: `Bearer ${this.apiToken}`,
+        'Content-Type': 'application/vnd.api+json',
+      },
+    };
+
+    const res = await request2(settings);
+    const { statusCode, body } = res;
+
+    if (statusCode !== 200) {
+      throw new LegacyServiceError(settings, statusCode, body);
+    }
+
+    return body.data;
   }
 }

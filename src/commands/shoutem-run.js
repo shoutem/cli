@@ -8,6 +8,7 @@ import { unlinkDeletedWorkingDirectories } from '../clients/mobile-env';
 import { ensureNodeVersion } from '../extension/node';
 import { ensureDeveloperIsRegistered } from '../commands/register';
 import { readJsonFile, writeJsonFile } from '../extension/data';
+import { handleError } from '../extension/error-handler';
 import path from 'path';
 import msg from '../user_messages';
 import fs from 'mz/fs';
@@ -39,7 +40,13 @@ export default async (platform, appId, options = {}) => {
   const { apiToken } = await ensureDeveloperIsRegistered();
   const legacyService = new LegacyServiceClient(apiToken);
 
-  if (!appId) {
+  if (appId) {
+    try {
+      await legacyService.getApp(appId);
+    } catch (err) {
+      return await handleError(err);
+    }
+  } else {
     const apps = await legacyService.getLatestAppsAsync();
     appId = (await prompt({
       type: 'list',

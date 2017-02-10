@@ -10,11 +10,19 @@ import { version } from '../package.json';
 import { isLatest } from './extension/npmjs';
 import apiUrls from '../config/services';
 import msg from '../src/user_messages';
+import { spawn } from 'superspawn';
 
 (async () => {
   if (!await isLatest(apiUrls.cliAppUri, version)) {
     console.log(msg.version.updateRequired());
-    return null;
+    try {
+      await spawn('npm', ['install', '-g', '@shoutem/cli'], {stdio: 'inherit'});
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+    console.log('Update complete');
+    return spawn('shoutem', process.argv.filter((_, index) => index > 1), { stdio: 'inherit' });
   }
 
   const cli = yargs.usage('Usage: shoutem [command] [-h]')
