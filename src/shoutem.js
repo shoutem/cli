@@ -16,10 +16,14 @@ import { spawn } from 'superspawn';
   if (!await isLatest(apiUrls.cliAppUri, version)) {
     console.log(msg.version.updateRequired());
     try {
-      await spawn('npm', ['install', '-g', '@shoutem/cli'], {stdio: 'inherit'});
+      await spawn('npm', ['install', '-g', '@shoutem/cli']);
     } catch (err) {
-      console.log(err);
-      return null;
+      if (process.platform !== 'win32') {
+        console.log('Current user does not have permissions to update shoutem CLI. Using sudo...');
+        await spawn('sudo', ['npm', 'install', '-g', '@shoutem/cli'], { stdio: 'inherit' });
+      } else {
+        throw err;
+      }
     }
     console.log('Update complete');
     return spawn('shoutem', process.argv.filter((_, index) => index > 1), { stdio: 'inherit' });
