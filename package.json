@@ -16,6 +16,7 @@
     "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",
     "update-theme": "node update-theme.js",
     "shoutem": "node build/src/shoutem.js",
+    "publish": "npm run update-theme && git push && npm publish --access public",
     "postinstall": "node build/src/scripts/postinstall.js"
   },
   "author": "",
