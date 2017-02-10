@@ -1,11 +1,14 @@
 {
-  "title": "Rubicon",
+  "title": "Rubicon Prime",
   "properties": {
+
+
+
     "featuredColor": {
       "type": "string",
       "title": "Featured color",
       "format": "color",
-      "default": "#FFFFFF"
+      "default": "#659CEC"
     },
     "backgroundColor": {
       "type": "string",
@@ -19,6 +22,15 @@
       "format": "color",
       "default": "#FFFFFF"
     },
+    "shadowColor": {
+      "type": "string",
+      "title": "Shadow color",
+      "format": "color",
+      "default": "rgba(0, 0, 0, 0.1)"
+    },
+
+
+
     "heading": {
       "type": "object",
       "title": "Heading",
@@ -61,19 +73,19 @@
       "minFontSize": 10,
       "maxFontSize": 25
     },
-    "sectionHeader": {
+    "caption": {
       "type": "object",
-      "title": "Section Header",
+      "title": "Caption",
       "format": "font",
       "default": {
         "fontFamily": "Rubik-Regular",
         "fontStyle": "normal",
         "fontWeight": "normal",
         "fontSize": 12,
-        "color": "#555555"
+        "color": "#666666"
       },
       "minFontSize": 12,
-      "maxFontSize": 24
+      "maxFontSize": 25
     },
     "text": {
       "type": "object",
@@ -89,27 +101,47 @@
       "minFontSize": 12,
       "maxFontSize": 25
     },
-    "captions": {
-      "type": "object",
-      "title": "Captions",
-      "format": "font",
-      "default": {
-        "fontFamily": "Rubik-Regular",
-        "fontStyle": "normal",
-        "fontWeight": "normal",
-        "fontSize": 12,
-        "color": "#555555"
-      },
-      "minFontSize": 12,
-      "maxFontSize": 25
-    },
-    "textColorOnDarkBackground": {
+
+
+    "imageOverlayColor": {
       "type": "string",
-      "title": "Text color on dark background",
+      "title": "Image overlay color",
+      "format": "color",
+      "default": "rgba(0, 0, 0, 0.2)"
+    },
+    "imageOverlayTextColor": {
+      "type": "string",
+      "title": "Image overlay text color",
       "format": "color",
       "default": "#FFFFFF"
     },
-    "navBarTitle": {
+    "tagOverlayColor": {
+      "type": "string",
+      "title": "Tag overlay color",
+      "format": "color",
+      "default": "rgba(0, 0, 0, 0.7)"
+    },
+    "tagOverlayTextColor": {
+      "type": "string",
+      "title": "Tag overlay text color",
+      "format": "color",
+      "default": "#FFFFFF"
+    },
+
+
+    "navBarBackground": {
+      "type": "string",
+      "title": "Background color",
+      "format": "color",
+      "default": "#FFFFFF"
+    },
+    "navBarBorderColor": {
+      "type": "string",
+      "title": "Bottom border color",
+      "format": "color",
+      "default": "#f2f2f2"
+    },
+    "navBarText": {
       "type": "object",
       "title": "Title",
       "format": "font",
@@ -121,48 +153,27 @@
         "color": "#222222"
       }
     },
-    "navBarLinks": {
-      "type": "object",
-      "title": "Links",
-      "format": "font",
-      "default": {
-        "fontFamily": "Rubik-Regular",
-        "fontStyle": "normal",
-        "fontWeight": "normal",
-        "fontSize": 15,
-        "color": "#222222"
-      }
-    },
-    "featuredNavBarTitle": {
-      "type": "object",
-      "title": "Featured Navigation bar title",
-      "format": "font",
-      "default": {
-        "fontFamily": "Rubik-Regular",
-        "fontStyle": "normal",
-        "fontWeight": "normal",
-        "fontSize": 15,
-        "color": "#FFFFFF"
-      }
-    },
-    "featuredNavBarLinks": {
-      "type": "object",
-      "title": "Featured Navigation bar links",
-      "format": "font",
-      "default": {
-        "fontFamily": "Rubik-Regular",
-        "fontStyle": "normal",
-        "fontWeight": "normal",
-        "fontSize": 15,
-        "color": "#FFFFFF"
-      }
-    },
-    "navBarBackground": {
+    "navBarIconsColor": {
       "type": "string",
-      "title": "Background color",
+      "title": "Icons color",
       "format": "color",
-      "default": "#FFFFFF"
+      "default": "#AEAEAE"
     },
+    "featuredNavBarTitleColor": {
+      "type": "string",
+      "title": "Featured title color",
+      "format": "color",
+      "default": "#ffffff"
+    },
+    "featuredNavBarIconsColor": {
+      "type": "string",
+      "title": "Featured icons color",
+      "format": "color",
+      "default": "#ffffff"
+    },
+
+
+
     "mainNavBackground": {
       "type": "string",
       "title": "Background color",
@@ -171,15 +182,9 @@
     },
     "mainNavItemColor": {
       "type": "string",
-      "title": "Item color",
+      "title": "Item text and icon color",
       "format": "color",
-      "default": "#b1b1b1"
-    },
-    "mainNavItemBackground": {
-      "type": "string",
-      "title": "Item background",
-      "format": "color",
-      "default": "#FFFFFF"
+      "default": "rgba(50, 50, 50, 0.4)"
     },
     "mainNavSelectedItemBackground": {
       "type": "string",
@@ -189,137 +194,149 @@
     },
     "mainNavSelectedItemColor": {
       "type": "string",
-      "title": "Selected item color",
+      "title": "Selected item text and icon color",
       "format": "color",
-      "default": "#666666"
+      "default": "#222222"
     },
     "mainNavSelectedItemBorderColor": {
       "type": "string",
       "title": "Selected item border color",
       "format": "color",
-      "default": "#222222"
+      "default": "#659CEC"
     },
-    "folderCardListItemColor": {
+    "mainNavBorderColor": {
       "type": "string",
-      "title": "Selected item border color",
+      "title": "Main navigation border color",
       "format": "color",
-      "default": "#222222"
+      "default": "#e0e0e0"
     },
-    "buttonText": {
+
+
+
+    "folderItemColor": {
+      "type": "string",
+      "title": "Folder item text color",
+      "format": "color",
+      "default": "#666666"
+    },
+    "folderListBorderColor": {
+      "type": "string",
+      "title": "Folder list border color",
+      "format": "color",
+      "default": "#e0e0e0"
+    },
+
+
+
+    "primaryButtonText": {
       "type": "object",
       "title": "Text",
       "format": "font",
       "default": {
         "fontFamily": "Rubik-Regular",
         "fontStyle": "normal",
-        "fontWeight": "bold",
+        "fontWeight": "600",
         "fontSize": 12,
-        "color": "#222222"
+        "color": "#ffffff"
       }
     },
-    "buttonBackgroundColor": {
+    "primaryButtonBackgroundColor": {
       "type": "string",
       "title": "Background color",
       "format": "color",
-      "default": "#FFFFFF"
+      "default": "#659CEC"
     },
-    "darkButtonTextColor": {
+    "primaryButtonBorderColor": {
       "type": "string",
-      "title": "Dark background color",
+      "title": "Button border color",
       "format": "color",
-      "default": "#FFFFFF"
+      "default": "#659CEC"
     },
-    "darkButtonBackground": {
+    "secondaryButtonTextColor": {
       "type": "string",
-      "title": "Dark button color",
+      "title": "Secondary button text color",
       "format": "color",
-      "default": "#FFFFFF"
+      "default": "#659CEC"
     },
-    "actionIconColor": {
+    "secondaryButtonBackgroundColor": {
       "type": "string",
-      "title": "Action icon",
+      "title": "Secondary button background color",
       "format": "color",
-      "default": "#FFFFFF"
+      "default": "#ffffff"
     },
-    "descriptiveIconColor": {
+    "secondaryButtonBorderColor": {
       "type": "string",
-      "title": "Descriptive icon",
+      "title": "Secondary button border color",
       "format": "color",
-      "default": "#FFFFFF"
+      "default": "#659CEC"
+    },
+
+
+
+    "lineColor": {
+      "type": "string",
+      "title": "Line color",
+      "format": "color",
+      "default": "#e5e5e5"
     },
     "sectionHeaderBackgroundColor": {
       "type": "string",
-      "title": "Section header background color",
+      "title": "Section background color",
       "format": "color",
-      "default": "#f2f2f2"
-    },
-    "strongLineColor": {
-      "type": "string",
-      "title": "Strong line",
-      "format": "color",
-      "default": "rgba(51, 51, 51, 0.1)"
-    },
-    "lightLineColor": {
-      "type": "string",
-      "title": "Light line",
-      "format": "color",
-      "default": "rgba(51, 51, 51, 0.2)"
+      "default": "#F2F2F2"
     }
+
+
+
   },
   "layout": {
     "sections": [
       {
         "title": "Basic colors",
         "properties": [
+          "featuredColor",
           "backgroundColor",
-          "paperColor"
+          "paperColor",
+          "shadowColor"
         ]
       },
       {
-        "title": "Headings",
+        "title": "Typography",
         "properties": [
           "heading",
           "title",
           "subtitle",
-          "sectionHeader"
-        ]
-      },
-      {
-        "title": "Basic text",
-        "properties": [
-          "text",
-          "captions"
-        ]
-      },
-      {
-        "title": "Text on dark background",
-        "properties": [
-          "textColorOnDarkBackground"
-        ]
-      },
-      {
-        "title": "Featured",
-        "properties": [
-          "featuredColor",
-          "featuredNavBarTitle",
-          "featuredNavBarLinks"
+          "caption",
+          "text"
         ]
       },
       {
         "title": "Navigation bar",
         "properties": [
-          "navBarTitle",
-          "navBarLinks",
-          "navBarBackground"
+          "navBarText",
+          "navBarIconsColor",
+          "featuredNavBarTitleColor",
+          "featuredNavBarIconsColor",
+          "navBarBackground",
+          "navBarBorderColor"
+        ]
+      },
+      {
+        "title": "Overlays",
+        "properties": [
+          "imageOverlayColor",
+          "imageOverlayTextColor",
+          "tagOverlayColor",
+          "tagOverlayTextColor"
         ]
       },
       {
         "title": "Main navigation",
         "properties": [
-          "mainNavItemColor",
           "mainNavBackground",
+          "mainNavBorderColor",
+          "mainNavItemColor",
           "mainNavSelectedItemColor",
-          "mainNavItemBackground",
           "mainNavSelectedItemBackground",
           "mainNavSelectedItemBorderColor"
         ]
@@ -327,31 +344,26 @@
       {
         "title": "Folder",
         "properties": [
-          "folderCardListItemColor"
+          "folderItemColor",
+          "folderListBorderColor"
         ]
       },
       {
         "title": "Buttons",
         "properties": [
-          "buttonText",
-          "buttonBackgroundColor",
-          "darkButtonTextColor",
-          "darkButtonBackground"
-        ]
-      },
-      {
-        "title": "Icons",
-        "properties": [
-          "actionIconColor",
-          "descriptiveIconColor"
+          "primaryButtonText",
+          "primaryButtonBackgroundColor",
+          "primaryButtonBorderColor",
+          "secondaryButtonTextColor",
+          "secondaryButtonBackgroundColor",
+          "secondaryButtonBorderColor"
         ]
       },
       {
         "title": "Separators",
         "properties": [
-          "sectionHeaderBackgroundColor",
-          "strongLineColor",
-          "lightLineColor"
+          "lineColor",
+          "sectionHeaderBackgroundColor"
         ]
       }
     ]
