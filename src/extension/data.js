@@ -96,7 +96,7 @@ export async function pathExists(path) {
     await mzfs.stat(path);
     return true;
   } catch (err) {
-    if (err.code === 'ENOENT') {
+    if (err.code === 'ENOENT' || err.code === 'ENOTDIR') {
       return false;
     }
     throw err;
