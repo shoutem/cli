@@ -78,7 +78,7 @@ export async function handler(args) {
       }
     }
 
-    await shoutemRunCommand('ios', args.appId, args)
+    await shoutemRunCommand('ios', args.appId, args);
   } catch (err) {
     console.error(err.message || err);
   }

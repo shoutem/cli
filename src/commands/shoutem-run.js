@@ -25,7 +25,6 @@ export default async (platform, appId, options = {}) => {
 
   await unlinkDeletedWorkingDirectories();
 
-  const serverApiEndpoint = url.parse(cliUrls.appManager).hostname;
   const dev = await ensureDeveloperIsRegistered();
 
   // platform path not needed if using local mobile app
@@ -82,7 +81,8 @@ export default async (platform, appId, options = {}) => {
   Object.assign(mobileAppConfig, {
       platform,
       appId,
-      serverApiEndpoint,
+      serverApiEndpoint: url.parse(cliUrls.appManager).hostname,
+      legacyApiEndpoint: url.parse(cliUrls.legacyService).hostname,
       authorization: dev.apiToken,
       configurationFilePath: await getPlatformConfigPath(),
       platformsDirectory: await getPlatformsPath(),

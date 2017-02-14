@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.72",
+  "version": "0.8.77",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -16,7 +16,7 @@
     "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",
     "update-theme": "node update-theme.js",
     "shoutem": "node build/src/shoutem.js",
-    "publish": "npm run update-theme && git push && npm publish --access public",
+    "push-and-publish": "npm run update-theme && git push && npm publish --access public",
     "postinstall": "node build/src/scripts/postinstall.js"
   },
   "author": "",
