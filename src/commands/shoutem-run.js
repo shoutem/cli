@@ -131,6 +131,11 @@ export default async (platform, appId, options = {}) => {
     runOptions.push(options.simulator);
   }
 
+  if (options.release) {
+    runOptions.push('--configuration');
+    runOptions.push('Release');
+  }
+
   console.log('Running the app, this may take a minute...');
   const runResult = await npm.run(platformPath || buildDirectory, 'run', runOptions, 'default');
   console.log(runResult);
