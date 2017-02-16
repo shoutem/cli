@@ -1,64 +1,35 @@
 /* eslint no-console: 0 */
 import _ from 'lodash';
-import async from 'async';
 import inquirer from 'inquirer';
-
-import { ensureDeveloperIsRegistered } from './register';
 import {
-  loadExtensionJson,
-  saveExtensionJson,
+  loadExtensionJsonAsync,
+  saveExtensionJsonAsync,
 } from '../extension/data';
 import msg from '../user_messages';
 
-export function promptShortcutDetails(shortcutName, callback) {
+export async function createShortcut(shortcutName, screenName = null) {
+  const extJson = await loadExtensionJsonAsync();
+  extJson.shortcuts = extJson.shortcuts || [];
+
+  const names = extJson.shortcuts.map(s => s.name);
+  if (_.includes(names, shortcutName)) {
+    throw new Error(msg.shortcut.add.alreadyExists(shortcutName));
+  }
+
   console.log('Enter shortcut information.');
-  const questions = [{
+  const { title } =  await inquirer.prompt([{
     message: 'Title',
     name: 'title',
     type: 'input',
+    default: _.upperFirst(shortcutName),
     validate: input => input.length > 0
-  }, {
-    message: 'Description',
-    name: 'description',
-    type: 'input',
-    validate: input => input.length >= 0
-  }];
+  }]);
 
-  inquirer.prompt(questions)
-    .then(answers => callback(null, answers))
-    .catch(callback);
-}
+  const shortcut = { title,  name: shortcutName };
+  if (screenName) {
+    shortcut.screen = `@.${screenName}`;
+  }
+  extJson.shortcuts.push(shortcut);
 
-export function createShortcut(shortcutName, callback) {
-  let extension;
-
-  async.waterfall([
-    // This will call process.exit() if called outside of extension directory:
-    loadExtensionJson,
-
-    (extJson, done) => {
-      extension = extJson;
-      ensureDeveloperIsRegistered()
-        .then(dev => done(null, dev))
-        .catch(err => done(err));
-    },
-
-    (__, done) => {
-      const names = _.get(extension, 'shortcuts', []).map(s => s.name);
-      if (_.includes(names, shortcutName)) {
-        done(new Error(msg.shortcut.add.alreadyExists(shortcutName)));
-      } else {
-        promptShortcutDetails(shortcutName, done);
-      }
-    },
-
-    (shortcut, done) => {
-      /* eslint no-param-reassign: 0 */
-      shortcut.name = shortcutName;
-      if (extension.shortcuts) extension.shortcuts.push(shortcut);
-      else extension.shortcuts = [shortcut];
-      saveExtensionJson(extension, done);
-    },
-  ],
-    callback);
+  await saveExtensionJsonAsync(extJson);
 }

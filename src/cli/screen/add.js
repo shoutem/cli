@@ -1,11 +1,39 @@
-import { createScreen } from '../../commands/screen';
+import _ from 'lodash';
 import msg from '../../user_messages';
+import { ensureInExtensionDir } from '../../extension/data';
+import { instantiateTemplatePath } from '../../extension/template';
+import { handleError } from '../../extension/error-handler';
+import { createShortcut } from '../../commands/shortcut';
+import { loadExtensionJsonAsync } from '../../extension/data';
 
 export const description = 'Add a screen for applications running this extension';
 export const command = 'add <name>';
-export function handler(args) {
-  createScreen(args.name, (err, path) => {
-    if (err) console.log(err.message);
-    else console.log(msg.screen.add.complete(args.name, path));
-  });
+export const builder = {
+  shortcut: {
+    alias: 's',
+    requiresArg: true
+  }
+};
+export async function handler(args) {
+  const screenName = args.name;
+  const shortcutName = args.shortcut;
+
+  try {
+    const extJson = await loadExtensionJsonAsync();
+    if (shortcutName && _.includes(extJson.shortcuts.map(s => s.name), shortcutName)) {
+        throw new Error(msg.shortcut.add.alreadyExists(shortcutName));
+    }
+    const extensionDir = ensureInExtensionDir();
+    const { path } = await instantiateTemplatePath('screen', extensionDir, { screenName, screenClassName: screenName });
+    console.log(msg.screen.add.complete(screenName, path));
+
+    if (!shortcutName) {
+      return null;
+    }
+
+    await createShortcut(shortcutName, screenName);
+    console.log(msg.shortcut.add.complete(args.name));
+  } catch (err) {
+    await handleError(err);
+  }
 }
