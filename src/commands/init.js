@@ -9,7 +9,6 @@ import msg from '../user_messages';
 import { ExtensionManagerClient } from '../clients/extension-manager';
 import { ensureUserIsLoggedIn } from './login'
 
-
 export function cwd() {
   return process.cwd();
 }
@@ -30,9 +29,6 @@ export async function promptExtensionInit(extName) {
   const platforms = await extClient.getPlatforms();
   const platformVersions = platforms.map(p => p.attributes.version);
 
-  const firstChoice = generateNoPatchSemver(_.first(platformVersions));
-  const platformChoices = [firstChoice, ...platformVersions];
-
   const version = '0.0.1';
 
   const questions = [{
@@ -49,18 +45,12 @@ export async function promptExtensionInit(extName) {
   }, {
     name: 'description',
     message: 'Description',
-  }, {
-    type: 'list',
-    name: 'platform',
-    message: 'Shoutem platform version',
-    choices: platformChoices,
-    default: firstChoice
   }];
 
   console.log(msg.init.requestInfo());
   const answer = await inquirer.prompt(questions);
 
-  return { name, ...answer };
+  return { name, ...answer, platform: generateNoPatchSemver(_.first(platformVersions)) };
 }
 
 async function ensureWorkingDirIsEmpty() {
