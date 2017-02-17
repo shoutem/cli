@@ -2,7 +2,7 @@
 import { lastErrorPath } from '../clients/cli-paths';
 import fs from 'mz/fs';
 
-export const description = `Prints last encountered error.`;
+export const description = null;
 export const command = 'last-error';
 export async function handler() {
   try {

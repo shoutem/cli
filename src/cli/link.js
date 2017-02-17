@@ -9,6 +9,7 @@ export const description = 'Link working directory extension with mobile environ
 export const command = 'link';
 export const builder = {
   force: {
+    alias: 'f',
     type: 'boolean',
     description: 'Link current directory even if it\'s not an extension directory'
   }

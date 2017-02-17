@@ -3,7 +3,6 @@ import inquirer from 'inquirer';
 import LocalDataClient from '../clients/local-data';
 import { ensureUserIsLoggedIn } from './login';
 import { ExtensionManagerClient } from '../clients/extension-manager';
-import { handleError } from '../extension/error-handler';
 
 function promptDeveloperName() {
   /* eslint no-confusing-arrow: 0 */
@@ -24,18 +23,21 @@ export function registerDeveloper(userApiToken) {
     .then(devInfo => localDataClient.saveDeveloper(devInfo));
 }
 
-export function getDeveloper(userApiToken) {
+
+const localDataClient = new LocalDataClient();
+
+export async function getDeveloper(userApiToken = null) {
+  userApiToken = userApiToken || await localDataClient.loadApiToken();
+  if (!userApiToken) {
+    return null;
+  }
+
   const extensionManagerClient = new ExtensionManagerClient(userApiToken);
-  const localDataClient = new LocalDataClient();
 
-  return localDataClient.loadDeveloper()
-    .then(localDevInfo => localDevInfo || extensionManagerClient.getDeveloper())
-    .then(devInfo => localDataClient.saveDeveloper(devInfo));
-}
+  const devInfo = await localDataClient.loadDeveloper() || await extensionManagerClient.getDeveloper();
 
-export async function exitError(err) {
-  await handleError(err);
-  process.exit(1);
+  await localDataClient.saveDeveloper(devInfo);
+  return devInfo;
 }
 
 export async function ensureDeveloperIsRegistered() {

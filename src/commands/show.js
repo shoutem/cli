@@ -3,6 +3,7 @@ import { loadMobileConfig, unlinkDeletedWorkingDirectories } from '../clients/mo
 import { getHostEnvName } from '../clients/server-env';
 import apisConfig from '../../config/services';
 import msg from '../user_messages';
+import { getDeveloper } from '../commands/register';
 
 export default async function() {
   await unlinkDeletedWorkingDirectories();
@@ -21,5 +22,10 @@ export default async function() {
     console.log(msg.show.missingExtensions());
   } else {
     console.log(msg.show.listExtensions(extDirs));
+  }
+
+  const developer = await getDeveloper();
+  if (developer) {
+    console.log(msg.login.complete(developer));
   }
 }

@@ -21,7 +21,7 @@ function promptUserCredentials() {
   return inquirer.prompt(questions);
 }
 
-export function loginUser() {
+export async function loginUser() {
   /*
     Asks user to enter credentials, verifies those credentials with authentication
     service, and saves the received API token locally for further requests.
@@ -29,15 +29,12 @@ export function loginUser() {
   const authServiceClient = new AuthServiceClient();
   const localDataClient = new LocalDataClient();
 
-  const credsPromise = promptUserCredentials();
-  const loginPromise = credsPromise
-    .then(creds => authServiceClient.loginUser(creds.username, creds.password));
+  const creds  = await promptUserCredentials();
+  const { username, password } = creds;
+  const apiToken = await authServiceClient.loginUser(username, password);
+  console.log(msg.login.loggedIn(creds));
 
-  return Promise.all([credsPromise, loginPromise])
-    .then(([credentials, apiToken]) => {
-      console.log(msg.login.loggedIn(credentials));
-      return localDataClient.saveApiToken(apiToken);
-    });
+  return await localDataClient.saveApiToken(apiToken);
 }
 
 export async function ensureUserIsLoggedIn() {

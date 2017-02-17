@@ -1,21 +1,22 @@
 /* eslint no-console: 0 */
 import { uploadExtension } from '../commands/push';
 import msg from '../user_messages';
-import _ from 'lodash';
 import { pathExists } from '../extension/data';
 import { handleError } from '../extension/error-handler';
-import fs from 'mz/fs';
 import bluebird from 'bluebird';
 import path from 'path';
 import { prompt } from 'inquirer';
 import { getHostEnvName } from '../clients/server-env';
 
 export async function pushAll(args) {
-  const dirFiles = _.difference(await fs.readdir(process.cwd()), args.without || []);
-  const extPaths = await bluebird.filter(dirFiles, f => pathExists(path.join(f, 'extension.json')));
+  const extPaths = await bluebird.filter(args.paths, f => pathExists(path.join(f, 'extension.json')));
 
   if (extPaths.length === 0) {
     console.log('No extensions found in current directory.');
+    return [];
+  }
+
+  if (args.nopush) {
     return [];
   }
 
