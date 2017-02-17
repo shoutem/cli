@@ -1,24 +1,25 @@
 /* eslint no-console: 0 */
-import fs from 'fs';
+import fs from 'mz/fs';
 import path from 'path';
-
 import _ from 'lodash';
-import async from 'async';
 import inquirer from 'inquirer';
-import mkdirp from 'mkdirp';
-
-import { ensureDeveloperIsRegistered } from './register';
+import mkdirp from 'mkdirp-promise';
+import request from 'request-promise';
 import {
-  loadExtensionJson,
-  saveExtensionJson,
+  loadExtensionJsonAsync,
+  saveExtensionJsonAsync,
   ensureInExtensionDir,
 } from '../extension/data';
 import { load } from '../extension/template';
-
 import msg from '../user_messages';
 
+const themeUrls = {
+  theme: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/server/themeVariables.json',
+  variables: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/server/themeVariables.json'
+};
 
-export function promptThemeDetails(themeName, callback) {
+
+export async function promptThemeDetails(themeName) {
   console.log('Enter theme information.');
   const questions = [{
     message: 'Title',
@@ -31,122 +32,70 @@ export function promptThemeDetails(themeName, callback) {
     type: 'input',
   }];
 
-  inquirer.prompt(questions)
-    .then(answers => callback(null, answers))
-    .catch(callback);
+  return await inquirer.prompt(questions)
 }
 
-export function exportThemeInIndexJs(themeName, callback) {
+export async function exportThemeInIndexJs(themeName) {
   const rootDir = ensureInExtensionDir();
   const indexJsPath = path.join(rootDir, 'app', 'index.js');
+  const indexJsContent = await fs.readFile(indexJsPath, 'utf8');
 
-  async.waterfall([
-    done => fs.readFile(indexJsPath, 'utf8', done),
-
-    (indexJsContent, done) => {
-      // Do not add anything to index.js if some theme is already exported.
-      // Obviously, this is check if far from bullet-proof.
-      if (indexJsContent.indexOf('export theme') !== -1) {
-        return process.nextTick(done);
-      }
-
-      const template = load('./theme/app-index.js.template', { themeName });
-      const newContent = `${indexJsContent}\n${template}\n`;
-      return fs.writeFile(indexJsPath, newContent, 'utf8', done);
-    },
-  ],
-    callback);
+  const template = load('./theme/app-index.js.template', { themeName });
+  const newContent = `${indexJsContent}\n${template}\n`;
+  await fs.writeFile(indexJsPath, newContent, 'utf8');
 }
 
-export function createThemeFile(themeName, callback) {
+export async function createThemeFile(themeName) {
   const rootDir = ensureInExtensionDir();
   const themeDir = path.join(rootDir, 'app', 'themes');
+
   const themeFile = path.join(themeDir, `${themeName}.js`);
+  await mkdirp(themeDir);
+  const template = await request(themeUrls.theme);
+  await fs.writeFile(themeFile, template, 'utf8');
 
-  async.waterfall([
-    done => mkdirp(themeDir, done),
-
-    (__, done) => {
-      const template = load('./theme/app-themes-theme.js.template');
-      fs.writeFile(themeFile, template, 'utf8', done);
-    },
-  ],
-    err => callback(err, path.relative(rootDir, themeFile)));
+  return path.relative(rootDir, themeFile);
 }
 
-export function createVariablesFile(themeName, callback) {
+export async function createVariablesFile(themeName) {
   const rootDir = ensureInExtensionDir();
   const themeVarsDir = path.join(rootDir, 'server', 'themes');
   const themeVarsFile = path.join(themeVarsDir, `${themeName}Variables.json`);
-
-  async.waterfall([
-    done => mkdirp(themeVarsDir, done),
-
-    (__, done) => {
-      const template = load('./theme/server-themes-variables.json.template', { themeName });
-      fs.writeFile(themeVarsFile, template, 'utf8', done);
-    },
-  ],
-    err => callback(err, path.relative(rootDir, themeVarsFile)));
+  await mkdirp(themeVarsDir);
+  const template = await request(themeUrls.variables);
+  await fs.writeFile(themeVarsFile, template, 'utf8');
+  return path.relative(rootDir, themeVarsFile);
 }
 
-export function createTheme(name, callback) {
+export async function createTheme(name) {
   const themeName = _.upperFirst(_.camelCase(name));
-  let extension;
-  let themeFilePath;
 
-  async.waterfall([
-    // This will call process.exit() if called outside of extension directory:
-    loadExtensionJson,
+  const extJson = await loadExtensionJsonAsync();
+  const names = _.get(extJson, 'themes', []).map(s => s.name);
+  if (_.includes(names, themeName)) {
+    throw new Error(msg.theme.add.alreadyExists(themeName));
+  } else {
+    const theme = await promptThemeDetails(themeName);
+    theme.name = themeName;
+    theme.showcase = [];
+    theme.variables = `@.${themeName}Variables`;
 
-    (extJson, done) => {
-      extension = extJson;
-      ensureDeveloperIsRegistered()
-        .then(dev => done(null, dev))
-        .catch(err => done(err));
-    },
+    // Add theme to array of themes.
+    extJson.themes = extJson.themes || [];
+    extJson.themes.push(theme);
 
-    (__, done) => {
-      const names = _.get(extension, 'themes', []).map(s => s.name);
-      if (_.includes(names, themeName)) {
-        done(new Error(msg.theme.add.alreadyExists(themeName)));
-      } else {
-        promptThemeDetails(themeName, done);
-      }
-    },
+    // Add theme variables.
+    const vars = {
+      name: `${themeName}Variables`,
+      path: `./server/themes/${themeName}Variables.json`,
+    };
+    extJson.themeVariables = extJson.themeVariables || [];
+    extJson.themeVariables.push(vars);
 
-    (theme, done) => {
-      /* eslint no-param-reassign: 0 */
-      theme.name = themeName;
-      theme.showcase = [];
-      theme.variables = `@.${themeName}Variables`;
-
-      // Add theme to array of themes.
-      if (extension.themes) extension.themes.push(theme);
-      else extension.themes = [theme];
-
-      // Add theme variables.
-      const vars = {
-        name: `${themeName}Variables`,
-        path: `./server/themes/${themeName}Variables.json`,
-      };
-      if (extension.themeVariables) extension.themeVariables.push(vars);
-      else extension.themeVariables = [vars];
-
-      saveExtensionJson(extension, done);
-    },
-
-    (extJson, done) => exportThemeInIndexJs(themeName, done),
-
-    done => createThemeFile(themeName, done),
-
-    (themeFile, done) => {
-      themeFilePath = themeFile;
-      createVariablesFile(themeName, done);
-    },
-  ],
-    (err, themeVarsPath) => {
-      if (err) callback(err);
-      else callback(null, [themeFilePath, themeVarsPath]);
-    });
+    await saveExtensionJsonAsync(extJson);
+    await exportThemeInIndexJs(themeName);
+    const themeFilePath = await createThemeFile(themeName);
+    const themeVarsPath = await createVariablesFile(themeName);
+    return [themeFilePath, themeVarsPath];
+  }
 }
