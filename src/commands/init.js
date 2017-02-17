@@ -1,7 +1,6 @@
 /* eslint no-console: 0 */
 import _ from 'lodash';
 import inquirer from 'inquirer';
-import mzfs from 'mz/fs';
 import { instantiateTemplatePath } from '../extension/template';
 import { ensureDeveloperIsRegistered } from './register';
 import * as yarn from '../extension/yarn';
@@ -53,16 +52,7 @@ export async function promptExtensionInit(extName) {
   return { name, ...answer, platform: generateNoPatchSemver(_.first(platformVersions)) };
 }
 
-async function ensureWorkingDirIsEmpty() {
-  const files = await mzfs.readdir(cwd());
-
-  if (files.length !== 0) {
-    throw new Error(msg.init.nonEmpty());
-  }
-}
-
 export async function initExtension(extName) {
-  await ensureWorkingDirIsEmpty();
   await yarn.ensureYarnInstalled();
   const developer = await ensureDeveloperIsRegistered();
   const extJson = await promptExtensionInit(extName);
