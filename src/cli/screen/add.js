@@ -20,6 +20,7 @@ export async function handler(args) {
 
   try {
     const extJson = await loadExtensionJsonAsync();
+    extJson.shortcuts = extJson.shortcuts || [];
     if (shortcutName && _.includes(extJson.shortcuts.map(s => s.name), shortcutName)) {
         throw new Error(msg.shortcut.add.alreadyExists(shortcutName));
     }

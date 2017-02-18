@@ -25,6 +25,7 @@ export async function pushAll(args) {
     name: 'pathsToPush',
     message: `Check extensions you want to push to ${getHostEnvName()}?`,
     choices: extPaths,
+    default: extPaths,
     pageSize: 25
   });
   pathsToPush = pathsToPush || extPaths;
