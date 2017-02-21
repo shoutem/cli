@@ -5,6 +5,7 @@ require('yargonaut')
   .helpStyle('green.underline')
   .errorsStyle('red.bold');
 
+import 'colors';
 import yargs from 'yargs';
 import { version } from '../package.json';
 import { isLatest } from './extension/npmjs';
@@ -37,7 +38,8 @@ import { spawn } from 'superspawn';
     .commandDir('cli')
     .strict()
     .help()
-    .epilog('If you don\'t have a developer account, you can register @ shoutem.com')
+    .epilog(`If you don't have a developer account, you can register at ${apiUrls.appBuilder.bold}.\n\n`+
+    `More detailed reference on how to use CLI can be found on the Developer Portal: ${"https://shoutem.github.io/docs/extensions/reference/cli".bold}`)
     .alias('help', 'h');
 
   const argv = cli.argv;

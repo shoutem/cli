@@ -1,3 +1,5 @@
+import 'colors';
+
 export default {
   env: {
     install: {
@@ -20,7 +22,7 @@ export default {
   },
   init: {
     missingName: () => 'Extensions must have a name.',
-    complete: () => 'Extension initialized.',
+    complete: () => 'Extension initialized.'.green.bold,
     invalidName: name => 'Name must not contain any special characters, spaces or capital letters.',
     suggestName: suggestion => `Try something like ${suggestion}`,
     requestInfo: () => 'Enter information about your extension. Press `return` to accept (default) values.',
@@ -44,7 +46,7 @@ export default {
   },
   login: {
     complete: dev => `Registered as \`${dev.name}\`.`,
-    credentialsPrompt: () => 'Enter your Shoutem credentials.',
+    credentialsPrompt: url => `Enter your Shoutem credentials (obtained at ${url.bold}):`,
     loggedIn: credentials => `\nLogged in as \`${credentials.username}\`.`
   },
   logout: {

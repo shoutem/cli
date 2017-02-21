@@ -4,7 +4,8 @@
     "name": {
       "format": "single-line",
       "title": "Name",
-      "type": "string"
+      "type": "string",
+      "displayPriority": 1
     }
   },
   "titleProperty": "name",

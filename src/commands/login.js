@@ -1,14 +1,14 @@
 /* eslint no-console: 0 */
 import inquirer from 'inquirer';
-
 import LocalDataClient from '../clients/local-data';
 import { AuthServiceClient } from '../clients/auth-service';
 import die from '../extension/die';
 import msg from '../user_messages';
 import { ExtensionManagerClient } from '../clients/extension-manager';
+import urls from '../../config/services';
 
 function promptUserCredentials() {
-  console.log(msg.login.credentialsPrompt());
+  console.log(msg.login.credentialsPrompt(urls.appBuilder));
   const questions = [{
     name: 'username',
     message: 'Email',

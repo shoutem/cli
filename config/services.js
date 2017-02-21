@@ -26,7 +26,7 @@ const envValues = {
 const env = envValues[getHostEnvName()];
 
 export default {
-  appBuilder: env.appBuilder || `http://builder.${env.host}`,
+  appBuilder: env.appBuilder || `https://builder.${env.host}`,
   appManager: env.appManager || `http://apps.${env.host}`,
   authService: env.authService || `http://api.${env.host}`,
   extensionManager: env.extensionManager || `http://extensions.${env.host}`,
