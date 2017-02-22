@@ -12,7 +12,7 @@ export async function generateExtensionJs(extensionPath) {
 
   const screensNames = names
     .map(name => `  ${name}`)
-    .join('\n');
+    .join(',\n');
 
   await instantiateTemplatePath(
     'extension-js',
