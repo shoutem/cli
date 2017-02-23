@@ -72,8 +72,8 @@ export default async (platform, appId, options = {}) => {
         buildDirectory
       ]);
     } catch (err) {
-      console.log(err);
-      console.log(msg.run.killPackagerAndAdb());
+      console.log(err.red);
+      console.log(msg.run.killPackagerAndAdb().red.bold);
       return null;
     }
   }
@@ -141,8 +141,8 @@ export default async (platform, appId, options = {}) => {
   }
 
   console.log('Running the app, this may take a minute...');
-  const runResult = await npm.run(platformPath || buildDirectory, 'run', runOptions);
-  if ((runResult[0] + runResult[1]).indexOf('Code signing is required for product type') > 0) {
+  const { stdout, stderr } = await npm.run(platformPath || buildDirectory, 'run', runOptions);
+  if ((stdout + stderr).indexOf('Code signing is required for product type') > 0) {
 
     let xcodeProjectPath;
     // if platform is used

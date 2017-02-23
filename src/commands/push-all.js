@@ -17,7 +17,7 @@ export async function pushAll(args) {
   }
 
   if (args.nopush) {
-    return [];
+    return { pushed: [], notPushed: extPaths };
   }
 
   let { pathsToPush } = args.noconfirm || await prompt({
@@ -54,5 +54,5 @@ export async function pushAll(args) {
     console.log(notPushed.map(e => `  ${e}`).join('\n'));
   }
 
-  return pathsToPush;
+  return { pushed, notPushed };
 }

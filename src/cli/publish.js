@@ -1,10 +1,8 @@
 /* eslint no-console: 0 */
 import msg from '../user_messages';
 import { publishExtension, pushAndPublish } from '../commands/publish';
-import { uploadExtension } from '../commands/push';
 import { pushAll } from '../commands/push-all';
 import { handleError } from '../extension/error-handler';
-import { ensureInExtensionDir } from '../extension/data';
 import multiglob from '../extension/multiglob';
 
 export const description = 'Publish current extension version.';
@@ -31,11 +29,31 @@ export async function handler(args) {
       console.log(msg.publish.complete(result.attributes));
     } else {
       args.paths = multiglob(args.paths);
-      const extPaths = await pushAll(args);
+      const { pushed, notPushed } = await pushAll(args);
 
-      for (const extPath of extPaths) {
-        const result = await publishExtension(extPath);
-        console.log(msg.publish.complete(result.attributes));
+      const published = [];
+      let notPublished = [];
+      for (const extPath of pushed) {
+        try {
+          const result = await publishExtension(extPath);
+          console.log(msg.publish.complete(result.attributes).green.bold);
+          published.push(extPath);
+        } catch (err) {
+          await handleError(err);
+          notPublished.push(extPath);
+        }
+      }
+
+      console.log();
+      if (published.length > 0) {
+        console.log(`Published:`);
+        console.log(published.map(e => `  ${e}`).join('\n'));
+      }
+
+      notPublished = [...notPublished, ...notPushed];
+      if (notPublished.length > 0) {
+        console.log(`Not published:`);
+        console.log(notPublished.map(e => `  ${e}`).join('\n'));
       }
     }
   } catch (err) {

@@ -1,5 +1,6 @@
 import { spawn } from 'child-process-promise';
 import toString from 'stream-to-string';
+import stripAnsi from 'strip-ansi';
 
 export async function install(cwd = process.cwd()) {
   await spawn('npm', ['install'], {
@@ -31,5 +32,6 @@ export async function run(cwd, task, taskArgs = []) {
 
   const stdPromises = [toString(childProcess.stdout), toString(childProcess.stderr)];
   await spawned;
-  return await Promise.all(stdPromises);
+  const [stdout, stderr] = await Promise.all(stdPromises);
+  return { stdout: stripAnsi(stdout), stderr: stripAnsi(stderr) };
 }

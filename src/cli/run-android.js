@@ -1,4 +1,5 @@
 import shoutemRunCommand from '../commands/shoutem-run';
+import { handleError } from '../extension/error-handler';
 
 export const description = 'Run shoutem application on android platform';
 export const command = 'run-android [appId]';
@@ -24,7 +25,10 @@ export const builder = {
     requiresArg: true
   }
 };
-export function handler(args) {
-  shoutemRunCommand('android', args.appId, args)
-    .catch(err => console.log(err.message || err));
+export async function handler(args) {
+  try {
+    await shoutemRunCommand('android', args.appId, args)
+  } catch (err) {
+    await handleError(err);
+  }
 }

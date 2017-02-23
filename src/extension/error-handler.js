@@ -1,3 +1,4 @@
+import 'colors';
 import _ from 'lodash';
 import { lastErrorPath } from '../clients/cli-paths';
 import { writeJsonFile } from '../extension/data';
@@ -9,6 +10,10 @@ function getJsonApiErrorMessage(errors) {
 }
 
 export function getErrorMessage(err) {
+  if (!err) {
+    return '';
+  }
+
   if (_.get(err, 'response.body.errors')) {
     return getJsonApiErrorMessage(err.response.body.errors);
   }
@@ -31,7 +36,7 @@ export function getErrorMessage(err) {
 }
 
 export async function handleError(err) {
-  console.error(getErrorMessage(err));
+  console.error(getErrorMessage(err).red.bold);
 
   const errorJson = JSON.parse(JSON.stringify(err));
   errorJson.stack = err.stack;
