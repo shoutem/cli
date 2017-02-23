@@ -118,10 +118,14 @@ export default async (platform, appId, options = {}) => {
   const runOptions = [
     '--',
     '--platform',
-    platform,
-    '--buildDirectory',
-    buildDirectory
+    platform
   ];
+
+  if (platformPath) {
+    runOptions.push('--buildDirectory');
+    runOptions.push(buildDirectory);
+  }
+
   if (options.device) {
     runOptions.push('--device');
     runOptions.push(options.device);
@@ -137,9 +141,8 @@ export default async (platform, appId, options = {}) => {
   }
 
   console.log('Running the app, this may take a minute...');
-  const runResult = await npm.run(platformPath || buildDirectory, 'run', runOptions, 'default');
-  console.log(runResult);
-  if (runResult.indexOf('Code signing is required for product type') > 0) {
+  const runResult = await npm.run(platformPath || buildDirectory, 'run', runOptions);
+  if ((runResult[0] + runResult[1]).indexOf('Code signing is required for product type') > 0) {
 
     let xcodeProjectPath;
     // if platform is used
