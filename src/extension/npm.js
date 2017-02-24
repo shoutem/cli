@@ -1,6 +1,6 @@
 import { spawn } from 'child-process-promise';
-import toString from 'stream-to-string';
 import stripAnsi from 'strip-ansi';
+import _ from 'lodash';
 
 export async function install(cwd = process.cwd()) {
   await spawn('npm', ['install'], {
@@ -16,10 +16,11 @@ export async function run(cwd, task, taskArgs = []) {
     cwd,
     stdio: ['inherit', 'pipe', 'pipe'],
     shell: true,
-    env: { ...process.env, FORCE_COLOR: true }
+    env: { ...process.env, FORCE_COLOR: true },
+    capture: ['stdout', 'stderr']
   };
 
-  taskArgs = taskArgs.map(arg => arg.replace(/ /g, '\\ '));
+  taskArgs = taskArgs.map(arg => _.includes(arg, ' ') ? `"${arg}"` : arg);
 
   const spawned = taskArgs.length ?
     spawn('npm', ['run', task, '--', ...taskArgs], opts) :
@@ -30,8 +31,7 @@ export async function run(cwd, task, taskArgs = []) {
   childProcess.stdout.pipe(process.stdout);
   childProcess.stderr.pipe(process.stderr);
 
-  const stdPromises = [toString(childProcess.stdout), toString(childProcess.stderr)];
-  await spawned;
-  const [stdout, stderr] = await Promise.all(stdPromises);
+  const { stdout, stderr } = await spawned;
+
   return { stdout: stripAnsi(stdout), stderr: stripAnsi(stderr) };
 }
