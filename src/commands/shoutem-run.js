@@ -67,7 +67,6 @@ export default async (platform, appId, options = {}) => {
   if (platformPath) {
     try {
       await npm.run(platformPath, 'clean', [
-        '--',
         '--buildDirectory',
         buildDirectory
       ]);
@@ -105,7 +104,6 @@ export default async (platform, appId, options = {}) => {
   }
 
   await npm.run(platformPath || buildDirectory, 'configure', [
-    '--',
     '--configPath',
     await mobileAppConfigPath()
   ]);
@@ -116,7 +114,6 @@ export default async (platform, appId, options = {}) => {
   }
 
   const runOptions = [
-    '--',
     '--platform',
     platform
   ];
