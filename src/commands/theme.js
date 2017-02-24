@@ -9,6 +9,7 @@ import {
   loadExtensionJsonAsync,
   saveExtensionJsonAsync,
   ensureInExtensionDir,
+  writeJsonFile
 } from '../extension/data';
 import { load } from '../extension/template';
 import msg from '../user_messages';
@@ -62,8 +63,11 @@ export async function createVariablesFile(themeName) {
   const themeVarsDir = path.join(rootDir, 'server', 'themes');
   const themeVarsFile = path.join(themeVarsDir, `${themeName}Variables.json`);
   await mkdirp(themeVarsDir);
-  const template = await request(themeUrls.variables);
-  await fs.writeFile(themeVarsFile, template, 'utf8');
+
+  const templateJson = await request({ url: themeUrls.variables, json: true });
+  templateJson.title = themeName;
+  await writeJsonFile(templateJson, themeVarsFile);
+
   return path.relative(rootDir, themeVarsFile);
 }
 
