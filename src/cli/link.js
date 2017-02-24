@@ -7,12 +7,15 @@ import msg from '../user_messages';
 
 export const description = 'Link working directory extension with mobile environment';
 export const command = 'link';
-export const builder = {
-  force: {
-    alias: 'f',
-    type: 'boolean',
-    description: 'Link current directory even if it\'s not an extension directory'
-  }
+export const builder = yargs => {
+  return yargs
+    .options({
+      force: {
+      alias: 'f',
+        type: 'boolean',
+        description: 'Link current directory even if it\'s not an extension directory'
+      }})
+    .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 
 export async function handler(args) {

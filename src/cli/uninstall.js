@@ -10,13 +10,17 @@ const localData = new LocalData();
 
 export const description = `Uninstall current extension from an app.`;
 export const command = 'uninstall';
-export const builder = {
-  app: {
-    alias: 'a',
-    description: 'uninstall local extension from an app',
-    requiresArg: true,
-    demand: true
-  }
+export const builder = yargs => {
+  return yargs
+    .options({
+      app: {
+        alias: 'a',
+          description: 'uninstall local extension from an app',
+          requiresArg: true,
+          demand: true
+      }
+    })
+    .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 
 export async function handler(args) {

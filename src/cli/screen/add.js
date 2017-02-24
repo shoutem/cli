@@ -33,6 +33,7 @@ export async function handler(args) {
     }
 
     await createShortcut(shortcutName, screenName);
+    console.log('File `extension.json` was modified');
     console.log(msg.shortcut.add.complete(args.name));
   } catch (err) {
     await handleError(err);

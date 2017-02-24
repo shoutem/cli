@@ -5,11 +5,15 @@ import { handleError } from '../extension/error-handler';
 
 export const description = 'Pack shoutem extensions for upload';
 export const command = 'pack';
-export const builder = {
-  nobuild: {
-    type: 'boolean',
-    description: 'Pack the extension without building it.'
-  }
+export const builder = yargs => {
+  return yargs
+    .options({
+      nobuild: {
+        type: 'boolean',
+          description: 'Pack the extension without building it.'
+      }
+    })
+    .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 export async function handler(args) {
   const extensionDir = await ensureInExtensionDir();

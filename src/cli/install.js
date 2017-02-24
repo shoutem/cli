@@ -9,21 +9,23 @@ import {
 import msg from '../user_messages';
 import { handleError } from '../extension/error-handler';
 
-export const description = `Install the locally present extension to application with id <appId>.
-To install another extension, set its id with --extension option.`;
+export const description = 'Install the current extension to an application.';
 
 export const command = 'install';
-export const builder = {
-  app: {
-    alias: 'a',
-    description: 'app id to install current extension to',
-    requiresArg: true
-  },
-  new: {
-    alias: 'n',
-    description: 'install to a new app with given name',
-    type: 'string'
-  }
+export const builder = yargs => {
+  return yargs
+    .options({
+      app: {
+        alias: 'a',
+          description: 'app id to install current extension to',
+          requiresArg: true
+      },
+      new: {
+      alias: 'n',
+        description: 'install to a new app with given name',
+        type: 'string'
+      }})
+    .usage(`usage: shoutem ${command} [options]\n\n${description}`);
 };
 
 export function handler(program) {

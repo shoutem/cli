@@ -6,11 +6,16 @@ import msg from '../user_messages';
 
 export const description = 'Unlink working directory extension from mobile environment';
 export const command = 'unlink';
-export const builder = {
-  all: {
-    alias: 'a',
-    type: 'boolean'
-  }
+
+export const builder = yargs => {
+  return yargs
+    .options({
+      all: {
+        alias: 'a',
+        type: 'boolean'
+      }
+    })
+    .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 export async function handler(args) {
   const config = await readJsonFile(await mobileAppConfigPath()) || {};

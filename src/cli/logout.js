@@ -10,3 +10,6 @@ export function handler() {
     .then(() => console.log(msg.logout.complete()))
     .catch(handleError);
 }
+export function builder(yargs) {
+  return yargs.usage(`shoutem ${command}\n\n${description}`);
+}

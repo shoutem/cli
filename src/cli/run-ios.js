@@ -8,32 +8,36 @@ import * as cache from '../extension/cache';
 
 export const description = 'Run shoutem application on ios platform';
 export const command = 'run-ios [appId]';
-export const builder = {
-  platformBuild: {
-    alias: 'p',
-    description: 'use external platform build tool',
-    requiresArg: true
-  },
-  mobileApp: {
-    alias: 'm',
-    description: 'use external mobile app (ignores platform settings)',
-    requiresArg: true
-  },
-  release: {
-    alias: 'r',
-    description: 'create a release build',
-    type: 'boolean'
-  },
-  device: {
-    alias: 'd',
-    description: 'run app on a specific device',
-    requiresArg: true
-  },
-  simulator: {
-    alias: 's',
-    description: 'run app on a specific simulator',
-    requiresArg: true
-  }
+export const builder = yargs => {
+  return yargs
+    .options({
+      platformBuild: {
+        alias: 'p',
+        description: 'use external platform build tool',
+        requiresArg: true
+      },
+      mobileApp: {
+        alias: 'm',
+        description: 'use external mobile app (ignores platform settings)',
+        requiresArg: true
+      },
+      release: {
+        alias: 'r',
+        description: 'create a release build',
+        type: 'boolean'
+      },
+      device: {
+        alias: 'd',
+        description: 'run app on a specific device',
+        requiresArg: true
+      },
+      simulator: {
+        alias: 's',
+        description: 'run app on a specific simulator',
+        requiresArg: true
+      }
+    })
+    .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 
 export async function handler(args) {

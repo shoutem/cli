@@ -7,20 +7,24 @@ import multiglob from '../extension/multiglob';
 
 export const description = 'Upload local extension code and assets.';
 export const command = 'push [paths..]';
-export const builder = {
-  nobuild: {
-    type: 'boolean',
-    description: 'Push the extension without building it. Use this option carefully!'
-  },
-  noconfirm: {
-    type: 'boolean',
-    description: 'Push extensions without asking for confirmation'
-  },
-  without: {
-    type: 'array',
-    description: 'Directory to skip. Can be passed multiple times for skipping multiple directories. Used only if multiple extensions are pushed.',
-    requiresArg: true,
-  }
+export const builder = yargs => {
+  return yargs
+    .options({
+      nobuild: {
+        type: 'boolean',
+          description: 'Push the extension without building it. Use this option carefully!'
+      },
+      noconfirm: {
+        type: 'boolean',
+          description: 'Push extensions without asking for confirmation'
+      },
+      without: {
+        type: 'array',
+          description: 'Directory to skip. Can be passed multiple times for skipping multiple directories. Used only if multiple extensions are pushed.',
+          requiresArg: true,
+      }
+    })
+    .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 
 export async function handler(args) {
