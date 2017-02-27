@@ -6,21 +6,25 @@ import { handleError } from '../extension/error-handler';
 import multiglob from '../extension/multiglob';
 
 export const description = 'Publish current extension version.';
-export const command = 'publish [paths...]';
-export const builder = {
-  nobuild: {
-    type: 'boolean',
-    description: 'Push and publish the extension without building it. Use this option carefully!'
-  },
-  nopush: {
-    type: 'boolean',
-    description: 'Publish the extension without pushing it first. Use this option carefully!'
-  },
-  without: {
-    type: 'array',
-    description: 'Directory to skip. Can be passed multiple times for skipping multiple directories. Used only if multiple extensions are published.',
-    requiresArg: true,
-  }
+export const command = 'publish [paths..]';
+export const builder = yargs => {
+  return yargs
+    .options({
+      nobuild: {
+        type: 'boolean',
+          description: 'Push and publish the extension without building it. Use this option carefully!'
+      },
+      nopush: {
+        type: 'boolean',
+          description: 'Publish the extension without pushing it first. Use this option carefully!'
+      },
+      without: {
+        type: 'array',
+          description: 'Directory to skip. Can be passed multiple times for skipping multiple directories. Used only if multiple extensions are published.',
+          requiresArg: true,
+      }
+    })
+    .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 export async function handler(args) {
   try {

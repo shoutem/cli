@@ -19,3 +19,6 @@ export async function handler(args) {
     await handleError(err);
   }
 }
+export const builder = yargs => {
+  return yargs.usage(`shoutem ${command}\n\n${description}`);
+};

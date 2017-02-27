@@ -50,7 +50,7 @@ export default {
     loggedIn: credentials => `\nLogged in as \`${credentials.username}\`.`
   },
   logout: {
-    complete: () => 'Local credentials cleared.'
+    complete: () => 'Successfully logged out.'
   },
   page: {
     add: {
@@ -83,7 +83,7 @@ export default {
   },
   shortcut: {
     add: {
-      complete: shortcutName => `\`${shortcutName}\` shortcut is created.`,
+      complete: shortcutName => `Shortcut \`${shortcutName}\` is created.`,
       alreadyExists: shortcutName => `Shortcut "${shortcutName}" already exists. Pick another name.`
     }
   },

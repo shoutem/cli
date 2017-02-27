@@ -15,3 +15,7 @@ export async function handler() {
     console.log(err.message || err);
   }
 }
+
+export function builder(yargs) {
+  return yargs.usage(`shoutem ${command}\n\n${description}`);
+}

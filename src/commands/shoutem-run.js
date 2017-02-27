@@ -59,8 +59,6 @@ export default async (platform, appId, options = {}) => {
   // if using local client, it is also used as a build directory
   const buildDirectory = options.mobileApp || path.join(await getPlatformsPath(), 'build');
   const currentRunState = await getCurrentRunState(appId, apiToken, platform);
-  console.log(currentRunState);
-  console.log(await cache.getValue('lastRunState'));
 
   const shouldCleanBuild = options.clean || !_.isEqual(currentRunState, await cache.getValue('lastRunState'));
 
