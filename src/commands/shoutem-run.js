@@ -4,11 +4,11 @@ import cliUrls from '../../config/services';
 import url from 'url';
 import * as npm from '../extension/npm';
 import { ensureYarnInstalled } from '../extension/yarn';
+import { AppManagerClient } from '../clients/app-manager';
 import { unlinkDeletedWorkingDirectories } from '../clients/mobile-env';
 import { ensureNodeVersion } from '../extension/node';
 import { ensureDeveloperIsRegistered } from '../commands/register';
 import { readJsonFile, writeJsonFile } from '../extension/data';
-import { handleError } from '../extension/error-handler';
 import path from 'path';
 import msg from '../user_messages';
 import fs from 'mz/fs';
@@ -17,6 +17,8 @@ import { LegacyServiceClient } from '../clients/legacy-service';
 import { exec } from 'mz/child_process';
 import { killPackager } from '../extension/react-native';
 const _ = require('lodash');
+import { getHostEnvName } from '../clients/server-env';
+import * as cache from '../extension/cache';
 
 export default async (platform, appId, options = {}) => {
   await ensureYarnInstalled();
@@ -39,13 +41,7 @@ export default async (platform, appId, options = {}) => {
   const { apiToken } = await ensureDeveloperIsRegistered();
   const legacyService = new LegacyServiceClient(apiToken);
 
-  if (appId) {
-    try {
-      await legacyService.getApp(appId);
-    } catch (err) {
-      return await handleError(err);
-    }
-  } else {
+  if (!appId) {
     const apps = await legacyService.getLatestAppsAsync();
     appId = (await prompt({
       type: 'list',
@@ -62,9 +58,15 @@ export default async (platform, appId, options = {}) => {
 
   // if using local client, it is also used as a build directory
   const buildDirectory = options.mobileApp || path.join(await getPlatformsPath(), 'build');
+  const currentRunState = await getCurrentRunState(appId, apiToken, platform);
+  console.log(currentRunState);
+  console.log(await cache.getValue('lastRunState'));
 
-  // clean is needed only when using platform's client
-  if (platformPath) {
+  const shouldCleanBuild = options.clean || !_.isEqual(currentRunState, await cache.getValue('lastRunState'));
+
+  // clean is needed when using platform's client
+  // but not needed when rerunning the same app
+  if (platformPath && shouldCleanBuild) {
     try {
       await npm.run(platformPath, 'clean', [
         '--buildDirectory',
@@ -75,6 +77,8 @@ export default async (platform, appId, options = {}) => {
       console.log(msg.run.killPackagerAndAdb().red.bold);
       return null;
     }
+  } else {
+    console.log('Skipping clean step');
   }
 
   Object.assign(mobileAppConfig, {
@@ -157,6 +161,10 @@ export default async (platform, appId, options = {}) => {
       'select a provisioning profile and then rerun `shoutem run-ios`.');
     await exec(`open "${xcodeProjectPath}"`);
   }
+
+  if (platformPath) {
+    await cache.setValue('lastRunState', currentRunState);
+  }
 }
 
 async function uncommentBuildDir(buildDirectory) {
@@ -165,3 +173,15 @@ async function uncommentBuildDir(buildDirectory) {
   buildGradle = buildGradle.replace('//<CLI> buildDir', 'buildDir');
   await fs.writeFile(buildGradlePath, buildGradle);
 }
+
+async function getCurrentRunState(appId, apiToken, operatingSystem) {
+  const appManagerClient = new AppManagerClient(apiToken, appId);
+
+  return {
+    appId: appId,
+    env: getHostEnvName(),
+    platformVersion: (await appManagerClient.getApplicationPlatform()).version,
+    operatingSystem: operatingSystem
+  }
+}
+

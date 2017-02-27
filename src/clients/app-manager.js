@@ -2,9 +2,7 @@ import _ from 'lodash';
 import request from 'request';
 import URI from 'urijs';
 import * as jsonApi from './json-api-client';
-
 import services from '../../config/services';
-
 
 export class AppManagerError {
   /*
@@ -34,6 +32,7 @@ export class AppManagerClient {
     this.createApp.bind(this);
     this.prepareInstallExtensionRequest.bind(this);
     this.installExtension.bind(this);
+    this.getApplicationPlatform.bind(this);
   }
 
   prepareInstallExtensionRequest(extensionId) {
@@ -128,4 +127,8 @@ export class AppManagerClient {
     });
   }
 
+  async getApplicationPlatform() {
+    const url = new URI(this.serviceUri).segment(`/v1/apps/${this.appId}/platform`).toString();
+    return (await jsonApi.get(url, this.apiToken)).data;
+  }
 }

@@ -23,6 +23,11 @@ export const builder = {
     alias: 'd',
     description: 'run app on a specific device',
     requiresArg: true
+  },
+  clean: {
+    alias: 'c',
+    description: 'clean build directory before running',
+    type: 'boolean'
   }
 };
 export async function handler(args) {

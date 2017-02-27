@@ -33,6 +33,11 @@ export const builder = {
     alias: 's',
     description: 'run app on a specific simulator',
     requiresArg: true
+  },
+  clean: {
+    alias: 'c',
+    description: 'clean build directory before running',
+    type: 'boolean'
   }
 };
 
