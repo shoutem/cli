@@ -19,6 +19,7 @@ import { killPackager } from '../extension/react-native';
 const _ = require('lodash');
 import { getHostEnvName } from '../clients/server-env';
 import * as cache from '../extension/cache';
+import { handleError } from '../extension/error-handler';
 
 export default async (platform, appId, options = {}) => {
   await ensureYarnInstalled();
@@ -71,7 +72,7 @@ export default async (platform, appId, options = {}) => {
         buildDirectory
       ]);
     } catch (err) {
-      console.log(err.red);
+      await handleError(err);
       console.log(msg.run.killPackagerAndAdb().red.bold);
       return null;
     }
