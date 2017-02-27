@@ -67,6 +67,7 @@ export default async (platform, appId, options = {}) => {
   // but not needed when rerunning the same app
   if (platformPath && shouldCleanBuild) {
     try {
+      await cache.setValue('lastRunState', null);
       await npm.run(platformPath, 'clean', [
         '--buildDirectory',
         buildDirectory
