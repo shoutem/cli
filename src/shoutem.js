@@ -8,26 +8,12 @@ require('yargonaut')
 import 'colors';
 import yargs from 'yargs';
 import { version } from '../package.json';
-import { isLatest } from './extension/npmjs';
 import apiUrls from '../config/services';
-import msg from '../src/user_messages';
-import { spawn } from 'superspawn';
+import autoUpdate from './commands/update-cli';
 
 (async () => {
-  if (!await isLatest(apiUrls.cliAppUri, version)) {
-    console.log(msg.version.updateRequired());
-    try {
-      await spawn('npm', ['install', '-g', '@shoutem/cli']);
-    } catch (err) {
-      if (process.platform !== 'win32') {
-        console.log('Current user does not have permissions to update shoutem CLI. Using sudo...');
-        await spawn('sudo', ['npm', 'install', '-g', '@shoutem/cli'], { stdio: 'inherit' });
-      } else {
-        throw err;
-      }
-    }
-    console.log('Update complete');
-    return spawn('shoutem', process.argv.filter((_, index) => index > 1), { stdio: 'inherit' });
+  if (await autoUpdate()) {
+    return null;
   }
 
   const cli = yargs.usage('Usage: shoutem [command] [-h]')
