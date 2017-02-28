@@ -11,7 +11,8 @@ module.exports = (templatePath, extensionPath, templateVars) => {
       extJson.pages = extJson.pages || [];
       extJson.pages.push({
         name: pageName,
-        path: `server/pages/${pageName}/index.html`
+        path: `server/pages/${pageName}/index.html`,
+        type: 'html'
       });
       return fs.writeFile(extPath, JSON.stringify(extJson, null, 2));
     })
