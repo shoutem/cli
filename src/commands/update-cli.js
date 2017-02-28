@@ -2,8 +2,8 @@ import { isLatest } from '../extension/npmjs';
 import apiUrls from '../../config/services';
 import msg from '../../src/user_messages';
 import { spawn } from 'superspawn';
-import { prompt } from 'inquirer';
 import { version } from '../../package.json';
+import confirm from '../extension/confirmer';
 import 'colors';
 
 export default async function () {
@@ -11,11 +11,7 @@ export default async function () {
     return false;
   }
 
-  const { updateConfirmed } = await prompt({
-    type: 'confirm',
-    message: msg.version.updateRequired(),
-    name: 'updateConfirmed'
-  });
+  const updateConfirmed = await confirm(msg.version.updateRequired());
 
   if (!updateConfirmed) {
     console.log('Skipping update'.bold.red);

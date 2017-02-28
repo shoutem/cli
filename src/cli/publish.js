@@ -4,6 +4,7 @@ import { publishExtension, pushAndPublish } from '../commands/publish';
 import { pushAll } from '../commands/push-all';
 import { handleError } from '../extension/error-handler';
 import multiglob from '../extension/multiglob';
+import confirmPublish from '../commands/confirm-admin-action';
 
 export const description = 'Publish current extension version.';
 export const command = 'publish [paths..]';
@@ -27,6 +28,11 @@ export const builder = yargs => {
     .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 export async function handler(args) {
+  if (!await confirmPublish('WARNING: you are about to publish using shoutem developer. Are you sure about that?')) {
+    console.log('Publish aborted'.bold.yellow);
+    return null;
+  }
+
   try {
     if (args.paths.length === 0) {
       const result = await pushAndPublish(args);

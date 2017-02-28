@@ -4,6 +4,7 @@ import { uploadExtension } from '../commands/push';
 import msg from '../user_messages';
 import { handleError } from '../extension/error-handler';
 import multiglob from '../extension/multiglob';
+import confirmPush from '../commands/confirm-admin-action';
 
 export const description = 'Upload local extension code and assets.';
 export const command = 'push [paths..]';
@@ -28,6 +29,11 @@ export const builder = yargs => {
 };
 
 export async function handler(args) {
+  if (!await confirmPush('WARNING: you are about tu push using shoutem developer. Are you sure about that?')) {
+    console.log('Push aborted'.bold.yellow);
+    return null;
+  }
+
   try {
     if (args.paths.length === 0) {
       await uploadExtension(args);
