@@ -23,7 +23,7 @@ export default async function () {
   }
 
   try {
-    await spawn('npm', ['install', '-g', '@shoutem/cli']);
+    await spawn('npm', ['install', '-g', '@shoutem/cli'], { stdio: 'inherit' });
   } catch (err) {
     if (process.platform !== 'win32') {
       console.log('Current user does not have permissions to update shoutem CLI. Using sudo...');
