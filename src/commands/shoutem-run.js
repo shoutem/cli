@@ -24,7 +24,6 @@ import { handleError } from '../extension/error-handler';
 export default async (platform, appId, options = {}) => {
   await ensureYarnInstalled();
   await ensureNodeVersion();
-  await killPackager();
 
   await unlinkDeletedWorkingDirectories();
 
@@ -66,8 +65,9 @@ export default async (platform, appId, options = {}) => {
   // clean is needed when using platform's client
   // but not needed when rerunning the same app
   if (platformPath && shouldCleanBuild) {
+    await cache.setValue('lastRunState', null);
+    await killPackager();
     try {
-      await cache.setValue('lastRunState', null);
       await npm.run(platformPath, 'clean', [
         '--buildDirectory',
         buildDirectory
@@ -107,7 +107,7 @@ export default async (platform, appId, options = {}) => {
     await npm.install(path.join(buildDirectory, 'scripts'));
   }
 
-  await npm.run(platformPath || buildDirectory, 'configure', [
+  await npm.run(shouldCleanBuild ? platformPath || buildDirectory : buildDirectory, 'configure', [
     '--configPath',
     await mobileAppConfigPath()
   ]);
