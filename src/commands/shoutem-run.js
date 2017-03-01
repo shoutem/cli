@@ -67,8 +67,9 @@ export default async function shoutemRun(platform, appId, options = {}) {
   // clean is needed when using platform's client
   // but not needed when rerunning the same app
   if (platformPath && shouldCleanBuild) {
-    await killPackager();
+    console.log('running clean!');
     try {
+      await killPackager();
       await npm.run(platformPath, 'clean', [
         '--buildDirectory',
         buildDirectory
@@ -163,10 +164,15 @@ export default async function shoutemRun(platform, appId, options = {}) {
         'select a provisioning profile and then rerun `shoutem run-ios`.');
       await exec(`open "${xcodeProjectPath}"`);
     }
+
+    if (!shouldCleanBuild && (stdout + stderr).indexOf('BUILD FAILED') > 0) {
+      console.log('The build might have failed because of changes to native extensions. Running the clean build now...'.bold.red);
+      return await shoutemRun(platform, appId, options);
+    }
   } catch (err) {
     if (!shouldCleanBuild) {
       console.log('The build might have failed because of changes to native extensions. Running the clean build now...'.bold.red);
-      await shoutemRun(platform, appId, options);
+      return await shoutemRun(platform, appId, options);
     } else {
       throw err;
     }
