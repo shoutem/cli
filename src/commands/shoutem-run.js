@@ -59,7 +59,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
 
   // if using local client, it is also used as a build directory
   const buildDirectory = options['mobile-app']|| path.join(await getPlatformsPath(), 'build');
-  const currentRunState = await getCurrentRunState(appId, apiToken, platform);
+  const currentRunState = await getCurrentRunState(appId, apiToken, platform, { release: options.release });
 
   const shouldCleanBuild = options.clean || !_.isEqual(currentRunState, await cache.getValue('lastRunState'));
   await cache.setValue('lastRunState', null);
@@ -190,14 +190,15 @@ async function uncommentBuildDir(buildDirectory) {
   await fs.writeFile(buildGradlePath, buildGradle);
 }
 
-async function getCurrentRunState(appId, apiToken, operatingSystem) {
+async function getCurrentRunState(appId, apiToken, operatingSystem, opts = {}) {
   const appManagerClient = new AppManagerClient(apiToken, appId);
 
   return {
     appId: appId,
     env: getHostEnvName(),
     platformVersion: (await appManagerClient.getApplicationPlatform()).version,
-    operatingSystem: operatingSystem
+    operatingSystem: operatingSystem,
+    ...opts
   }
 }
 
