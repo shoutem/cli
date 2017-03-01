@@ -13,16 +13,11 @@ export const builder = yargs => {
     .options({
       nobuild: {
         type: 'boolean',
-          description: 'Push and publish the extension without building it. Use this option carefully!'
+        description: 'Push and publish the extension without building it. Use this option carefully!'
       },
       nopush: {
         type: 'boolean',
-          description: 'Publish the extension without pushing it first. Use this option carefully!'
-      },
-      without: {
-        type: 'array',
-          description: 'Directory to skip. Can be passed multiple times for skipping multiple directories. Used only if multiple extensions are published.',
-          requiresArg: true,
+        description: 'Publish the extension without pushing it first. Use this option carefully!'
       }
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);
