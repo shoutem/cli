@@ -5,6 +5,7 @@ import { instantiateTemplatePath } from '../../extension/template';
 import { handleError } from '../../extension/error-handler';
 import { createShortcut } from '../../commands/shortcut';
 import { loadExtensionJsonAsync } from '../../extension/data';
+import { ensureVariableName } from '../../extension/cli-parsing';
 
 export const description = 'Add a screen for applications running this extension';
 export const command = 'add <name>';
@@ -20,6 +21,8 @@ export async function handler(args) {
   const shortcutName = args.shortcut;
 
   try {
+    ensureVariableName(screenName);
+    ensureVariableName(shortcutName);
     const extJson = await loadExtensionJsonAsync();
     extJson.shortcuts = extJson.shortcuts || [];
     if (shortcutName && _.includes(extJson.shortcuts.map(s => s.name), shortcutName)) {

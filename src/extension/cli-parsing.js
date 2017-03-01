@@ -5,3 +5,10 @@ export function limitArguments(args, maxAllowed) {
     throw new Error(`Invalid argument ${_.drop(args._, maxAllowed + 1)}`);
   }
 }
+
+const varNameRegex = /^[a-z_]\w*$/;
+export function ensureVariableName(str) {
+  if (!varNameRegex.test(str)){
+    throw new Error(`${str} is not a valid name`);
+  }
+}
