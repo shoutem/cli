@@ -19,7 +19,7 @@ export async function publishExtension(extDir) {
 }
 
 export async function pushAndPublish(args) {
-  if (!args.nopush) {
+  if (!args['no-push']) {
     await uploadExtension(args);
   }
   const extPath = ensureInExtensionDir();

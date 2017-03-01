@@ -8,7 +8,7 @@ export const command = 'pack';
 export const builder = yargs => {
   return yargs
     .options({
-      nobuild: {
+      'no-build': {
         type: 'boolean',
           description: 'Pack the extension without building it.'
       }

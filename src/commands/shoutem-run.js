@@ -32,9 +32,9 @@ export default async function shoutemRun(platform, appId, options = {}) {
 
   // platform path not needed if using local mobile app
   const platformPath =
-    options.mobileApp ?
+    options['mobile-app']?
     null :
-    options.platformBuild || getPlatformBuildPath(path.join(__dirname, '..', '..', '..'));
+    options['platform-build'] || getPlatformBuildPath(path.join(__dirname, '..', '..', '..'));
 
   // read global mobile-app config used for current server env
   const mobileAppConfig = await readJsonFile(await mobileAppConfigPath()) || {};
@@ -58,7 +58,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
   }
 
   // if using local client, it is also used as a build directory
-  const buildDirectory = options.mobileApp || path.join(await getPlatformsPath(), 'build');
+  const buildDirectory = options['mobile-app']|| path.join(await getPlatformsPath(), 'build');
   const currentRunState = await getCurrentRunState(appId, apiToken, platform);
 
   const shouldCleanBuild = options.clean || !_.isEqual(currentRunState, await cache.getValue('lastRunState'));

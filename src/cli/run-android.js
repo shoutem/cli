@@ -6,12 +6,12 @@ export const command = 'run-android [appId]';
 export const builder = yargs => {
   return yargs
     .options({
-      platformBuild: {
+      'platform-build': {
         alias: 'p',
           description: 'use external platform build tool',
           requiresArg: true
       },
-      mobileApp: {
+      'mobile-app': {
         alias: 'm',
           description: 'use external mobile app (ignores platform settings)',
           requiresArg: true
