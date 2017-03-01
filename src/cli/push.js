@@ -15,7 +15,7 @@ export const builder = yargs => {
         type: 'boolean',
           description: 'Push the extension without building it. Use this option carefully!'
       },
-      noconfirm: {
+      'no-confirm': {
         type: 'boolean',
           description: 'Push extensions without asking for confirmation'
       },
