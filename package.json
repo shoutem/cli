@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.94",
+  "version": "0.8.95",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -53,7 +53,7 @@
     "underscore": "^1.8.3",
     "urijs": "1.18.0",
     "yargonaut": "^1.1.2",
-    "yargs": "^6.3.0"
+    "yargs": "https://github.com/yargs/yargs"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",

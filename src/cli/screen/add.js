@@ -11,7 +11,8 @@ export const command = 'add <name>';
 export const builder = {
   shortcut: {
     alias: 's',
-    requiresArg: true
+    requiresArg: true,
+    description: 'adds a shortcut pointing to the screen being created'
   }
 };
 export async function handler(args) {
