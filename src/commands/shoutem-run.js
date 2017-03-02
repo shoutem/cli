@@ -67,9 +67,9 @@ export default async function shoutemRun(platform, appId, options = {}) {
   // clean is needed when using platform's client
   // but not needed when rerunning the same app
   if (platformPath && shouldCleanBuild) {
-    console.log('running clean!');
     try {
       await killPackager();
+      console.log('running clean!');
       await npm.run(platformPath, 'clean', [
         '--buildDirectory',
         buildDirectory

@@ -1,5 +1,6 @@
 import 'colors';
 import _ from 'lodash';
+import stringify from 'json-stringify-safe';
 import { lastErrorPath } from '../clients/cli-paths';
 import { writeJsonFile } from '../extension/data';
 
@@ -38,7 +39,7 @@ export function getErrorMessage(err) {
 export async function handleError(err) {
   console.error(getErrorMessage(err).red.bold);
 
-  const errorJson = JSON.parse(JSON.stringify(err));
+  const errorJson = JSON.parse(stringify(err));
   errorJson.stack = err.stack;
   errorJson.message = err.message;
   await writeJsonFile(errorJson, await lastErrorPath());
