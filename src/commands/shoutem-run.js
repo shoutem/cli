@@ -146,7 +146,8 @@ export default async function shoutemRun(platform, appId, options = {}) {
   console.log('Running the app, this may take a minute...');
   try {
     const {stdout, stderr} = await npm.run(platformPath || buildDirectory, 'run', runOptions);
-    if ((stdout + stderr).indexOf('Code signing is required for product type') > 0) {
+    const output = stdout + stderr;
+    if (output.indexOf('Code signing is required for product type') > 0) {
 
       let xcodeProjectPath;
       // if platform is used
@@ -165,9 +166,14 @@ export default async function shoutemRun(platform, appId, options = {}) {
       await exec(`open "${xcodeProjectPath}"`);
     }
 
-    if (!shouldCleanBuild && (stdout + stderr).indexOf('BUILD FAILED') > 0) {
+    if (!shouldCleanBuild && output.indexOf('BUILD FAILED') > 0) {
       console.log('The build might have failed because of changes to native extensions. Running the clean build now...'.bold.red);
       return await shoutemRun(platform, appId, options);
+    }
+
+    if (output.indexOf('Unable to find a destination matching the provided destination specifier')) {
+      console.log('The app couldn\'t be run because of outdated Xcode version. Please update Xcode to 8.2.1 or later'.bold.red);
+      return null;
     }
   } catch (err) {
     if (!shouldCleanBuild) {
