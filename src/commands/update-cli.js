@@ -4,17 +4,29 @@ import msg from '../../src/user_messages';
 import { spawn } from 'superspawn';
 import { version } from '../../package.json';
 import confirm from '../extension/confirmer';
+import * as cache from '../extension/cache';
 import 'colors';
+
+async function confirmUpdate() {
+  if (await cache.getValue('updateConfirmed') === false) {
+    return false;
+  }
+
+  const updateConfirmed = await confirm(msg.version.updateRequired());
+  await cache.setValue('updateConfirmed', false, 24 * 3600);
+
+  return updateConfirmed;
+}
 
 export default async function () {
   if (await isLatest(apiUrls.cliAppUri, version)) {
     return false;
   }
 
-  const updateConfirmed = await confirm(msg.version.updateRequired());
+  const updateConfirmed = await confirmUpdate();
 
   if (!updateConfirmed) {
-    console.log('Skipping update'.bold.red);
+    console.log('Warning: This is an outdated version of shoutem CLI'.bold.yellow);
     return false;
   }
 
