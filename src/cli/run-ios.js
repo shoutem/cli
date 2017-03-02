@@ -5,6 +5,7 @@ import { listIosSimulators, listIosDevices } from '../extension/device';
 import { prompt } from 'inquirer';
 import commandExists from '../extension/command-exists';
 import * as cache from '../extension/cache';
+import _ from 'lodash';
 
 export const description = 'Run shoutem application on ios platform';
 export const command = 'run-ios [appId]';
@@ -29,12 +30,12 @@ export const builder = yargs => {
       device: {
         alias: 'd',
         description: 'run app on a specific device',
-        requiresArg: true
+        type: 'string'
       },
       simulator: {
         alias: 's',
         description: 'run app on a specific simulator',
-        requiresArg: true
+        type: 'string'
       },
       clean: {
         alias: 'c',
@@ -64,16 +65,24 @@ export async function handler(args) {
         defaultIosDevice = null;
       }
 
-      const { device } = await prompt({
-        type: 'list',
-        name: 'device',
-        message: 'Select a device',
-        choices: allDevices,
-        default: defaultIosDevice || iosDevices[0] || 'iPhone 6',
-        pageSize: 20
-      });
+      const devicesListChanged =
+        !_.isEqual(await cache.getValue('allIosDevices'), allDevices) ||
+        args.simulator === '' ||
+        args.device === '';
+
+      const { device } = devicesListChanged ? await prompt({
+          type: 'list',
+          name: 'device',
+          message: 'Select a device',
+          choices: allDevices,
+          default: defaultIosDevice || iosDevices[0] || 'iPhone 6',
+          pageSize: 20
+        }) : {
+          device: defaultIosDevice
+        };
 
       await cache.setValue('default_ios_device', device);
+      await cache.setValue('allIosDevices', allDevices);
 
       if (iosDevices.indexOf(device) > -1) {
         if (!await commandExists('ios-deploy')) {
