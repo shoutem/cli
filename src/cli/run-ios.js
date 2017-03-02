@@ -55,7 +55,10 @@ export async function handler(args) {
 
     await ensureCocoaPodsInstalled();
 
-    if (!args.simulator && !args.device) {
+    const selectedIosDevice = args.simulator || args.device;
+    if (selectedIosDevice) {
+      await cache.setValue('default_ios_device', selectedIosDevice);
+    } else {
       const iosDevices = await listIosDevices();
       const iosSimulators = await listIosSimulators();
       const allDevices = [...iosDevices, ...iosSimulators];
