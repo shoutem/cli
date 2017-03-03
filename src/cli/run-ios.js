@@ -12,12 +12,12 @@ export const command = 'run-ios [appId]';
 export const builder = yargs => {
   return yargs
     .options({
-      'platform-build': {
+      platformBuild: {
         alias: 'p',
         description: 'use external platform build tool',
         requiresArg: true
       },
-      'mobile-app': {
+      mobileApp: {
         alias: 'm',
         description: 'use external mobile app (ignores platform settings)',
         requiresArg: true

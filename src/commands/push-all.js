@@ -5,7 +5,7 @@ import { pathExists } from '../extension/data';
 import { handleError } from '../extension/error-handler';
 import bluebird from 'bluebird';
 import path from 'path';
-import { prompt } from 'inquirer';
+import { prompt, Separator } from 'inquirer';
 import { getHostEnvName } from '../clients/server-env';
 
 export async function pushAll(args) {
@@ -16,17 +16,17 @@ export async function pushAll(args) {
     return [];
   }
 
-  if (args['no-push']) {
+  if (args.nopush) {
     return { pushed: extPaths, notPushed: [] };
   }
 
-  let { pathsToPush } = args['no-confirm'] || await prompt({
+  let { pathsToPush } = args.noconfirm || await prompt({
     type: 'checkbox',
     name: 'pathsToPush',
     message: `Check extensions you want to push to ${getHostEnvName()}?`,
-    choices: extPaths,
+    choices: extPaths.concat(new Separator()),
     default: extPaths,
-    pageSize: 25
+    pageSize: 20
   });
   pathsToPush = pathsToPush || extPaths;
 

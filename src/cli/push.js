@@ -11,11 +11,11 @@ export const command = 'push [paths..]';
 export const builder = yargs => {
   return yargs
     .options({
-      'no-build': {
+      nobuild: {
         type: 'boolean',
           description: 'Push the extension without building it. Use this option carefully!'
       },
-      'no-confirm': {
+      noconfirm: {
         type: 'boolean',
           description: 'Push extensions without asking for confirmation'
       },

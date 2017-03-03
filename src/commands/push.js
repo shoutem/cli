@@ -39,7 +39,7 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
 
   const extJson = await utils.loadExtensionJsonAsync(extensionDir);
   await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version, extensionDir);
-  const packResult = await shoutemPack(extensionDir, { packToTempDir: true, 'no-build': opts['no-build'] });
+  const packResult = await shoutemPack(extensionDir, { packToTempDir: true, nobuild: opts.nobuild });
 
   const stream = fs.createReadStream(packResult.package);
   const id = utils.getExtensionCanonicalName(dev.name, extJson.name, extJson.version);
