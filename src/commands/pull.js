@@ -8,9 +8,11 @@ export async function pullExtensions({ appId }) {
     const appManager = new AppManagerClient(await ensureUserIsLoggedIn(), appId);
     const installations = await appManager.getInstallations();
 
-    for (const { extension, canonicalName } of installations) {
+    /*for (const { extension, canonicalName } of installations) {
       await pullExtension(extension);
-    }
+    }*/
+
+    await pullExtension(installations[0].extension);
   } catch (err) {
     await handleError(err);
   }
@@ -18,7 +20,9 @@ export async function pullExtensions({ appId }) {
 
 export async function pullExtension(extId) {
   const extManager = new ExtensionManagerClient(await ensureUserIsLoggedIn());
+  const { location: {} } = await extManager.getExtension(extId);
 
-  console.log(await extManager.getExtension(extId));
+
+  console.log(JSON.stringify(extensionJson, null, 2));
 }
 
