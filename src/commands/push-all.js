@@ -16,7 +16,7 @@ export async function pushAll(args) {
     return [];
   }
 
-  if (args['no-push']) {
+  if (args.nopush) {
     return { pushed: [], notPushed: extPaths };
   }
 

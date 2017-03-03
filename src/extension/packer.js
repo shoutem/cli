@@ -70,8 +70,8 @@ export default async function shoutemPack(dir, options) {
 
   const dirsToPack = await bluebird.filter(packedDirectories, hasPackageJson);
 
-  if (options['no-build']) {
-    console.error('Skipping build step due to --no-build flag.');
+  if (options.nobuild) {
+    console.error('Skipping build step due to --nobuild flag.');
   } else {
     await buildNodeProject(path.join(dir, 'server'));
     await buildNodeProject(path.join(dir, 'app'));

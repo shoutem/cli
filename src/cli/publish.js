@@ -11,11 +11,11 @@ export const command = 'publish [paths..]';
 export const builder = yargs => {
   return yargs
     .options({
-      'no-build': {
+      nobuild: {
         type: 'boolean',
         description: 'Push and publish the extension without building it. Use this option carefully!'
       },
-      'no-push': {
+      nopush: {
         type: 'boolean',
         description: 'Publish the extension without pushing it first. Use this option carefully!'
       }
