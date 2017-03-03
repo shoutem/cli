@@ -17,10 +17,10 @@ export async function pushAll(args) {
   }
 
   if (args['no-push']) {
-    return { pushed: extPaths, notPushed: [] };
+    return { pushed: [], notPushed: extPaths };
   }
 
-  let { pathsToPush } = args['no-confirm'] || await prompt({
+  let { pathsToPush } = args.noconfirm || await prompt({
     type: 'checkbox',
     name: 'pathsToPush',
     message: `Check extensions you want to push to ${getHostEnvName()}?`,
