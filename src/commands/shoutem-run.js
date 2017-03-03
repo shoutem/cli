@@ -171,7 +171,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
       return await shoutemRun(platform, appId, options);
     }
 
-    if (output.indexOf('Unable to find a destination matching the provided destination specifier')) {
+    if (output.indexOf('Unable to find a destination matching the provided destination specifier') > 0) {
       console.log('The app couldn\'t be run because of outdated Xcode version. Please update Xcode to 8.2.1 or later'.bold.red);
       return null;
     }
