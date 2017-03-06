@@ -47,6 +47,15 @@ function npmPack(dir, destinationDir) {
     });
 }
 
+async function shoutemUnpack(tgzFile, destinationDir) {
+  const tmpDir = (await tmp.dir()).path;
+  await targz().extract(tgzFile, tmpDir);
+
+  const extensionJsonPath = path.join(tmpDir, 'package', 'extension.json');
+
+  await targz().extract(path.join(tmpDir, 'package', 'app.tgz'), path.join(destinationDir, 'app'));
+}
+
 function hasExtensionsJson(dir) {
   const extensionJsonPath = path.join(dir, 'extension.json');
   return fs

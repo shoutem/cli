@@ -12,17 +12,19 @@ export async function pullExtensions({ appId }) {
       await pullExtension(extension);
     }*/
 
-    await pullExtension(installations[0].extension);
+    await getExtensionUrl(installations[0].extension);
   } catch (err) {
     await handleError(err);
   }
 }
 
-export async function pullExtension(extId) {
+async function getExtensionUrl(extId) {
   const extManager = new ExtensionManagerClient(await ensureUserIsLoggedIn());
-  const { location: {} } = await extManager.getExtension(extId);
+  const { location: { extension } } = await extManager.getExtension(extId);
 
-
-  console.log(JSON.stringify(extensionJson, null, 2));
+ return `${removeTrailingSlash(extension.package)}/extension.tgz`;
 }
 
+function removeTrailingSlash(str) {
+  return str.replace(/\/$/, "");
+}

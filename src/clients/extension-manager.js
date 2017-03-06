@@ -271,6 +271,6 @@ export class ExtensionManagerClient {
 
   async getExtension(extId) {
     const uri = new URI(this.serviceUri).segment(`/v1/extensions/${extId}`);
-    return jsonApi.get(uri.toString(), this.apiToken);
+    return (await jsonApi.get(uri.toString(), this.apiToken)).data;
   }
 }
