@@ -27,6 +27,7 @@ export default async function () {
 
   if (!updateConfirmed) {
     console.log('Warning: This is an outdated version of shoutem CLI'.bold.yellow);
+    console.log('Install the new one with: `npm install -g @shoutem/cli`. You might need to run it with `sudo` prefix.'.yellow);
     return false;
   }
 

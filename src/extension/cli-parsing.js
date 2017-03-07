@@ -6,7 +6,7 @@ export function limitArguments(args, maxAllowed) {
   }
 }
 
-const varNameRegex = /^[a-z_]\w*$/;
+const varNameRegex = /^[a-zA-Z]\w*$/;
 export function ensureVariableName(str) {
   if (!varNameRegex.test(str)){
     throw new Error(`${str} is not a valid name`);
