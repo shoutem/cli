@@ -7,8 +7,10 @@ import fs2 from 'fs-extra';
 import targz from 'tar.gz';
 import { buildNodeProject } from './builder';
 import { readJsonFile, writeJsonFile } from './data';
+import move from 'glob-move';
+import { pathExists } from '../extension/data';
+
 const copy = bluebird.promisify(fs2.copy);
-const mv = bluebird.promisify(require('mv'));
 
 function hasPackageJson(dir) {
   const packageJsonPath = path.join(dir, 'package.json');
@@ -50,9 +52,22 @@ function npmPack(dir, destinationDir) {
 }
 
 export async function npmUnpack(tgzFile, destinationDir) {
+  /*if (!(await pathExists(tgzFile))) {
+    return [];
+  }*/
+
   const tmpDir = (await tmp.dir()).path;
   await targz().extract(tgzFile, tmpDir);
-  await mv(path.join(tmpDir, 'package'), path.join(destinationDir), { mkdirp: true });
+  return await move(path.join(tmpDir, 'package', '*'), path.join(destinationDir), { dot: true });
+}
+
+export async function shoutemUnpack(tgzFile, destinationDir) {
+  const tmpDir = (await tmp.dir()).path;
+  await npmUnpack(tgzFile, tmpDir);
+
+  await npmUnpack(path.join(tmpDir, 'app.tgz'), path.join(destinationDir, 'app'));
+  await npmUnpack(path.join(tmpDir, 'server.tgz'), path.join(destinationDir, 'server'));
+  await move(path.join(tmpDir, 'extension.json'), path.join(destinationDir));
 }
 
 function hasExtensionsJson(dir) {
