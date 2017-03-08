@@ -15,7 +15,7 @@ import { load } from '../extension/template';
 import msg from '../user_messages';
 
 const themeUrls = {
-  theme: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/server/themeVariables.json',
+  theme: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/app/themes/Rubicon.js',
   variables: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/server/themeVariables.json'
 };
 
