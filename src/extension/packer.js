@@ -7,6 +7,8 @@ import fs2 from 'fs-extra';
 import targz from 'tar.gz';
 import { buildNodeProject } from './builder';
 import { readJsonFile, writeJsonFile } from './data';
+const copy = bluebird.promisify(fs2.copy);
+const mv = bluebird.promisify(require('mv'));
 
 function hasPackageJson(dir) {
   const packageJsonPath = path.join(dir, 'package.json');
@@ -47,13 +49,10 @@ function npmPack(dir, destinationDir) {
     });
 }
 
-async function shoutemUnpack(tgzFile, destinationDir) {
+export async function npmUnpack(tgzFile, destinationDir) {
   const tmpDir = (await tmp.dir()).path;
   await targz().extract(tgzFile, tmpDir);
-
-  const extensionJsonPath = path.join(tmpDir, 'package', 'extension.json');
-
-  await targz().extract(path.join(tmpDir, 'package', 'app.tgz'), path.join(destinationDir, 'app'));
+  await mv(path.join(tmpDir, 'package'), path.join(destinationDir), { mkdirp: true });
 }
 
 function hasExtensionsJson(dir) {
@@ -63,8 +62,6 @@ function hasExtensionsJson(dir) {
     .then(() => true)
     .catch(() => false);
 }
-
-const copy = bluebird.promisify(fs2.copy);
 
 export default async function shoutemPack(dir, options) {
   const packedDirectories = ['app', 'server'].map(d => path.join(dir, d));
