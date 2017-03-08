@@ -9,6 +9,7 @@ import { buildNodeProject } from './builder';
 import { readJsonFile, writeJsonFile } from './data';
 import move from 'glob-move';
 import { pathExists } from '../extension/data';
+import decompress from 'decompress';
 
 const copy = bluebird.promisify(fs2.copy);
 
@@ -57,8 +58,8 @@ export async function npmUnpack(tgzFile, destinationDir) {
   }*/
 
   const tmpDir = (await tmp.dir()).path;
-  await targz().extract(tgzFile, tmpDir);
-  return await move(path.join(tmpDir, 'package', '*'), path.join(destinationDir), { dot: true });
+  await decompress(tgzFile, tmpDir);
+  return await move(path.join(tmpDir, 'package', '*'), destinationDir, { dot: true });
 }
 
 export async function shoutemUnpack(tgzFile, destinationDir) {
@@ -67,7 +68,7 @@ export async function shoutemUnpack(tgzFile, destinationDir) {
 
   await npmUnpack(path.join(tmpDir, 'app.tgz'), path.join(destinationDir, 'app'));
   await npmUnpack(path.join(tmpDir, 'server.tgz'), path.join(destinationDir, 'server'));
-  await move(path.join(tmpDir, 'extension.json'), path.join(destinationDir));
+  await move(path.join(tmpDir, 'extension.json'), destinationDir);
 }
 
 function hasExtensionsJson(dir) {

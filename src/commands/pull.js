@@ -14,15 +14,13 @@ export async function pullExtensions({ appId }) {
     const appManager = new AppManagerClient(await ensureUserIsLoggedIn(), appId);
     const installations = await appManager.getInstallations();
 
-    /*for (const { extension, canonicalName } of installations) {
-      await pullExtension(extension);
-    }*/
+    await Promise.all(installations.map(async ({ extension, canonicalName }) => {
+      const url = await getExtensionUrl(extension);
+      const tgzDir = (await tmp.dir()).path;
+      await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
+      await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), path.join(process.cwd(), 'extensions', canonicalName));
+    }));
 
-    const url = await getExtensionUrl(installations[0].extension);
-    const tgzDir = (await tmp.dir()).path;
-    await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
-    console.log(tgzDir);
-    await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), process.cwd());
   } catch (err) {
     await handleError(err);
   }
@@ -30,7 +28,8 @@ export async function pullExtensions({ appId }) {
 
 async function getExtensionUrl(extId) {
   const extManager = new ExtensionManagerClient(await ensureUserIsLoggedIn());
-  const { location: { extension } } = await extManager.getExtension(extId);
+  const resp = await extManager.getExtension(extId);
+  const { location: { extension } } = resp;
 
  return `${removeTrailingSlash(extension.package)}/extension.tgz`;
 }
