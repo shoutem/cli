@@ -29,7 +29,7 @@
     "colors": "^1.1.2",
     "command-exists": "^1.0.2",
     "decompress": "^4.0.0",
-    "download": "^5.0.2",
+    "download": "^5.0.3",
     "download-file": "latest",
     "fs-extra": "^1.0.0",
     "glob-move": "^1.0.1",

@@ -53,9 +53,9 @@ function npmPack(dir, destinationDir) {
 }
 
 export async function npmUnpack(tgzFile, destinationDir) {
-  /*if (!(await pathExists(tgzFile))) {
+  if (!(await pathExists(tgzFile))) {
     return [];
-  }*/
+  }
 
   const tmpDir = (await tmp.dir()).path;
   await decompress(tgzFile, tmpDir);

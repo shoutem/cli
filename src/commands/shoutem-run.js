@@ -20,6 +20,7 @@ import _ from 'lodash';
 import { getHostEnvName } from '../clients/server-env';
 import * as cache from '../extension/cache';
 import { handleError } from '../extension/error-handler';
+import selectApp from '../extension/app-selector';
 import 'colors';
 
 export default async function shoutemRun(platform, appId, options = {}) {
@@ -40,22 +41,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
   const mobileAppConfig = await readJsonFile(await mobileAppConfigPath()) || {};
 
   const { apiToken } = await ensureDeveloperIsRegistered();
-  const legacyService = new LegacyServiceClient(apiToken);
-
-  if (!appId) {
-    const apps = await legacyService.getLatestAppsAsync();
-    appId = (await prompt({
-      type: 'list',
-      name: 'appId',
-      message: 'Select your app',
-      choices: apps.map(app => ({
-        name: `${app.name} (${app.id})`,
-        value: app.id
-      })),
-      default: mobileAppConfig.appId,
-      pageSize: 20
-    })).appId;
-  }
+  appId = appId || await selectApp(mobileAppConfig.appId);
 
   // if using local client, it is also used as a build directory
   const buildDirectory = options.mobileApp || path.join(await getPlatformsPath(), 'build');

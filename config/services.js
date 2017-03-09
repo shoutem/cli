@@ -31,5 +31,6 @@ export default {
   authService: env.authService || `http://api.${env.host}`,
   extensionManager: env.extensionManager || `http://extensions.${env.host}`,
   legacyService: env.legacyService || `http://api.${env.host}`,
-  cliAppUri: 'http://registry.npmjs.org/@shoutem%2fcli'
+  cliAppUri: 'http://registry.npmjs.org/@shoutem%2fcli',
+  mobileAppUrl: 'https://github.com/5minutes/mobile-app'
 };
