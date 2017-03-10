@@ -22,6 +22,8 @@ export async function run(cwd, task, taskArgs = []) {
 
   taskArgs = taskArgs.map(arg => _.includes(arg, ' ') ? `"${arg}"` : arg);
 
+  console.log(taskArgs);
+
   const spawned = taskArgs.length ?
     spawn('npm', ['run', task, '--', ...taskArgs], opts) :
     spawn('npm', ['run', task], opts);

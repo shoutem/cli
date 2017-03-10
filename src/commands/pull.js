@@ -7,6 +7,7 @@ import { AppManagerClient } from '../clients/app-manager';
 import { ensureUserIsLoggedIn } from './login';
 import { shoutemUnpack } from '../extension/packer';
 import decompressUri from '../extension/decompress';
+import { preparePlatform } from '../extension/platform';
 import apiUrls from '../../config/services';
 import { LegacyServiceClient } from '../clients/legacy-service';
 import { pathExists } from '../extension/data';
@@ -47,11 +48,16 @@ export async function pullApp({ appId }, destinationDir) {
   appId = appId || await selectApp();
 
   const { attributes: { name } } = await new LegacyServiceClient(await ensureUserIsLoggedIn()).getApp(appId);
+  const spacelessName = name.replace(/ /g, '_');
 
-  const appDir = path.join(destinationDir, name);
+  const appDir = path.join(destinationDir, spacelessName);
   if (await pathExists(appDir)) {
     throw new Error(`Directory ${appDir} already exists`);
   }
+  if (appDir.indexOf(' ') >= 0) {
+    throw new Error('Due to a bug in the `npm`, app\'s path can\'t contain spaces');
+  }
+
   await mkdirp(appDir);
 
   const appManager = new AppManagerClient(await ensureUserIsLoggedIn(), appId);
@@ -64,6 +70,11 @@ export async function pullApp({ appId }, destinationDir) {
     pullPlatform(mobileAppVersion, appDir)]
   );
 
+  if (process.platform === 'darwin') {
+    await preparePlatform(appDir, { platform: 'ios', appId });
+  }
+  await preparePlatform(appDir, { platform: 'android', appId });
+
   console.log('Success!');
-  console.log(`Change your working directory to \`${name}\``);
+  console.log(`Change your working directory to \`${spacelessName}\``);
 }

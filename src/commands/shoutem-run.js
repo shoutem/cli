@@ -8,12 +8,10 @@ import { AppManagerClient } from '../clients/app-manager';
 import { unlinkDeletedWorkingDirectories } from '../clients/mobile-env';
 import { ensureNodeVersion } from '../extension/node';
 import { ensureDeveloperIsRegistered } from '../commands/register';
+import { shoutemRunLocal } from '../commands/shoutem-run-local';
 import { readJsonFile, writeJsonFile } from '../extension/data';
 import path from 'path';
 import msg from '../user_messages';
-import fs from 'mz/fs';
-import { prompt } from 'inquirer';
-import { LegacyServiceClient } from '../clients/legacy-service';
 import { exec } from 'mz/child_process';
 import { killPackager } from '../extension/react-native';
 import _ from 'lodash';
@@ -21,11 +19,22 @@ import { getHostEnvName } from '../clients/server-env';
 import * as cache from '../extension/cache';
 import { handleError } from '../extension/error-handler';
 import selectApp from '../extension/app-selector';
+import { uncommentBuildDir, getPlatformRootDir } from '../extension/platform';
 import 'colors';
 
 export default async function shoutemRun(platform, appId, options = {}) {
   await ensureYarnInstalled();
   await ensureNodeVersion();
+
+  const customClientDir = await getPlatformRootDir();
+
+  if (customClientDir) {
+    if (appId) {
+      throw new Error('You can\'t use appId argument when running local app');
+    }
+    await shoutemRunLocal(customClientDir, platform, options);
+    return null;
+  }
 
   await unlinkDeletedWorkingDirectories();
 
@@ -175,13 +184,6 @@ export default async function shoutemRun(platform, appId, options = {}) {
   }
 }
 
-async function uncommentBuildDir(buildDirectory) {
-  const buildGradlePath = path.join(buildDirectory, 'android', 'build.gradle');
-  let buildGradle = await fs.readFile(buildGradlePath, 'utf-8');
-  buildGradle = buildGradle.replace('//<CLI> buildDir', 'buildDir');
-  await fs.writeFile(buildGradlePath, buildGradle);
-}
-
 async function getCurrentRunState(appId, apiToken, operatingSystem, opts = {}) {
   const appManagerClient = new AppManagerClient(apiToken, appId);
 
@@ -193,4 +195,3 @@ async function getCurrentRunState(appId, apiToken, operatingSystem, opts = {}) {
     ...opts
   }
 }
-
