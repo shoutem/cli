@@ -41,6 +41,7 @@
     "mkdirp-promise": "^3.0.1",
     "mustache": "2.2.1",
     "mz": "^2.4.0",
+    "pipe-streams-to-promise": "^0.2.0",
     "request": "^2.72.0",
     "request-promise": "^4.1.1",
     "request-promise-native": "^1.0.3",

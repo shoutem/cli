@@ -72,8 +72,9 @@ export async function pullApp({ appId }, destinationDir) {
 
   if (process.platform === 'darwin') {
     await preparePlatform(appDir, { platform: 'ios', appId });
+  } else {
+    await preparePlatform(appDir, {platform: 'android', appId});
   }
-  await preparePlatform(appDir, { platform: 'android', appId });
 
   console.log('Success!');
   console.log(`Change your working directory to \`${spacelessName}\``);
