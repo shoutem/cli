@@ -71,7 +71,7 @@ export async function pullApp({ appId }, destinationDir) {
   );
 
   if (process.platform === 'darwin') {
-    await preparePlatform(appDir, { platform: 'ios', appId });
+    await preparePlatform(appDir, { platform: ['ios', 'android'], appId });
   } else {
     await preparePlatform(appDir, {platform: 'android', appId});
   }
