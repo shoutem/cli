@@ -1,5 +1,5 @@
 const path = require('path');
-const install = require('../../build/src/extension/yarn').install;
+const install = require('../../build/src/extension/npm').install;
 require('colors');
 
 module.exports = (_, extPath, { extJson }) => {
