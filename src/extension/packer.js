@@ -16,35 +16,30 @@ function hasPackageJson(dir) {
     .catch(() => false);
 }
 
-function npmPack(dir, destinationDir) {
-  const resultFilename = `${destinationDir}/${path.basename(dir)}.tgz`;
-  const packageJsonPath = `${dir}/package.json`;
+async function npmPack(dir, destinationDir) {
+  const resultFilename = path.join(destinationDir, `${path.basename(dir)}.tgz`);
+  const packageJsonPath = path.join(dir, 'package.json');
 
-  let originalFileContent = null;
-  return fs.readFile(packageJsonPath)
-    .then(fileContent => {
-      originalFileContent = fileContent;
-      return readJsonFile(packageJsonPath);
-    })
-    .then(packageJson => {
-      const timestamp = (new Date()).getTime();
-      packageJson.version = `${packageJson.version}-build${timestamp}`;
-      return writeJsonFile(packageJson, packageJsonPath);
-    })
-    .then(() => exec('npm pack', { cwd: dir }))
-    .then(([stdout]) => {
-      const packageFilename = stdout.replace(/\n$/, '');
-      const packagePath = path.join(dir, packageFilename);
-      return fs.rename(packagePath, resultFilename);
-    })
-    .catch(err => err)
-    .then(err => {
-      if (originalFileContent != null) {
-        return fs.writeFile(packageJsonPath, originalFileContent, 'utf8');
-      } else {
-        return Promise.reject(err);
-      }
-    });
+  const originalFileContent = await fs.readFile(packageJsonPath);
+  const packageJson = await readJsonFile(packageJsonPath);
+
+  const timestamp = (new Date()).getTime();
+  packageJson.version = `${packageJson.version}-build${timestamp}`;
+
+  await writeJsonFile(packageJson, packageJsonPath);
+  const [stdout] = await exec('npm pack', { cwd: dir });
+  const packageFilename = stdout.replace(/\n$/, '');
+  const packagePath = path.join(dir, packageFilename);
+
+  try {
+    await fs.rename(packagePath, resultFilename);
+  } catch (err) {
+    if (originalFileContent != null) {
+      return fs.writeFile(packageJsonPath, originalFileContent, 'utf8');
+    } else {
+      throw err;
+    }
+  }
 }
 
 function hasExtensionsJson(dir) {
