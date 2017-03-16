@@ -7,6 +7,9 @@ import fs2 from 'fs-extra';
 import targz from 'tar.gz';
 import { buildNodeProject } from './builder';
 import { readJsonFile, writeJsonFile } from './data';
+const copy = bluebird.promisify(fs2.copy);
+const mv = bluebird.promisify(require('mv'));
+
 
 function hasPackageJson(dir) {
   const packageJsonPath = path.join(dir, 'package.json');
@@ -31,14 +34,10 @@ async function npmPack(dir, destinationDir) {
   const packageFilename = stdout.replace(/\n$/, '');
   const packagePath = path.join(dir, packageFilename);
 
-  try {
-    await fs.rename(packagePath, resultFilename);
-  } catch (err) {
-    if (originalFileContent != null) {
-      return fs.writeFile(packageJsonPath, originalFileContent, 'utf8');
-    } else {
-      throw err;
-    }
+  await mv(packagePath, resultFilename);
+
+  if (originalFileContent != null) {
+    await fs.writeFile(packageJsonPath, originalFileContent, 'utf8');
   }
 }
 
@@ -49,8 +48,6 @@ function hasExtensionsJson(dir) {
     .then(() => true)
     .catch(() => false);
 }
-
-const copy = bluebird.promisify(fs2.copy);
 
 export default async function shoutemPack(dir, options) {
   const packedDirectories = ['app', 'server'].map(d => path.join(dir, d));

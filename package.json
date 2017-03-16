@@ -37,6 +37,7 @@
     "mkdirp": "0.5.1",
     "mkdirp-promise": "^3.0.1",
     "mustache": "2.2.1",
+    "mv": "^2.1.1",
     "mz": "^2.4.0",
     "request": "^2.72.0",
     "request-promise": "^4.1.1",
