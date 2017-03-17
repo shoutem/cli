@@ -27,9 +27,9 @@ const env = envValues[getHostEnvName()];
 
 export default {
   appBuilder: env.appBuilder || `https://builder.${env.host}`,
-  appManager: env.appManager || `http://apps.${env.host}`,
-  authService: env.authService || `http://api.${env.host}`,
-  extensionManager: env.extensionManager || `http://extensions.${env.host}`,
-  legacyService: env.legacyService || `http://api.${env.host}`,
+  appManager: env.appManager || `https://apps.${env.host}`,
+  authService: env.authService || `https://api.${env.host}`,
+  extensionManager: env.extensionManager || `https://extensions.${env.host}`,
+  legacyService: env.legacyService || `https://api.${env.host}`,
   cliAppUri: 'http://registry.npmjs.org/@shoutem%2fcli'
 };
