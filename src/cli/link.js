@@ -1,5 +1,4 @@
 /* eslint no-console: "off" */
-import 'babel-polyfill';
 import path from 'path';
 import { mobileAppConfigPath } from '../clients/cli-paths';
 import { getExtensionRootDir, readJsonFile, writeJsonFile } from '../extension/data';

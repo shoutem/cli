@@ -1,8 +1,6 @@
-import 'babel-polyfill';
 import os from 'os';
 import path from 'path';
 import rimraf from 'rmfr';
-import { spawn } from 'superspawn';
 
 (async () => {
   const cliHome = path.join(os.homedir(), '.shoutem');

@@ -1,6 +1,4 @@
-#!/usr/bin/env node
-import 'babel-polyfill';
-
+#!/usr/bin/env node --harmony-async-await
 require('yargonaut')
   .helpStyle('green.underline')
   .errorsStyle('red.bold');

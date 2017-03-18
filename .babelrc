@@ -1,4 +1,5 @@
 {
-  "presets": ["es2015"],
-  "plugins": ["rewire"]
+  "presets": ["node6"],
+  "plugins": ["transform-object-rest-spread"],
+  "sourceMaps": true
 }
