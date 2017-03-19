@@ -3,7 +3,6 @@ import _ from 'lodash';
 import inquirer from 'inquirer';
 import { instantiateTemplatePath } from '../extension/template';
 import { ensureDeveloperIsRegistered } from './register';
-import * as yarn from '../extension/yarn';
 import msg from '../user_messages';
 import { ExtensionManagerClient } from '../clients/extension-manager';
 import { ensureUserIsLoggedIn } from './login'
@@ -53,7 +52,6 @@ export async function promptExtensionInit(extName) {
 }
 
 export async function initExtension(extName) {
-  await yarn.ensureYarnInstalled();
   const developer = await ensureDeveloperIsRegistered();
   const extJson = await promptExtensionInit(extName);
   await instantiateTemplatePath('init', cwd(), { devName: developer.name, extJson });
