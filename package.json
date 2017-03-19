@@ -10,12 +10,10 @@
     "shoutem": "./src/shoutem.js"
   },
   "scripts": {
-    "build": "npm run clean && babel ./ --out-dir ./build --copy-files --ignore node_modules,build,templates --source-maps build",
-    "clean": "rimraf ./build",
     "lint": "eslint ./ --ignore-pattern build/",
     "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",
     "shoutem": "node --harmony-async-await src/shoutem.js",
-    "push-and-publish": "npm run build && git push && npm publish --access public",
+    "push-and-publish": "git push && npm publish --access public",
     "postinstall": "node --harmony-async-await src/scripts/postinstall.js"
   },
   "author": "",
@@ -23,9 +21,12 @@
   "dependencies": {
     "@shoutem/platform-build": "0.0.6",
     "async": "2.0.0-rc.3",
+    "babel-plugin-transform-object-rest-spread": "^6.22.0",
+    "babel-preset-node6": "^11.0.0",
     "babel-register": "^6.24.0",
     "bluebird": "^3.4.6",
     "child-process-promise": "^2.2.0",
+    "cli-spinner": "^0.2.6",
     "colors": "^1.1.2",
     "command-exists": "^1.0.2",
     "fs-extra": "^1.0.0",
@@ -38,6 +39,7 @@
     "mustache": "2.2.1",
     "mv": "^2.1.1",
     "mz": "^2.4.0",
+    "progress": "^1.1.8",
     "request": "^2.72.0",
     "request-promise": "^4.1.1",
     "request-promise-native": "^1.0.3",
@@ -53,9 +55,7 @@
     "underscore": "^1.8.3",
     "urijs": "1.18.0",
     "yargonaut": "^1.1.2",
-    "yargs": "^6.6.0",
-    "babel-plugin-transform-object-rest-spread": "^6.22.0",
-    "babel-preset-node6": "^11.0.0"
+    "yargs": "^6.6.0"
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",

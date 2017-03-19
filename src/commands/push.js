@@ -10,6 +10,8 @@ import * as utils from '../extension/data';
 import shoutemPack from '../extension/packer';
 import msg from '../user_messages';
 import _ from 'lodash';
+import { createProgressHandler } from '../extension/progress-bar';
+import { startSpinner } from '../extension/spinner';
 
 async function setPackageNameVersion(path, name, version) {
   const data = await utils.readJsonFile(path);
@@ -41,12 +43,26 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
   await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version, extensionDir);
   const packResult = await shoutemPack(extensionDir, { packToTempDir: true, nobuild: opts.nobuild });
 
+  const { size } = await mzfs.stat(packResult.package);
   const stream = fs.createReadStream(packResult.package);
+
   const id = utils.getExtensionCanonicalName(dev.name, extJson.name, extJson.version);
   const extensionManager = new ExtensionManagerClient(dev.apiToken);
 
   console.log(msg.push.uploadingInfo(extJson, getHostEnvName()));
-  const extensionId = await extensionManager.uploadExtension(id, stream);
+  let spinner = null;
+  const extensionId = await extensionManager.uploadExtension(
+    id,
+    stream,
+    createProgressHandler('Upload progress', size, () => spinner = startSpinner('Processing upload... %s')),
+    size
+  );
+
+  if (spinner) {
+    spinner.stop(true);
+  }
+
+  //{ progressHandler: createProgressHandler({ msg: 'Upload progress', total: size }), }
   await mzfs.unlink(packResult.package);
 
   const notPacked = _.difference(packResult.allDirs, packResult.packedDirs);

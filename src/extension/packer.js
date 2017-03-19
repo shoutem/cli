@@ -7,6 +7,7 @@ import fs2 from 'fs-extra';
 import targz from 'tar.gz';
 import { buildNodeProject } from './builder';
 import { readJsonFile, writeJsonFile } from './data';
+import { startSpinner } from '../extension/spinner';
 const copy = bluebird.promisify(fs2.copy);
 const mv = bluebird.promisify(require('mv'));
 
@@ -50,6 +51,8 @@ function hasExtensionsJson(dir) {
 }
 
 export default async function shoutemPack(dir, options) {
+  const spinner = startSpinner('Packing extension... %s');
+
   const packedDirectories = ['app', 'server'].map(d => path.join(dir, d));
 
   if (!await hasExtensionsJson(dir)) {
@@ -79,6 +82,8 @@ export default async function shoutemPack(dir, options) {
 
   const destinationDirectory = path.join(options.packToTempDir ? tmpDir : dir, 'extension.tgz');
   await targz().compress(packageDir, destinationDirectory);
+
+  spinner.stop(true);
 
   return ({
     packedDirs: dirsToPack,

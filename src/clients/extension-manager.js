@@ -5,6 +5,7 @@ import URI from 'urijs';
 import request2 from 'request-promise';
 import services from '../../config/services';
 import bluebird from 'bluebird';
+import { listenStream } from '../extension/stream-listener';
 
 
 export class ExtensionManagerError {
@@ -187,7 +188,12 @@ export class ExtensionManagerClient {
   /*
     Upload zipped extension.
   */
-  uploadExtension(canonicalName, zipStream) {
+  uploadExtension(canonicalName, zipStream, progressHandler, size) {
+
+    if (progressHandler) {
+      listenStream(zipStream, progressHandler, size);
+    }
+
     const settings = this.prepareUploadExtensionZipRequest(canonicalName, zipStream);
 
     return request2(settings)
@@ -239,7 +245,6 @@ export class ExtensionManagerClient {
     const settings = this.preparePublishExtensionRequest(canonicalName);
 
     const res = await request2(settings);
-    //console.log(JSON.stringify(res.body));
     if (res.statusCode === 200 || res.statusCode === 201) {
       return (res.body || {}).data;
     } else {
