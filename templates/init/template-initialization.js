@@ -1,5 +1,5 @@
 const path = require('path');
-const install = require('../../build/src/extension/npm').install;
+const install = require('../../src/extension/npm').install;
 require('colors');
 
 module.exports = (_, extPath, { extJson }) => {

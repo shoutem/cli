@@ -1,8 +1,0 @@
-src/
-*.map
-!build/
-
-.idea/
-*.tgz
-.update-theme
-update-theme.json

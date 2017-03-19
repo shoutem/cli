@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('mz/fs');
-const { generateExtensionJs } = require('../../build/src/extension/ext-js-generator');
+const { generateExtensionJs } = require('../../src/extension/ext-js-generator');
 
 module.exports = (localTemplatePath, destinationPath, { screenName }) => {
   const extPath = path.join(destinationPath, 'extension.json');

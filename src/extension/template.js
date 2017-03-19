@@ -4,7 +4,7 @@ import Mustache from 'mustache';
 import { pathExists } from './data';
 import mkdirp from 'mkdirp-promise';
 
-const templatesDirectory = path.join(__dirname, '..', '..', '..', 'templates');
+const templatesDirectory = path.join(__dirname, '..', '..', 'templates');
 
 export function load(pathWithSlashes, templateContext) {
   const p = path.join(templatesDirectory, ...pathWithSlashes.split('/'));

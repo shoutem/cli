@@ -1,6 +1,6 @@
-import os from 'os';
-import path from 'path';
-import rimraf from 'rmfr';
+const os =  require('os');
+const path = require('path');
+const rimraf = require('rmfr');
 
 (async () => {
   const cliHome = path.join(os.homedir(), '.shoutem');

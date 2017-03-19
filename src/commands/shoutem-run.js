@@ -34,7 +34,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
   const platformPath =
     options.mobileApp ?
     null :
-    options.platformBuild || getPlatformBuildPath(path.join(__dirname, '..', '..', '..'));
+    options.platformBuild || getPlatformBuildPath(path.join(__dirname, '..', '..'));
 
   // read global mobile-app config used for current server env
   const mobileAppConfig = await readJsonFile(await mobileAppConfigPath()) || {};

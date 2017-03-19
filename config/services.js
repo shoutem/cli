@@ -1,4 +1,4 @@
-import { getHostEnvName } from '../src/clients/server-env';
+const { getHostEnvName } = require('../src/clients/server-env');
 
 const envValues = {
   production: {
@@ -25,7 +25,7 @@ const envValues = {
 
 const env = envValues[getHostEnvName()];
 
-export default {
+module.exports = {
   appBuilder: env.appBuilder || `https://builder.${env.host}`,
   appManager: env.appManager || `https://apps.${env.host}`,
   authService: env.authService || `https://api.${env.host}`,
