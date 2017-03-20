@@ -1,8 +1,14 @@
-#!/usr/bin/env node --harmony-async-await
+#!/usr/bin/env node --harmony
+const semver = require('semver');
+
+const plugins = ['transform-object-rest-spread'];
+if (semver.lt(process.versions.node, '7.0.0')) {
+  plugins.push('transform-async-to-generator');
+}
 
 require('babel-register')({
   presets: ['node6'],
-  plugins: ['transform-object-rest-spread'],
+  plugins,
   sourceMaps: true,
   ignore: false,
   only: ['config', 'src', 'templates']

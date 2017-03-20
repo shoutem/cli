@@ -12,7 +12,7 @@
   "scripts": {
     "lint": "eslint ./ --ignore-pattern build/",
     "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",
-    "shoutem": "node --harmony-async-await src/shoutem.js",
+    "shoutem": "node --harmony src/shoutem.js",
     "push-and-publish": "git push && npm publish --access public",
     "postinstall": "node --harmony-async-await src/scripts/postinstall.js"
   },
@@ -21,6 +21,7 @@
   "dependencies": {
     "@shoutem/platform-build": "0.0.6",
     "async": "2.0.0-rc.3",
+    "babel-plugin-transform-async-to-generator": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.22.0",
     "babel-preset-node6": "^11.0.0",
     "babel-register": "^6.24.0",
