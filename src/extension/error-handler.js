@@ -3,6 +3,7 @@ import _ from 'lodash';
 import stringify from 'json-stringify-safe';
 import { lastErrorPath } from '../clients/cli-paths';
 import { writeJsonFile } from '../extension/data';
+import * as spinner from './spinner';
 
 function getJsonApiErrorMessage(errors) {
   return _.get(errors, '[0].detail') ||
@@ -37,6 +38,7 @@ export function getErrorMessage(err) {
 }
 
 export async function handleError(err) {
+  spinner.stopAll();
   console.error(getErrorMessage(err).red.bold);
 
   const errorJson = JSON.parse(stringify(err));
