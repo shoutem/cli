@@ -4,7 +4,6 @@ import cliUrls from '../../config/services';
 import url from 'url';
 import * as npm from '../extension/npm';
 import { ensureYarnInstalled } from '../extension/yarn';
-import { AppManagerClient } from '../clients/app-manager';
 import { unlinkDeletedWorkingDirectories } from '../clients/mobile-env';
 import { ensureNodeVersion } from '../extension/node';
 import { ensureDeveloperIsRegistered } from '../commands/register';
@@ -17,8 +16,6 @@ import { LegacyServiceClient } from '../clients/legacy-service';
 import { exec } from 'mz/child_process';
 import { killPackager } from '../extension/react-native';
 import _ from 'lodash';
-import { getHostEnvName } from '../clients/server-env';
-import * as cache from '../extension/cache';
 import { handleError } from '../extension/error-handler';
 import 'colors';
 
@@ -59,17 +56,12 @@ export default async function shoutemRun(platform, appId, options = {}) {
 
   // if using local client, it is also used as a build directory
   const buildDirectory = options.mobileApp || path.join(await getPlatformsPath(), 'build');
-  const currentRunState = await getCurrentRunState(appId, apiToken, platform, { release: options.release });
-
-  const shouldCleanBuild = options.clean || !_.isEqual(currentRunState, await cache.getValue('lastRunState'));
-  await cache.setValue('lastRunState', null);
 
   // clean is needed when using platform's client
   // but not needed when rerunning the same app
-  if (platformPath && shouldCleanBuild) {
+  if (platformPath && !options.noclean) {
     try {
       await killPackager();
-      console.log('running clean!');
       await npm.run(platformPath, 'clean', [
         '--buildDirectory',
         buildDirectory
@@ -80,7 +72,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
       return null;
     }
   } else {
-    console.log('Skipping clean step');
+    console.log('Skipping clean step!');
   }
 
   Object.assign(mobileAppConfig, {
@@ -109,7 +101,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
     await npm.install(path.join(buildDirectory, 'scripts'));
   }
 
-  await npm.run(shouldCleanBuild ? platformPath || buildDirectory : buildDirectory, 'configure', [
+  await npm.run(platformPath || buildDirectory, 'configure', [
     '--configPath',
     await mobileAppConfigPath()
   ]);
@@ -144,48 +136,30 @@ export default async function shoutemRun(platform, appId, options = {}) {
   }
 
   console.log('Running the app, this may take a minute...');
-  try {
-    const {stdout, stderr} = await npm.run(platformPath || buildDirectory, 'run', runOptions);
-    const output = stdout + stderr;
-    if (output.indexOf('Code signing is required for product type') > 0) {
 
-      let xcodeProjectPath;
-      // if platform is used
-      // last runtime configuration is required to get the mobile-app directory
-      if (platformPath) {
-        const runtimeConfig = await readJsonFile(await getPlatformConfigPath());
-        const platform = _.find(runtimeConfig.included, {type: 'shoutem.core.platform-installations'});
-        const version = _.get(platform, 'attributes.mobileAppVersion');
-        xcodeProjectPath = path.join(await getPlatformsPath(), `v${version}`, 'ios', 'ShoutemApp.xcodeproj');
-      } else {
-        xcodeProjectPath = path.join(buildDirectory, 'ios', 'ShoutemApp.xcodeproj');
-      }
-
-      console.log('Select ShoutemApp target from xcode and activate "Automatically manage signing", ' +
-        'select a provisioning profile and then rerun `shoutem run-ios`.');
-      await exec(`open "${xcodeProjectPath}"`);
-    }
-
-    if (!shouldCleanBuild && output.indexOf('BUILD FAILED') > 0) {
-      console.log('The build might have failed because of changes to native extensions. Running the clean build now...'.bold.red);
-      return await shoutemRun(platform, appId, options);
-    }
-
-    if (output.indexOf('Unable to find a destination matching the provided destination specifier') > 0) {
-      console.log('The app couldn\'t be run because of outdated Xcode version. Please update Xcode to 8.2.1 or later'.bold.red);
-      return null;
-    }
-  } catch (err) {
-    if (!shouldCleanBuild) {
-      console.log('The build might have failed because of changes to native extensions. Running the clean build now...'.bold.red);
-      return await shoutemRun(platform, appId, options);
+  const {stdout, stderr} = await npm.run(platformPath || buildDirectory, 'run', runOptions);
+  const output = stdout + stderr;
+  if (output.indexOf('Code signing is required for product type') > 0) {
+    let xcodeProjectPath;
+    // if platform is used
+    // last runtime configuration is required to get the mobile-app directory
+    if (platformPath) {
+      const runtimeConfig = await readJsonFile(await getPlatformConfigPath());
+      const platform = _.find(runtimeConfig.included, {type: 'shoutem.core.platform-installations'});
+      const version = _.get(platform, 'attributes.mobileAppVersion');
+      xcodeProjectPath = path.join(await getPlatformsPath(), `v${version}`, 'ios', 'ShoutemApp.xcodeproj');
     } else {
-      throw err;
+      xcodeProjectPath = path.join(buildDirectory, 'ios', 'ShoutemApp.xcodeproj');
     }
+
+    console.log('Select ShoutemApp target from xcode and activate "Automatically manage signing", ' +
+      'select a provisioning profile and then rerun `shoutem run-ios`.');
+    await exec(`open "${xcodeProjectPath}"`);
   }
 
-  if (platformPath) {
-    await cache.setValue('lastRunState', currentRunState);
+  if (output.indexOf('Unable to find a destination matching the provided destination specifier') > 0) {
+    console.log('The app couldn\'t be run because of outdated Xcode version. Please update Xcode to 8.2.1 or later'.bold.red);
+    return null;
   }
 }
 
@@ -194,17 +168,5 @@ async function uncommentBuildDir(buildDirectory) {
   let buildGradle = await fs.readFile(buildGradlePath, 'utf-8');
   buildGradle = buildGradle.replace('//<CLI> buildDir', 'buildDir');
   await fs.writeFile(buildGradlePath, buildGradle);
-}
-
-async function getCurrentRunState(appId, apiToken, operatingSystem, opts = {}) {
-  const appManagerClient = new AppManagerClient(apiToken, appId);
-
-  return {
-    appId: appId,
-    env: getHostEnvName(),
-    platformVersion: (await appManagerClient.getApplicationPlatform()).version,
-    operatingSystem: operatingSystem,
-    ...opts
-  }
 }
 

@@ -26,9 +26,9 @@ export const builder = yargs => {
           description: 'run app on a specific device',
           requiresArg: true
       },
-      clean: {
-        alias: 'c',
-        description: 'clean build directory before running',
+      noclean: {
+        alias: 'n',
+        description: 'don\'t clean build directory before running',
         type: 'boolean'
       }
     })

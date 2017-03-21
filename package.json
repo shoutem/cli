@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.109",
+  "version": "0.8.113",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -10,11 +10,11 @@
     "shoutem": "./src/shoutem.js"
   },
   "scripts": {
-    "lint": "eslint ./ --ignore-pattern build/",
+    "lint": "eslint ./",
     "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",
     "shoutem": "node --harmony src/shoutem.js",
     "push-and-publish": "git push && npm publish --access public",
-    "postinstall": "node --harmony-async-await src/scripts/postinstall.js"
+    "postinstall": "node src/scripts/postinstall.js"
   },
   "author": "",
   "license": "ISC",
