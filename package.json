@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.115",
+  "version": "0.8.116",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -19,7 +19,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@shoutem/platform-build": "0.0.6",
+    "@shoutem/platform-build": "0.0.7",
     "async": "2.0.0-rc.3",
     "babel-plugin-transform-async-to-generator": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.22.0",
