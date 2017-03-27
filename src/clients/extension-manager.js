@@ -6,6 +6,7 @@ import request2 from 'request-promise';
 import services from '../../config/services';
 import bluebird from 'bluebird';
 import { listenStream } from '../extension/stream-listener';
+import * as jsonApi from './json-api-client';
 
 
 export class ExtensionManagerError {
@@ -271,5 +272,10 @@ export class ExtensionManagerClient {
     }
 
     return res.body.data;
+  }
+
+  async getExtension(extId) {
+    const uri = new URI(this.serviceUri).segment(`/v1/extensions/${extId}`);
+    return (await jsonApi.get(uri.toString(), this.apiToken)).data;
   }
 }

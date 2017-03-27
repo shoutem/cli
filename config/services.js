@@ -31,5 +31,6 @@ module.exports = {
   authService: env.authService || `https://api.${env.host}`,
   extensionManager: env.extensionManager || `https://extensions.${env.host}`,
   legacyService: env.legacyService || `https://api.${env.host}`,
-  cliAppUri: 'http://registry.npmjs.org/@shoutem%2fcli'
+  cliAppUri: 'http://registry.npmjs.org/@shoutem%2fcli',
+  mobileAppUrl: 'https://github.com/shoutem/platform'
 };

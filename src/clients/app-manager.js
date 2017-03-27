@@ -131,4 +131,9 @@ export class AppManagerClient {
     const url = new URI(this.serviceUri).segment(`/v1/apps/${this.appId}/platform`).toString();
     return (await jsonApi.get(url, this.apiToken)).data;
   }
+
+  async getInstallations() {
+    const url = new URI(this.serviceUri).segment(`/v1/apps/${this.appId}/installations`).toString();
+    return (await jsonApi.get(url, this.apiToken)).data;
+  }
 }

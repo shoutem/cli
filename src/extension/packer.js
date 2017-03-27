@@ -10,7 +10,9 @@ import { readJsonFile, writeJsonFile } from './data';
 import { startSpinner } from '../extension/spinner';
 const copy = bluebird.promisify(fs2.copy);
 const mv = bluebird.promisify(require('mv'));
-
+import move from 'glob-move';
+import { pathExists } from '../extension/data';
+import decompress from 'decompress';
 
 function hasPackageJson(dir) {
   const packageJsonPath = path.join(dir, 'package.json');
@@ -40,6 +42,25 @@ async function npmPack(dir, destinationDir) {
   if (originalFileContent != null) {
     await fs.writeFile(packageJsonPath, originalFileContent, 'utf8');
   }
+}
+
+export async function npmUnpack(tgzFile, destinationDir) {
+  if (!(await pathExists(tgzFile))) {
+    return [];
+  }
+
+  const tmpDir = (await tmp.dir()).path;
+  await decompress(tgzFile, tmpDir);
+  return await move(path.join(tmpDir, 'package', '*'), destinationDir, { dot: true });
+}
+
+export async function shoutemUnpack(tgzFile, destinationDir) {
+  const tmpDir = (await tmp.dir()).path;
+  await npmUnpack(tgzFile, tmpDir);
+
+  await npmUnpack(path.join(tmpDir, 'app.tgz'), path.join(destinationDir, 'app'));
+  await npmUnpack(path.join(tmpDir, 'server.tgz'), path.join(destinationDir, 'server'));
+  await move(path.join(tmpDir, 'extension.json'), destinationDir);
 }
 
 function hasExtensionsJson(dir) {
