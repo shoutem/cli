@@ -38,11 +38,13 @@ export function getErrorMessage(err) {
 }
 
 export async function handleError(err) {
-  spinner.stopAll();
-  console.error(getErrorMessage(err).red.bold);
+  try {
+      spinner.stopAll();
+      console.error(getErrorMessage(err).red.bold);
 
-  const errorJson = JSON.parse(stringify(err));
-  errorJson.stack = err.stack;
-  errorJson.message = err.message;
-  await writeJsonFile(errorJson, await lastErrorPath());
+      const errorJson = JSON.parse(stringify(err));
+      await writeJsonFile(errorJson, await lastErrorPath());
+  } catch (err) {
+      console.log(err);
+  }
 }

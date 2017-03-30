@@ -37,7 +37,12 @@ export async function run(cwd, platform) {
 }
 
 export async function killPackager() {
-  if (process.platform !== 'win32') {
+  if (process.platform === 'darwin') {
     await exec("lsof -n -i4TCP:8081 | sed '1 d' | awk '{print $2}' | xargs kill -9");
   }
+}
+
+export async function startPackager(cwd) {
+  console.log(cwd);
+  await spawn('react-native', ['start'], { stdio: 'inherit', cwd, detached: true })
 }

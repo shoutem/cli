@@ -7,12 +7,12 @@ import { ensureYarnInstalled } from '../extension/yarn';
 import { unlinkDeletedWorkingDirectories } from '../clients/mobile-env';
 import { ensureNodeVersion } from '../extension/node';
 import { ensureDeveloperIsRegistered } from '../commands/register';
-import { shoutemRunLocal } from '../commands/shoutem-run-local';
+//import { shoutemRunLocal } from '../commands/shoutem-run-local';
 import { readJsonFile, writeJsonFile } from '../extension/data';
 import path from 'path';
 import msg from '../user_messages';
 import { exec } from 'mz/child_process';
-import { killPackager } from '../extension/react-native';
+import { killPackager, startPackager } from '../extension/react-native';
 import _ from 'lodash';
 import { handleError } from '../extension/error-handler';
 import selectApp from '../extension/app-selector';
@@ -23,7 +23,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
   await ensureYarnInstalled();
   await ensureNodeVersion();
 
-  const customClientDir = await getPlatformRootDir();
+  /*const customClientDir = await getPlatformRootDir();
 
   if (customClientDir) {
     if (appId) {
@@ -32,7 +32,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
     await shoutemRunLocal(customClientDir, platform, options);
     return null;
   }
-
+*/
   await unlinkDeletedWorkingDirectories();
 
   const dev = await ensureDeveloperIsRegistered();
@@ -132,6 +132,8 @@ export default async function shoutemRun(platform, appId, options = {}) {
 
   console.log('Running the app, this may take a minute...');
 
+  const packagerPromise = process.platform === 'linux' ? startPackager(buildDirectory) : null;
+
   const {stdout, stderr} = await npm.run(platformPath || buildDirectory, 'run', runOptions);
   const output = stdout + stderr;
   if (output.indexOf('Code signing is required for product type') > 0) {
@@ -150,10 +152,13 @@ export default async function shoutemRun(platform, appId, options = {}) {
     console.log('Select ShoutemApp target from xcode and activate "Automatically manage signing", ' +
       'select a provisioning profile and then rerun `shoutem run-ios`.');
     await exec(`open "${xcodeProjectPath}"`);
+    return null;
   }
 
   if (output.indexOf('Unable to find a destination matching the provided destination specifier') > 0) {
     console.log('The app couldn\'t be run because of outdated Xcode version. Please update Xcode to 8.2.1 or later'.bold.red);
     return null;
   }
+
+  await packagerPromise;
 }
