@@ -1,6 +1,6 @@
 import { spawn } from 'superspawn';
 import msg from '../user_messages';
-import { exec } from 'mz/child_process';
+import { exec, fork } from 'mz/child_process';
 
 export async function ensureInstalled(cwd) {
   try {
@@ -43,6 +43,6 @@ export async function killPackager() {
 }
 
 export async function startPackager(cwd) {
-  console.log(cwd);
-  await spawn('react-native', ['start'], { stdio: 'inherit', cwd, detached: true })
+  console.log('Packager is being run within this process. Please keep this process running if app is used in debug mode'.bold.yellow);
+  await spawn('react-native', ['start'], { stdio: ['ignore', 'ignore', 'inherit'], cwd, detached: true })
 }

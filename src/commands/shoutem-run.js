@@ -17,6 +17,7 @@ import _ from 'lodash';
 import { handleError } from '../extension/error-handler';
 import selectApp from '../extension/app-selector';
 import { uncommentBuildDir, getPlatformRootDir } from '../extension/platform';
+import { printMobilizerQR } from '../commands/qr-generator';
 import 'colors';
 
 export default async function shoutemRun(platform, appId, options = {}) {
@@ -96,10 +97,26 @@ export default async function shoutemRun(platform, appId, options = {}) {
     await npm.install(path.join(buildDirectory, 'scripts'));
   }
 
-  await npm.run(platformPath || buildDirectory, 'configure', [
+  const configureOptions = [
     '--configPath',
     await mobileAppConfigPath()
-  ]);
+  ];
+
+  if (options.device === 'shoutem-preview') {
+    configureOptions.push('--skipNativeDependencies');
+    configureOptions.push(true);
+  }
+
+  await npm.run(platformPath || buildDirectory, 'configure', configureOptions);
+
+  const startPackagerExplicitly = process.platform === 'linux' || options.device === 'shoutem-preview';
+
+  const packagerPromise = startPackagerExplicitly ? startPackager(buildDirectory) : null;
+
+  if (options.device === 'shoutem-preview') {
+    await printMobilizerQR(appId, platform);
+    return await packagerPromise;
+  }
 
   // android run script requires android binaries to be stored near the system's root
   if (process.platform === 'win32') {
@@ -131,8 +148,6 @@ export default async function shoutemRun(platform, appId, options = {}) {
   }
 
   console.log('Running the app, this may take a minute...');
-
-  const packagerPromise = process.platform === 'linux' ? startPackager(buildDirectory) : null;
 
   const {stdout, stderr} = await npm.run(platformPath || buildDirectory, 'run', runOptions);
   const output = stdout + stderr;
