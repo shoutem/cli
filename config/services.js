@@ -8,10 +8,20 @@ const envValues = {
     host: 'beta.aperfector.com'
   },
   dev: {
-    host: 'dev.sauros.hr'
+    host: 'dev.sauros.hr',
+    appBuilder: 'https://builder.dev.sauros.hr',
+    appManager: 'https://apps.api.dev.sauros.hr',
+    authService: 'https://v4.api.dev.sauros.hr',
+    extensionManager: 'https://extensions.api.dev.sauros.hr',
+    legacyService: 'https://v4.api.dev.sauros.hr'
   },
   qa: {
-    host: 'qa.sauros.hr'
+    host: 'qa.sauros.hr',
+    appBuilder: 'https://builder.qa.sauros.hr',
+    appManager: 'https://apps.api.qa.sauros.hr',
+    authService: 'https://v4.api.qa.sauros.hr',
+    extensionManager: 'https://extensions.api.qa.sauros.hr',
+    legacyService: 'https://v4.api.qa.sauros.hr'
   },
   local: {
     host: process.env.SHOUTEM_CLI_HOST || 'shoutem.local',
