@@ -12,13 +12,12 @@ import path from 'path';
 import msg from '../user_messages';
 import { exec } from 'mz/child_process';
 import { killPackager, startPackager } from '../extension/react-native';
-import _ from 'lodash';
 import { handleError } from '../extension/error-handler';
 import selectApp from '../extension/app-selector';
-import { uncommentBuildDir } from '../extension/platform';
+import { printMobilizerQR } from '../commands/qr-generator';
 import 'colors';
 
-export default async function shoutemRun(platform, appId, options = {}) {
+export default async function (appId, options = {}) {
   await ensureYarnInstalled();
   await ensureNodeVersion();
 
@@ -29,8 +28,8 @@ export default async function shoutemRun(platform, appId, options = {}) {
   // platform path not needed if using local mobile app
   const platformPath =
     options.mobileApp ?
-    null :
-    options.platformBuild || getPlatformBuildPath(path.join(__dirname, '..', '..'));
+      null :
+      options.platformBuild || getPlatformBuildPath(path.join(__dirname, '..', '..'));
 
   // read global mobile-app config used for current server env
   const mobileAppConfig = await readJsonFile(await mobileAppConfigPath()) || {};
@@ -58,7 +57,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
   }
 
   Object.assign(mobileAppConfig, {
-      platform,
+      platform: 'any',
       appId,
       serverApiEndpoint: url.parse(cliUrls.appManager).hostname,
       legacyApiEndpoint: url.parse(cliUrls.legacyService).hostname,
@@ -85,68 +84,14 @@ export default async function shoutemRun(platform, appId, options = {}) {
 
   const configureOptions = [
     '--configPath',
-    await mobileAppConfigPath()
+    await mobileAppConfigPath(),
+    '--skipNativeDependencies',
+    true
   ];
 
   await npm.run(platformPath || buildDirectory, 'configure', configureOptions);
-  const packagerPromise = process.platform === 'linux' ? startPackager(buildDirectory) : null;
 
-  // android run script requires android binaries to be stored near the system's root
-  if (process.platform === 'win32') {
-    await uncommentBuildDir(buildDirectory);
-  }
-
-  const runOptions = [
-    '--platform',
-    platform
-  ];
-
-  if (platformPath) {
-    runOptions.push('--buildDirectory');
-    runOptions.push(buildDirectory);
-  }
-
-  if (options.device) {
-    runOptions.push('--device');
-    runOptions.push(options.device);
-  }
-  if (options.simulator) {
-    runOptions.push('--simulator');
-    runOptions.push(options.simulator);
-  }
-
-  if (options.release) {
-    runOptions.push('--configuration');
-    runOptions.push('Release');
-  }
-
-  console.log('Running the app, this may take a minute...');
-
-  const { stdout, stderr } = await npm.run(platformPath || buildDirectory, 'run', runOptions);
-  const output = stdout + stderr;
-  if (output.indexOf('Code signing is required for product type') > 0) {
-    let xcodeProjectPath;
-    // if platform is used
-    // last runtime configuration is required to get the mobile-app directory
-    if (platformPath) {
-      const runtimeConfig = await readJsonFile(await getPlatformConfigPath());
-      const platform = _.find(runtimeConfig.included, {type: 'shoutem.core.platform-installations'});
-      const version = _.get(platform, 'attributes.mobileAppVersion');
-      xcodeProjectPath = path.join(await getPlatformsPath(), `v${version}`, 'ios', 'ShoutemApp.xcodeproj');
-    } else {
-      xcodeProjectPath = path.join(buildDirectory, 'ios', 'ShoutemApp.xcodeproj');
-    }
-
-    console.log('Select ShoutemApp target from xcode and activate "Automatically manage signing", ' +
-      'select a provisioning profile and then rerun `shoutem run-ios`.');
-    await exec(`open "${xcodeProjectPath}"`);
-    return null;
-  }
-
-  if (output.indexOf('Unable to find a destination matching the provided destination specifier') > 0) {
-    console.log('The app couldn\'t be run because of outdated Xcode version. Please update Xcode to 8.2.1 or later'.bold.red);
-    return null;
-  }
-
-  await packagerPromise;
+  const packagerPromise = startPackager(buildDirectory);
+  await printMobilizerQR();
+  return await packagerPromise;
 }

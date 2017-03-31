@@ -1,14 +1,10 @@
 import qrcode from 'qrcode-terminal';
 import ip from 'ip';
+import 'colors';
 
-export async function printMobilizerQR(platform, host) {
-  host = host || ip.address();
+export async function printMobilizerQR(host = ip.address()) {
+  const mobilizerString = `http://shoutem.app.link/?host=${host}`;
 
-  const mobilizerString = JSON.stringify({
-    host,
-    bundleRoot: platform === 'ios' ? 'index.ios' : 'index.android'
-  });
-
-  console.log(mobilizerString);
+  console.log(mobilizerString.bold);
   qrcode.generate(mobilizerString);
 }
