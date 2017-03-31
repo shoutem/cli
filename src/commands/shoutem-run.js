@@ -114,7 +114,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
   const packagerPromise = startPackagerExplicitly ? startPackager(buildDirectory) : null;
 
   if (options.device === 'shoutem-preview') {
-    await printMobilizerQR(appId, platform);
+    await printMobilizerQR(platform);
     return await packagerPromise;
   }
 
