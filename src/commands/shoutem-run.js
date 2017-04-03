@@ -16,11 +16,13 @@ import _ from 'lodash';
 import { handleError } from '../extension/error-handler';
 import selectApp from '../extension/app-selector';
 import { uncommentBuildDir } from '../extension/platform';
+import * as reactNative from '../extension/react-native';
 import 'colors';
 
 export default async function shoutemRun(platform, appId, options = {}) {
   await ensureYarnInstalled();
   await ensureNodeVersion();
+  await reactNative.ensureInstalled();
 
   await unlinkDeletedWorkingDirectories();
 

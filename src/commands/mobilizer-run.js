@@ -15,11 +15,13 @@ import { killPackager, startPackager } from '../extension/react-native';
 import { handleError } from '../extension/error-handler';
 import selectApp from '../extension/app-selector';
 import { printMobilizerQR } from '../commands/qr-generator';
+import * as reactNative from '../extension/react-native';
 import 'colors';
 
 export default async function (appId, options = {}) {
   await ensureYarnInstalled();
   await ensureNodeVersion();
+  await reactNative.ensureInstalled();
 
   await unlinkDeletedWorkingDirectories();
 
@@ -93,5 +95,12 @@ export default async function (appId, options = {}) {
 
   const packagerPromise = startPackager(buildDirectory);
   await printMobilizerQR();
+  console.log('Make sure that the phone running Shoutem app is connected to the same network as this computer'.yellow);
+  if (process.platform === 'win32') {
+    console.log('If Shoutem app on your phone fails to load, try opening the 8081 TCP port manually from your Windows Firewall or disabling the firewall temporarily'.yellow);
+  } else {
+    console.log('Make sure that the 8081 TCP port is not blocked on this computer'.yellow);
+  }
+
   return await packagerPromise;
 }

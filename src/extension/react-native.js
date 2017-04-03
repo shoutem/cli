@@ -1,10 +1,13 @@
 import { spawn } from 'superspawn';
 import msg from '../user_messages';
 import { exec, fork } from 'mz/child_process';
+import commandExists from './command-exists';
 
-export async function ensureInstalled(cwd) {
+export async function ensureInstalled() {
   try {
-    await spawn('react-native', ['-v'], { cwd });
+    if (!await commandExists('react-native')) {
+      await spawn('npm', ['install', '-g', 'react-native-cli'], { stdio: 'inherit' })
+    }
   } catch (err) {
     throw new Error(msg.reactNative.missing());
   }
