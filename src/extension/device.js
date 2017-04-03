@@ -1,3 +1,5 @@
+import os from 'os';
+import path from 'path';
 import { exec } from 'mz/child_process';
 
 export async function listIosSimulators() {
@@ -26,3 +28,16 @@ export async function listIosDevices() {
   }
 }
 
+const androidSdkPath = path.join(os.homedir(), 'Library', 'Android', 'sdk');
+
+export async function listAndroidSimulators() {
+  const avdManagerPath = path.join(androidSdkPath, 'tools', 'bin', 'avdmanager');
+
+  const [stdout] = await exec(`${avdManagerPath} list avd`);
+  const devicesLines = stdout.split('\n').filter(l => l.indexOf('Name: ') > -1);
+  return devicesLines.map(line => line.substr(line.indexOf("Name: ") + 6));
+}
+
+export async function createAndroidDevice() {
+
+}

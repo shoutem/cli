@@ -70,7 +70,8 @@ export default async function shoutemRun(platform, appId, options = {}) {
       buildDirectory,
       debug: !options.release,
       offlineMode: true,
-      extensionsJsPath: "./extensions.js"
+      extensionsJsPath: "./extensions.js",
+      skipNativeDependencies: false
     }
   );
 
