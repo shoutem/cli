@@ -47,5 +47,5 @@ export async function killPackager() {
 
 export async function startPackager(cwd) {
   console.log('Packager is being run within this process. Please keep this process running if app is used in debug mode'.bold.yellow);
-  await spawn('react-native', ['start'], { stdio: ['ignore', 'ignore', 'inherit'], cwd, detached: true })
+  await spawn('react-native', ['start'], { stdio: ['ignore', 'ignore', 'inherit'], cwd })
 }

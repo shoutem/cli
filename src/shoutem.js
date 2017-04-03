@@ -1,21 +1,15 @@
 #!/usr/bin/env node
 
 const semver = require('semver');
+const path = require('path');
+const os = require('os');
 
-const presets = [];
-const plugins = ['transform-object-rest-spread', 'transform-async-to-generator'];
-
-if (semver.lt(process.versions.node, '6.0.0')) {
-  presets.push('full-node4');
-} else if (semver.lt(process.versions.node, '7.0.0')) {
-  presets.push('node6');
-} else {
-  presets.push('node7');
-}
+const babelCachePath = path.join(os.homedir(), '.shoutem', 'cache', 'babel-cache');
+process.env.BABEL_CACHE_PATH = process.env.BABEL_CACHE_PATH || babelCachePath;
 
 require('babel-register')({
-  presets,
-  plugins,
+  presets: ['node7'],
+  plugins: ['transform-object-rest-spread', 'transform-async-to-generator'],
   ignore: false,
   only: ['config', 'src', 'templates']
 });

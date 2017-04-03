@@ -16,6 +16,7 @@ import { handleError } from '../extension/error-handler';
 import selectApp from '../extension/app-selector';
 import { printMobilizerQR } from '../commands/qr-generator';
 import * as reactNative from '../extension/react-native';
+import * as tunnel from '../extension/tunnel';
 import 'colors';
 
 export default async function (appId, options = {}) {
@@ -71,7 +72,8 @@ export default async function (appId, options = {}) {
       buildDirectory,
       debug: !options.release,
       offlineMode: true,
-      extensionsJsPath: "./extensions.js"
+      extensionsJsPath: "./extensions.js",
+      skipNativeDependencies: true
     }
   );
 
@@ -86,20 +88,23 @@ export default async function (appId, options = {}) {
 
   const configureOptions = [
     '--configPath',
-    await mobileAppConfigPath(),
-    '--skipNativeDependencies',
-    true
+    await mobileAppConfigPath()
   ];
 
   await npm.run(platformPath || buildDirectory, 'configure', configureOptions);
 
   const packagerPromise = startPackager(buildDirectory);
-  await printMobilizerQR();
-  console.log('Make sure that the phone running Shoutem app is connected to the same network as this computer'.yellow);
-  if (process.platform === 'win32') {
-    console.log('If Shoutem app on your phone fails to load, try opening the 8081 TCP port manually from your Windows Firewall or disabling the firewall temporarily'.yellow);
+
+  if (options.local) {
+    console.log('Make sure that the phone running Shoutem app is connected to the same network as this computer'.yellow);
+    if (process.platform === 'win32') {
+      console.log('If Shoutem app on your phone fails to load, try opening the 8081 TCP port manually from your Windows Firewall or disabling the firewall temporarily'.yellow);
+    } else {
+      console.log('Make sure that the 8081 TCP port is not blocked on this computer'.yellow);
+    }
+    await printMobilizerQR();
   } else {
-    console.log('Make sure that the 8081 TCP port is not blocked on this computer'.yellow);
+    await printMobilizerQR(url.parse(await tunnel.start(8081)).hostname, 80);
   }
 
   return await packagerPromise;

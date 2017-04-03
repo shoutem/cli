@@ -1,4 +1,3 @@
-require('babel-polyfill');
 const os =  require('os');
 const path = require('path');
 const rimraf = require('rmfr');
