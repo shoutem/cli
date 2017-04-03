@@ -30,7 +30,8 @@ export const builder = yargs => {
         alias: 'l',
         description: 'don\'t use tunneling for Shoutem app, connect directly to packager. Note: ' +
           'this computer and iphone/android must be connected to the same network and port 8081 must be opened.',
-        type: 'boolean'
+        type: 'boolean',
+        default: true
       }
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);
