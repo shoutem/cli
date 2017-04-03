@@ -6,5 +6,5 @@ export async function printMobilizerQR(host = ip.address(), port = 8081) {
   const mobilizerString = `http://shoutem.app.link/?host=${host}&port=${port}`;
 
   console.log(mobilizerString.bold);
-  qrcode.generate(mobilizerString, { small: true });
+  qrcode.generate(mobilizerString);
 }

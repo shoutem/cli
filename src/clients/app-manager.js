@@ -3,6 +3,7 @@ import request from 'request';
 import URI from 'urijs';
 import * as jsonApi from './json-api-client';
 import services from '../../config/services';
+import bluebird from 'bluebird';
 
 export class AppManagerError {
   /*
@@ -30,8 +31,10 @@ export class AppManagerClient {
 
     this.prepareCreateAppRequest.bind(this);
     this.createApp.bind(this);
+    this.createAppAsync.bind(this);
     this.prepareInstallExtensionRequest.bind(this);
     this.installExtension.bind(this);
+    this.installExtensionAsync.bind(this);
     this.getApplicationPlatform.bind(this);
   }
 
@@ -70,6 +73,12 @@ export class AppManagerClient {
 
       return callback(new AppManagerError(settings, res.statusCode, body));
     });
+  }
+
+  async installExtensionAsync(extensionId) {
+    const installExtension = bluebird.promisify((extensionId, callback) => this.installExtension(extensionId, callback));
+
+    return await installExtension(extensionId);
   }
 
   uninstallExtension(extensionId) {
@@ -125,6 +134,12 @@ export class AppManagerClient {
       }
       return callback(new AppManagerError(settings, res.statusCode, body));
     });
+  }
+
+  async createAppAsync(app) {
+    const createApp = bluebird.promisify((app, callback) => this.createApp(app, callback));
+
+    return await createApp(app);
   }
 
   async getApplicationPlatform() {

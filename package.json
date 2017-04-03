@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.128",
+  "version": "0.8.129",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -12,7 +12,7 @@
   "scripts": {
     "lint": "eslint ./",
     "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",
-    "shoutem": "node --harmony src/shoutem.js",
+    "shoutem": "node src/shoutem.js",
     "push-and-publish": "git push && npm publish --access public",
     "postinstall": "node src/scripts/postinstall.js"
   },

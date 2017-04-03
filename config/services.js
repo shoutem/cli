@@ -2,10 +2,8 @@ const { getHostEnvName } = require('../src/clients/server-env');
 
 const envValues = {
   production: {
-    host: 'beta.shoutem.com'
-  },
-  beta: {
-    host: 'beta.aperfector.com'
+    host: 'beta.shoutem.com',
+    appBuilder: 'https://builder.shoutem.com',
   },
   dev: {
     host: 'dev.sauros.hr',

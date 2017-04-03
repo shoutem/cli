@@ -21,41 +21,35 @@ export const builder = yargs => {
           requiresArg: true
       },
       new: {
-      alias: 'n',
-        description: 'install to a new app with given name',
-        type: 'string'
+        alias: 'n',
+          description: 'install to a new app with given name',
+          type: 'string'
       }})
     .usage(`usage: shoutem ${command} [options]\n\n${description}`);
 };
 
-export function handler(program) {
-  function installToApp(appId, newApp = false) {
-    function handleInstall(err) {
-      if (err) handleError(err);
-      else {
-        console.log(newApp
-          ? msg.install.completeOntoNew(program.new)
-          : msg.install.complete());
-        const url = `${services.appBuilder}/app/${appId}`;
-        console.log(msg.install.seeNewInBrowser(url));
+export async function handler(options) {
+  try {
+    const appCreationRequested = options.new || options.new === '';
+
+    let appId;
+    if (appCreationRequested) {
+      if (options.app) {
+        throw new Error('`app` and `new` flags can\'t be used together');
       }
-    }
-
-    if (program.extension) {
-      installExtensionById(program.extension, appId, handleInstall);
+      appId = (await createNewApp(options.new || 'My Blank App')).id;
+    } else if (options.app) {
+      appId = options.app;
     } else {
-      installLocalExtension(appId, handleInstall);
+      appId = (await ensureApp()).id;
     }
-  }
-  if (program.new === '') {
-    program.new = 'My Blank App';
-  }
 
-  if (program.new) {
-    createNewApp(program.new, (err, app) => {
-      if (err) handleError(err);
-      else installToApp(app.id, true);
-    });
-  } else if (program.app) installToApp(program.app);
-  else ensureApp((appErr, app) => installToApp(app.id));
+    await installLocalExtension(appId);
+
+    console.log(msg.install.complete());
+    const url = `${services.appBuilder}/app/${appId}`;
+    console.log(msg.install.seeNewInBrowser(url));
+  } catch (err) {
+    await handleError(err);
+  }
 }

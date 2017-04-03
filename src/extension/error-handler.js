@@ -43,6 +43,8 @@ export async function handleError(err) {
       console.error(getErrorMessage(err).red.bold);
 
       const errorJson = JSON.parse(stringify(err));
+      errorJson.stack = (err || {}).stack;
+      errorJson.message = (err || {}).message;
       await writeJsonFile(errorJson, await lastErrorPath());
   } catch (err) {
       console.log(err);

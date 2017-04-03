@@ -1,5 +1,4 @@
 /* eslint no-console: 0 */
-import async from 'async';
 import inquirer from 'inquirer';
 
 import { AppManagerClient } from '../clients/app-manager';
@@ -11,139 +10,92 @@ import * as utils from '../extension/data';
 import msg from '../user_messages';
 
 
-export function promptAppSelect(apps, callback) {
-  const appNames = apps.map(app => app.name);
-  const longestName = appNames.sort((x, y) => y.length - x.length)[0];
-  const newName = `${longestName}1`;
-  const question = {
+export async function promptAppSelect(apps) {
+  const { appId } = await inquirer.prompt({
     type: 'list',
-    name: 'appIndex',
+    name: 'appId',
     message: 'Select app to install extension',
-    choices: appNames.concat([
+    choices: apps.map(app => ({ name: `${app.name} (${app.id})`, value: app.id })).concat([
       new inquirer.Separator(),
       {
         name: 'Create a new app',
-        value: newName,
+        value: null,
         short: 'new app',
       },
-    ]),
-    filter: appName => appNames.indexOf(appName),
-  };
+    ])
+  });
 
-  inquirer.prompt([question])
-    .then(answer => callback(null, answer.appIndex))
-    .catch(callback);
+  return appId;
 }
 
-export function promptCreateNewApp(callback) {
-  inquirer.prompt({
+export async function promptCreateNewApp() {
+  const { answerNew } = await inquirer.prompt({
     type: 'list',
     name: 'createNew',
     message: 'You have no apps. Create a new one?',
     choices: ['yes', 'no'],
-  }).then(answer => callback(null, answer.createNew === 'yes'))
-    .catch(callback);
+  });
+
+  return answerNew === 'yes';
 }
 
-export function promptAppName(callback) {
-  inquirer.prompt({
+export async function promptAppName() {
+  const { appName } = await inquirer.prompt({
     name: 'appName',
     message: 'App name',
     default: 'MyApp',
-  }).then(answer => callback(null, answer.appName))
-    .catch(callback);
+  });
+
+  return appName;
 }
 
-function exit(err) {
-  if (err) console.log(err.message);
-  process.exit(Number(Boolean(err)));
+async function getNewApp(appManager) {
+  const name = await promptAppName();
+  return await appManager.createAppAsync({ name });
 }
 
-export function ensureApp(callback) {
-  ensureDeveloperIsRegistered()
-    .then(developerInfo => {
-      const apiToken = developerInfo.apiToken;
-      const legacyService = new LegacyServiceClient(apiToken);
-      const appManager = new AppManagerClient(apiToken, null);
+export async function ensureApp() {
+  const { apiToken } = await ensureDeveloperIsRegistered();
+  const legacyService = new LegacyServiceClient(apiToken);
+  const appManager = new AppManagerClient(apiToken, null);
+  const appList = await legacyService.getLatestAppsAsync();
 
-      function getNewApp() {
-        promptAppName((promptErr, appName) => {
-          if (promptErr) exit(promptErr);
-          else {
-            appManager.createApp({ name: appName }, (createErr, app) => {
-              if (createErr) exit(createErr);
-              else callback(null, app);
-            });
-          }
-        });
-      }
+  if (appList.length === 0) {
+    if (!await promptCreateNewApp()) {
+      return await getNewApp();
+    }
+  }
 
-      legacyService.getLatestApps((appErr, appList) => {
-        if (appErr) return exit(appErr);
-
-        if (appList.length === 0) {
-          return promptCreateNewApp((promptErr, createNew) => {
-            if (promptErr || !createNew) exit(promptErr);
-            else getNewApp();
-          });
-        }
-
-        return promptAppSelect(appList, (selectErr, appIndex) => {
-          if (selectErr) callback(selectErr);
-          else if (appIndex === -1) getNewApp();
-          else process.nextTick(() => callback(null, appList[appIndex]));
-        });
-      });
-    });
+  const appId = await promptAppSelect(appList);
+  return appList.filter(app => app.id === appId)[0] || await getNewApp(appManager);
 }
 
-export function createNewApp(appName, callback) {
-  ensureDeveloperIsRegistered()
-    .then(developerInfo => {
-      const apiToken = developerInfo.apiToken;
-      const appManager = new AppManagerClient(apiToken, null);
-      appManager.createApp({ name: appName }, callback);
-    })
-    .catch(console.error);
+export async function createNewApp(name) {
+  const { apiToken } = await ensureDeveloperIsRegistered();
+  const appManager = new AppManagerClient(apiToken, null);
+  return await appManager.createAppAsync({ name });
 }
 
-export function installLocalExtension(appId, callback) {
-  ensureDeveloperIsRegistered()
-    .then(developerInfo => {
-      const devName = developerInfo.name;
-      const apiToken = developerInfo.apiToken;
-      const appManager = new AppManagerClient(apiToken, appId);
-      const extensionManager = new ExtensionManagerClient(apiToken);
+export async function installLocalExtension(appId) {
+  const dev = await ensureDeveloperIsRegistered();
+  const appManager = new AppManagerClient(dev.apiToken, appId);
+  const extensionManager = new ExtensionManagerClient(dev.apiToken);
 
-      async.waterfall([
-        utils.loadExtensionJson,
+  const { name, version } = await utils.loadExtensionJsonAsync();
+  const canonicalName = utils.getExtensionCanonicalName(dev.name, name, version);
+  const extensionId = await extensionManager.getExtensionIdAsync(canonicalName);
 
-        (extJson, done) => {
-          const name = extJson.name;
-          const version = extJson.version;
-          const canonicalName = utils.getExtensionCanonicalName(devName, name, version);
-          extensionManager.getExtensionId(canonicalName, done);
-        },
+  if (extensionId) {
+    await appManager.installExtensionAsync(extensionId);
+  } else {
+    throw new Error(msg.install.notExtensionDir());
+  }
 
-        (extensionId, done) => {
-          if (extensionId) appManager.installExtension(extensionId, done);
-          else {
-            process.nextTick(() => {
-              done(new Error(msg.install.notExtensionDir()));
-            });
-          }
-        },
-      ], callback);
-    })
-    .catch(console.error);
+  return extensionId;
 }
 
-export function installExtensionById(extensionId, appId, callback) {
-  ensureDeveloperIsRegistered()
-    .then(developerInfo => {
-      const apiToken = developerInfo.apiToken;
-      const appManager = new AppManagerClient(apiToken, appId);
-      appManager.installExtension(extensionId, callback);
-    })
-    .catch(console.error);
+export async function installExtensionById(extensionId, appId) {
+  const { apiToken } = await ensureDeveloperIsRegistered();
+  const appManager = new AppManagerClient(apiToken, appId);
+  return await appManager.installExtension(extensionId);
 }
