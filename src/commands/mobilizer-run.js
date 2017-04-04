@@ -17,6 +17,7 @@ import selectApp from '../extension/app-selector';
 import { printMobilizerQR } from '../commands/qr-generator';
 import * as reactNative from '../extension/react-native';
 import * as tunnel from '../extension/tunnel';
+import ip from 'ip';
 import 'colors';
 
 export default async function (appId, options = {}) {
@@ -70,7 +71,6 @@ export default async function (appId, options = {}) {
       workingDirectories: mobileAppConfig.workingDirectories || [],
       excludePackages: ['shoutem.code-push'],
       buildDirectory,
-      debug: !options.release,
       offlineMode: true,
       extensionsJsPath: "./extensions.js",
       skipNativeDependencies: true
@@ -102,9 +102,9 @@ export default async function (appId, options = {}) {
     } else {
       console.log('Make sure that the 8081 TCP port is not blocked on this computer'.yellow);
     }
-    await printMobilizerQR();
+    await printMobilizerQR(ip.address(), 8081, options);
   } else {
-    await printMobilizerQR(url.parse(await tunnel.start(8081)).hostname, 80);
+    await printMobilizerQR(url.parse(await tunnel.start(8081)).hostname, 80, options);
   }
 
   return await packagerPromise;

@@ -16,11 +16,6 @@ export const builder = yargs => {
         description: 'use external mobile app (ignores platform settings)',
         requiresArg: true
       },
-      release: {
-        alias: 'r',
-        description: 'create a release build',
-        type: 'boolean'
-      },
       noclean: {
         alias: 'n',
         description: 'don\'t clean build directory before running',
@@ -32,6 +27,16 @@ export const builder = yargs => {
           'this computer and iphone/android must be connected to the same network and port 8081 must be opened.',
         type: 'boolean',
         default: true
+      },
+      dev: {
+        alias: 'd',
+        description: 'use dev version of js bundle which degrades performance but allows for debug tools to be used',
+        type: 'boolean'
+      },
+      small: {
+        alias: 's',
+        description: 'display smaller ASCII QR code which could be unreadable in some fonts',
+        type: 'boolean'
       }
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);

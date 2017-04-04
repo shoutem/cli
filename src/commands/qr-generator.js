@@ -1,10 +1,9 @@
 import qrcode from 'qrcode-terminal';
-import ip from 'ip';
 import 'colors';
 
-export async function printMobilizerQR(host = ip.address(), port = 8081) {
-  const mobilizerString = `http://shoutem.app.link/?host=${host}&port=${port}`;
+export async function printMobilizerQR(host, port, { dev, small }) {
+  const mobilizerString = `http://shoutem.app.link/?host=${host}&port=${port}&dev=${!!dev}`;
 
   console.log(mobilizerString.bold);
-  qrcode.generate(mobilizerString);
+  qrcode.generate(mobilizerString, { small });
 }
