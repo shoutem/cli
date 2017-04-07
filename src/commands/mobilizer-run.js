@@ -31,16 +31,16 @@ export default async function (appId, options = {}) {
 
   // platform path not needed if using local mobile app
   const platformPath =
-    options.mobileApp ?
+    options.mobileapp ?
       null :
-      options.platformBuild || getPlatformBuildPath(path.join(__dirname, '..', '..'));
+      options.platformbuild || getPlatformBuildPath(path.join(__dirname, '..', '..'));
 
   // read global mobile-app config used for current server env
   const mobileAppConfig = await readJsonFile(await mobileAppConfigPath()) || {};
   appId = appId || await selectApp(mobileAppConfig.appId);
 
   // if using local client, it is also used as a build directory
-  const buildDirectory = options.mobileApp || path.join(await getPlatformsPath(), 'build');
+  const buildDirectory = options.mobileapp || path.join(await getPlatformsPath(), 'build');
 
   // clean is needed when using platform's client
   // but not needed when rerunning the same app
