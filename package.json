@@ -13,8 +13,7 @@
     "lint": "eslint ./",
     "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",
     "shoutem": "node src/shoutem.js",
-    "postinstall": "node src/scripts/postinstall.js",
-    "prepublish": "dos2unix src/shoutem.js"
+    "postinstall": "node src/scripts/postinstall.js"
   },
   "author": "",
   "license": "ISC",
