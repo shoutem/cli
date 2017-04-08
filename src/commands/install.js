@@ -62,7 +62,7 @@ export async function ensureApp() {
 
   if (appList.length === 0) {
     if (!await promptCreateNewApp()) {
-      return await getNewApp();
+      return await getNewApp(appManager);
     }
   }
 
