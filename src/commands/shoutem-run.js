@@ -92,7 +92,7 @@ export default async function shoutemRun(platform, appId, options = {}) {
   ];
 
   await npm.run(platformPath || buildDirectory, 'configure', configureOptions);
-  const packagerPromise = process.platform === 'linux' ? startPackager(buildDirectory) : null;
+  const packagerPromise = startPackager(buildDirectory, { resolveOnReady: false });
 
   // android run script requires android binaries to be stored near the system's root
   if (process.platform === 'win32') {
@@ -150,6 +150,8 @@ export default async function shoutemRun(platform, appId, options = {}) {
     console.log('The app couldn\'t be run because of outdated Xcode version. Please update Xcode to 8.2.1 or later'.bold.red);
     return null;
   }
+
+  console.log('Packager is being run within this process. Please keep this process running if app is used in debug mode'.bold.yellow);
 
   await packagerPromise;
 }

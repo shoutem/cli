@@ -93,7 +93,7 @@ export default async function (appId, options = {}) {
 
   await npm.run(platformPath || buildDirectory, 'configure', configureOptions);
 
-  const packagerPromise = startPackager(buildDirectory);
+  await startPackager(buildDirectory, { resolveOnReady: true });
 
   if (options.local) {
     console.log('Make sure that the phone running Shoutem app is connected to the same network as this computer'.yellow);
@@ -107,5 +107,5 @@ export default async function (appId, options = {}) {
     await printMobilizerQR(url.parse(await tunnel.start(8081)).hostname, 80, options);
   }
 
-  return await packagerPromise;
+  console.log('Packager is being run within this process. Please keep this process running if app is used in debug mode'.bold.yellow);
 }
