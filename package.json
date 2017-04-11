@@ -14,7 +14,7 @@
     "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",
     "shoutem": "node src/shoutem.js",
     "postinstall": "node src/scripts/postinstall.js",
-    "publish-win": "dos2unix src/shoutem.js && npm publish"
+    "prepublish": "dos2unix src/shoutem.js"
   },
   "author": "",
   "license": "ISC",
@@ -71,9 +71,9 @@
   },
   "devDependencies": {
     "babel-cli": "^6.8.0",
-    "dos2unix": "^1.1.2",
     "babel-plugin-rewire": "1.0.0-rc-2",
     "chai": "3.5.0",
+    "dos2unix-cli": "^1.0.0",
     "eslint": "2.9.0",
     "eslint-config-airbnb": "8.0.0",
     "eslint-plugin-import": "1.9.2",
