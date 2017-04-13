@@ -6,6 +6,7 @@ import * as npm from '../extension/npm';
 import { ensureYarnInstalled } from '../extension/yarn';
 import { unlinkDeletedWorkingDirectories } from '../clients/mobile-env';
 import { ensureNodeVersion } from '../extension/node';
+import * as reactNative from '../extension/react-native';
 import { ensureDeveloperIsRegistered } from '../commands/register';
 import { readJsonFile, writeJsonFile } from '../extension/data';
 import path from 'path';
@@ -16,7 +17,6 @@ import _ from 'lodash';
 import { handleError } from '../extension/error-handler';
 import selectApp from '../extension/app-selector';
 import { uncommentBuildDir } from '../extension/platform';
-import * as reactNative from '../extension/react-native';
 import 'colors';
 
 export default async function shoutemRun(platform, appId, options = {}) {

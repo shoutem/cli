@@ -1,17 +1,19 @@
+import url from 'url';
 import path from 'path';
+import fs from 'mz/fs';
+import glob from 'glob-promise';
+import replace from 'replace-in-file';
 import { AppManagerClient } from '../clients/app-manager';
-import { ensureUserIsLoggedIn } from '../commands/login';
 import decompressUri from '../extension/decompress';
 import apiUrls from '../../config/services';
-import url from 'url';
-import replace from 'replace-in-file';
 import cliUrls from '../../config/services';
-import fs from 'mz/fs';
 import { writeJsonFile } from '../extension/data';
 import * as npm from '../extension/npm';
 import { readJsonFile } from './data';
-import glob from 'glob-promise';
 import { ensureUserIsLoggedIn } from '../commands/login';
+import { ensureYarnInstalled } from '../extension/yarn';
+import { ensureNodeVersion } from '../extension/node';
+import * as reactNative from '../extension/react-native';
 
 async function isPlatformDirectory(dir) {
   const { name } = await readJsonFile(path.join(dir, 'package.json')) || {};
@@ -34,7 +36,6 @@ export async function getPlatformRootDir(dir = process.cwd()) {
 
 export async function getExtensionsPaths(platformDir) {
   const paths = await glob(path.join(platformDir, 'extensions', '*', 'app'));
-  console.log(paths);
   return paths;
 }
 
@@ -45,8 +46,8 @@ export async function uncommentBuildDir(buildDirectory) {
   await fs.writeFile(buildGradlePath, buildGradle);
 }
 
-export async function preparePlatform(platformDir, { platform, appId, debug = true, excludePackages = ['shoutem.code-push'], production = false, linkLocalExtensions = true }) {
-  const mobileConfig = {
+export async function createMobileConfig(platformDir, { platform, appId, debug = true, excludePackages = ['shoutem.code-push'], production = false, linkLocalExtensions = false, skipNativeDependencies = false, offlineMode = false }) {
+  return {
     platform,
     appId,
     serverApiEndpoint: url.parse(cliUrls.appManager).hostname,
@@ -54,12 +55,20 @@ export async function preparePlatform(platformDir, { platform, appId, debug = tr
     authorization: await ensureUserIsLoggedIn(),
     configurationFilePath: 'config.json',
     workingDirectories: linkLocalExtensions ? await getExtensionsPaths(platformDir) : [],
+    //TODO Add linked directories
     excludePackages,
     debug,
     extensionsJsPath: "./extensions.js",
     production,
-    skipNativeDependencies: false
+    skipNativeDependencies: skipNativeDependencies,
+    offlineMode
   };
+}
+
+export async function preparePlatform(platformDir, mobileConfig) {
+  await ensureYarnInstalled();
+  await ensureNodeVersion();
+  await reactNative.ensureInstalled();
 
   const configPath = path.join(platformDir, 'config.json');
 
@@ -124,4 +133,22 @@ export async function downloadApp(appId, destinationDir) {
 async function pullPlatform(version, destination) {
   const url = `${apiUrls.mobileAppUrl}/archive/v${version}.tar.gz`;
   await decompressUri(url, destination, { strip: 1 });
+}
+
+export async function runPlatform(platformDir, { platform, device, simulator, release }) {
+  const runOptions = ['--platform', platform];
+
+  if (device) {
+    runOptions.push('--device', device);
+  }
+
+  if (simulator) {
+    runOptions.push('--simulator', simulator);
+  }
+
+  if (release) {
+    runOptions.push('--configuration', 'Release');
+  }
+
+  await npm.run(platformDir, 'run', runOptions);
 }

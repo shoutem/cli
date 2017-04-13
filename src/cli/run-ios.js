@@ -1,4 +1,4 @@
-import shoutemRunCommand from '../commands/shoutem-run';
+import runPlatform from '../commands/run-platform';
 import { ensureCocoaPodsInstalled } from '../extension/cocoa-pods';
 import msg from '../user_messages';
 import { listIosSimulators, listIosDevices } from '../extension/device';
@@ -99,7 +99,7 @@ export async function handler(args) {
       }
     }
 
-    await shoutemRunCommand('ios', args.appId, args);
+    await runPlatform('ios', args);
   } catch (err) {
     console.error(err.message || err);
   }

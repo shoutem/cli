@@ -1,4 +1,4 @@
-import shoutemRunCommand from '../commands/shoutem-run';
+import runPlatform from '../commands/run-platform';
 import { handleError } from '../extension/error-handler';
 
 export const description = 'Run shoutem application on android platform';
@@ -36,7 +36,7 @@ export const builder = yargs => {
 };
 export async function handler(args) {
   try {
-    await shoutemRunCommand('android', args.appId, args)
+    await runPlatform('android', args);
   } catch (err) {
     await handleError(err);
   }
