@@ -44,6 +44,13 @@ export async function pullPlatform(version, destination) {
   await decompressUri(url, destination, { strip: 1 });
 }
 
+export async function downloadApp(destinationDir, appId) {
+  const appManager = new AppManagerClient(await ensureUserIsLoggedIn(), appId);
+  const { mobileAppVersion } = await appManager.getApplicationPlatform();
+
+  await pullPlatform(mobileAppVersion, destinationDir);
+}
+
 export async function pullApp({ appId }, destinationDir) {
   appId = appId || await selectApp();
 

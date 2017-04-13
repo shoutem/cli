@@ -20,6 +20,7 @@
   "license": "ISC",
   "dependencies": {
     "@shoutem/platform-build": "0.0.7",
+    "app-root-path": "^2.0.1",
     "async": "2.0.0-rc.3",
     "babel-plugin-transform-async-to-generator": "^6.22.0",
     "babel-plugin-transform-object-rest-spread": "^6.22.0",
@@ -52,6 +53,7 @@
     "pipe-streams-to-promise": "^0.2.0",
     "progress": "^1.1.8",
     "qrcode-terminal": "^0.11.0",
+    "replace-in-file": "^2.5.0",
     "request": "^2.72.0",
     "request-promise": "^4.1.1",
     "request-promise-native": "^1.0.3",

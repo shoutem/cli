@@ -1,6 +1,7 @@
 import os from 'os';
 import path from 'path';
 import mkdirp from 'mkdirp-promise';
+import { path as cliRoot } from 'app-root-path';
 import { getHostEnvName } from './server-env';
 
 export async function localStoragePath() {
@@ -42,8 +43,12 @@ export async function getPlatformsPath() {
   return platformsPath;
 }
 
-export function getPlatformBuildPath(cliRoot) {
-  return path.join(cliRoot, 'node_modules', '@shoutem', 'platform-build');
+export async function getBuildPath() {
+  return await path.join(await getPlatformsPath(), 'build');
+}
+
+export function getPlatformBuildPath() {
+  return path.join(getCliRoot(), 'node_modules', '@shoutem', 'platform-build');
 }
 
 export async function getPlatformConfigPath() {
@@ -52,4 +57,8 @@ export async function getPlatformConfigPath() {
 
 export async function mobileAppConfigPath() {
   return path.join(await mobileAppPath(), 'build-config.json');
+}
+
+export function getCliRoot() {
+  return cliRoot;
 }

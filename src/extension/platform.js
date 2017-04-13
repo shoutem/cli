@@ -1,5 +1,6 @@
 import path from 'path';
 import url from 'url';
+import replace from 'replace-in-file';
 import cliUrls from '../../config/services';
 import fs from 'mz/fs';
 import { writeJsonFile } from '../extension/data';
@@ -40,7 +41,7 @@ export async function uncommentBuildDir(buildDirectory) {
   await fs.writeFile(buildGradlePath, buildGradle);
 }
 
-export async function preparePlatform(platformDir, { platform, appId, release}) {
+export async function preparePlatform(platformDir, { platform, appId, debug = true, excludePackages = ['shoutem.code-push'], production = false, linkLocalExtensions = true }) {
   const mobileConfig = {
     platform,
     appId,
@@ -48,23 +49,57 @@ export async function preparePlatform(platformDir, { platform, appId, release}) 
     legacyApiEndpoint: url.parse(cliUrls.legacyService).hostname,
     authorization: await ensureUserIsLoggedIn(),
     configurationFilePath: 'config.json',
-    /*platformsDirectory: await getPlatformsPath(),*/
-    workingDirectories: await getExtensionsPaths(platformDir),
-    excludePackages: ['shoutem.code-push'],
-    debug: !release,
-    offlineMode: true,
-    extensionsJsPath: "./extensions.js"
+    workingDirectories: linkLocalExtensions ? await getExtensionsPaths(platformDir) : [],
+    excludePackages,
+    debug,
+    extensionsJsPath: "./extensions.js",
+    production,
+    skipNativeDependencies: false
   };
 
   const configPath = path.join(platformDir, 'config.json');
-  console.log(configPath);
 
   await writeJsonFile(mobileConfig, configPath);
   await npm.install(path.join(platformDir, 'scripts'));
-  await npm.run(platformDir, 'configure', ['--configPath', configPath]);
+  await npm.run(platformDir, 'configure'/* , ['--configPath', configPath] */);
 
   // android run script requires android binaries to be stored near the system's root
   if (process.platform === 'win32') {
+    await uncommentBuildDir(platformDir);
+  }
+}
+
+export async function buildPlatform(platformDir, platform, outputDir = process.cwd()) {
+  await npm.run(platformDir, 'build', [
+    '--platform', platform,
+    '--outputDirectory', outputDir
+  ]);
+}
+
+export async function fixPlatform(platformDir) {
+  const appBuilderPath = path.join(platformDir, 'scripts', 'classes', 'app-builder.js');
+
+  if (process.platform === 'win32') {
+    try {
+      await replace({
+        files: appBuilderPath,
+        from: './gradlew',
+        to: 'gradlew'
+      });
+    } catch (err) {
+      console.log('WARN: Could not rename ./gradle to gradle');
+    }
+
+    try {
+      await replace({
+        files: appBuilderPath,
+        from: "const apkPath = path.join('android', 'app', 'build', 'outputs', 'apk');",
+        to: "const apkPath = path.join('c:/', 'tmp', 'ShoutemApp', 'app', 'outputs', 'apk');"
+      });
+    } catch (err) {
+      console.log('WARN: Could not adapt client for c:\\tmp build directory');
+    }
+
     await uncommentBuildDir(platformDir);
   }
 }
