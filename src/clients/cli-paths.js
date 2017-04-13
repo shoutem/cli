@@ -4,7 +4,7 @@ import mkdirp from 'mkdirp-promise';
 import findNodeModules from 'find-node-modules';
 import { getHostEnvName } from './server-env';
 
-const cliRoot = findNodeModules({ relative: false })[0];
+const cliRoot = findNodeModules({ cwd: __dirname, relative: false })[0];
 
 export async function localStoragePath() {
   const storagePath = path.join(os.homedir(), '.shoutem');
