@@ -1,8 +1,10 @@
 import os from 'os';
 import path from 'path';
 import mkdirp from 'mkdirp-promise';
-import { path as cliRoot } from 'app-root-path';
+import findNodeModules from 'find-node-modules';
 import { getHostEnvName } from './server-env';
+
+const cliRoot = findNodeModules({ relative: false })[0];
 
 export async function localStoragePath() {
   const storagePath = path.join(os.homedir(), '.shoutem');
@@ -48,7 +50,7 @@ export async function getBuildPath() {
 }
 
 export function getPlatformBuildPath() {
-  return path.join(getCliRoot(), 'node_modules', '@shoutem', 'platform-build');
+  return path.join(getCliRoot(), '@shoutem', 'platform-build');
 }
 
 export async function getPlatformConfigPath() {
