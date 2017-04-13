@@ -1,4 +1,8 @@
 import path from 'path';
+import { AppManagerClient } from '../clients/app-manager';
+import { ensureUserIsLoggedIn } from '../commands/login';
+import decompressUri from '../extension/decompress';
+import apiUrls from '../../config/services';
 import url from 'url';
 import replace from 'replace-in-file';
 import cliUrls from '../../config/services';
@@ -102,4 +106,22 @@ export async function fixPlatform(platformDir) {
 
     await uncommentBuildDir(platformDir);
   }
+}
+
+export async function getPlatformVersion(appId) {
+  const appManager = new AppManagerClient(await ensureUserIsLoggedIn(), appId);
+  const { mobileAppVersion } = await appManager.getApplicationPlatform();
+
+  return mobileAppVersion;
+}
+
+export async function downloadApp(appId, destinationDir) {
+  const mobileAppVersion = await getPlatformVersion(appId);
+
+  await pullPlatform(mobileAppVersion, destinationDir);
+}
+
+async function pullPlatform(version, destination) {
+  const url = `${apiUrls.mobileAppUrl}/archive/v${version}.tar.gz`;
+  await decompressUri(url, destination, { strip: 1 });
 }

@@ -1,4 +1,3 @@
-import bluebird from 'bluebird';
 import path from 'path';
 import { dir } from 'tmp-promise';
 import decompress from 'decompress';

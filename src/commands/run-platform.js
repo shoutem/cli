@@ -14,7 +14,7 @@ export default async function(platform, opts) {
     await platformBuild.clean();
   }
 
-  await platformBuild.configure(platform, opts.appId || selectApp(), { debug: !opts.release });
+  await platformBuild.configure(platform, opts.appId || await selectApp(), { debug: !opts.release });
 
 
 }
