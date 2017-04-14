@@ -43,7 +43,7 @@ export const builder = yargs => {
 };
 export async function handler(args) {
   try {
-    await mobilizerRunCommand(args.appId, args)
+    await mobilizerRunCommand(args)
   } catch (err) {
     await handleError(err);
   }

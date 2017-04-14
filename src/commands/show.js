@@ -1,13 +1,11 @@
 /* eslint no-console: "off" */
-import { loadMobileConfig, unlinkDeletedWorkingDirectories } from '../clients/mobile-env';
+import { getLinkedDirectories } from '../extension/linker';
 import { getHostEnvName } from '../clients/server-env';
 import apisConfig from '../../config/services';
 import msg from '../user_messages';
 import { getDeveloper } from '../commands/register';
 
 export default async function() {
-  await unlinkDeletedWorkingDirectories();
-
   const serverEnv = getHostEnvName();
 
   if (serverEnv !== 'production') {
@@ -15,8 +13,7 @@ export default async function() {
     console.log(apisConfig);
   }
 
-  const config = await loadMobileConfig() || {};
-  const extDirs = config.workingDirectories || [];
+  const extDirs = await getLinkedDirectories();
 
   if (extDirs.length === 0) {
     console.log(msg.show.missingExtensions());

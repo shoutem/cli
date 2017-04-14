@@ -3,6 +3,7 @@ import path from 'path';
 import fs from 'mz/fs';
 import glob from 'glob-promise';
 import replace from 'replace-in-file';
+import { getLinkedDirectories } from './linker';
 import { AppManagerClient } from '../clients/app-manager';
 import decompressUri from '../extension/decompress';
 import apiUrls from '../../config/services';
@@ -54,13 +55,12 @@ export async function createMobileConfig(platformDir, { platform, appId, debug =
     legacyApiEndpoint: url.parse(cliUrls.legacyService).hostname,
     authorization: await ensureUserIsLoggedIn(),
     configurationFilePath: 'config.json',
-    workingDirectories: linkLocalExtensions ? await getExtensionsPaths(platformDir) : [],
-    //TODO Add linked directories
+    workingDirectories: linkLocalExtensions ? await getExtensionsPaths(platformDir) : await getLinkedDirectories(),
     excludePackages,
     debug,
     extensionsJsPath: "./extensions.js",
     production,
-    skipNativeDependencies: skipNativeDependencies,
+    skipNativeDependencies,
     offlineMode
   };
 }

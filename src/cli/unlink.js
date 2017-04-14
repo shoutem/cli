@@ -1,8 +1,7 @@
 /* eslint no-console: "off" */
-import path from 'path';
-import { mobileAppConfigPath } from '../clients/cli-paths';
-import { getExtensionRootDir, readJsonFile, writeJsonFile } from '../extension/data';
 import { handleError } from '../extension/error-handler';
+import { getExtensionRootDir } from '../extension/data';
+import { unlinkDirectory, setLinkedDirectories } from '../extension/linker';
 import { limitArguments } from '../extension/cli-parsing';
 import msg from '../user_messages';
 
@@ -23,23 +22,13 @@ export const builder = yargs => {
 export async function handler(args) {
   try {
     limitArguments(args, 0);
-    const config = await readJsonFile(await mobileAppConfigPath()) || {};
+
     if (args.all) {
-      config.workingDirectories = [];
+      await setLinkedDirectories([]);
     } else {
-      const extensionDir = getExtensionRootDir();
-      const workingDir = extensionDir ? path.join(extensionDir, 'app') : process.cwd();
-      const extensionDirIndex = (config.workingDirectories || []).indexOf(workingDir);
-
-      if (extensionDirIndex < 0) {
-        console.log(msg.unlink.notLinked());
-        return null;
-      }
-
-      config.workingDirectories.splice(extensionDirIndex, 1);
+      await unlinkDirectory(getExtensionRootDir() || process.cwd());
     }
 
-    await writeJsonFile(config, await mobileAppConfigPath());
     console.log(msg.unlink.complete());
   } catch (exc) {
     await handleError(exc);
