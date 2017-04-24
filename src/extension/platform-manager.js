@@ -3,67 +3,64 @@ import { exec } from 'mz/child_process';
 import _ from 'lodash';
 import { join } from 'path';
 import rmrf from 'rmfr';
-import fs from 'mz/fs';
 import ip from 'ip';
 import * as tunnel from '../extension/tunnel';
 import { startPackager } from './react-native';
 import { mobileEnvPath } from '../clients/cli-paths';
 import * as platform from './platform';
-import { readJsonFile, pathExists } from './data';
+import { readJsonFile, writeJsonFile } from './data';
 import { printMobilizerQR } from '../commands/qr-generator';
+import { getAppManager, getLegacyServiceClient } from '../clients/clients-factory';
 
 async function getAppDir(appId) {
-  return join(await mobileEnvPath(), appId);
+  return join(await mobileEnvPath(), appId.toString());
 }
 
-async function isAppConfigured(appId) {
-  const path = join(await getAppDir(appId), 'configured.info');
-  return await pathExists(path);
+async function getCurrentApplicationState(appId, buildConfig) {
+  const publishingProperties = await (await getLegacyServiceClient()).getPublishingProperties(appId);
+  const installations = await (await getAppManager(appId)).getInstallations();
+  const installationsUrls = installations.map(inst => inst.location.app.package);
+  const platformVersion = await platform.getPlatformVersion(appId);
+
+  return {
+    publishingProperties,
+    installationsUrls,
+    buildConfig,
+    platformVersion
+  };
 }
 
-async function markAppConfigured(appId) {
-  const path = join(await getAppDir(appId), 'configured.info');
-  await fs.writeFile(path, 'This file is to mark the successful app configuration step');
+async function getApplicationStatePath(appId) {
+  return join(await getAppDir(appId), 'last_build_state.json');
 }
 
-async function isAppSynced(mobileConfig) {
-  const { appId } = mobileConfig;
+async function saveApplicationState(appId, state) {
+  return await writeJsonFile(state, await getApplicationStatePath(appId));
+}
 
-  if (!await isAppConfigured(appId)) {
-    return false;
-  }
-
-  const oldConfigFile = await readJsonFile(join(await getAppDir(appId), 'config.json')) || {};
-  if (!_.isEqual(mobileConfig, oldConfigFile)) {
-    return false;
-  }
-
-  const serverVersion = await platform.getPlatformVersion(appId);
-  const { version } = await readJsonFile(join(await getAppDir(appId), 'package.json')) || {};
-  if (!version || serverVersion !== version) {
-    return false;
-  }
-
-  //TODO check for installed extensions
-  //TODO check for publishing properties
-
-  return true;
+async function getOldApplicationState(appId) {
+  return await readJsonFile(await getApplicationStatePath(appId));
 }
 
 async function syncApp(opts) {
-  const path = await getAppDir(opts.appId);
+  const { appId } = opts;
+
+  const path = await getAppDir(appId);
   const mobileConfig = await platform.createMobileConfig(path, opts);
 
-  if (await isAppSynced(mobileConfig)) {
+  const currentAppState = await getCurrentApplicationState(appId, mobileConfig);
+  const oldAppState = await getOldApplicationState(appId);
+
+  if (_.isEqual(currentAppState, oldAppState)) {
     return null;
   }
 
   await rmrf(path);
-  
-  await platform.downloadApp(opts.appId, path);
+  await platform.downloadApp(appId, path);
   await platform.fixPlatform(path);
   await platform.preparePlatform(path, mobileConfig);
-  await markAppConfigured(opts.appId);
+
+  await saveApplicationState(appId, currentAppState);
 }
 
 export async function nativeRun(opts) {

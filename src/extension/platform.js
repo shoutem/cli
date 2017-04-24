@@ -50,7 +50,7 @@ export async function uncommentBuildDir(buildDirectory) {
 export async function createMobileConfig(platformDir, { platform, appId, debug = true, excludePackages = ['shoutem.code-push'], production = false, linkLocalExtensions = false, skipNativeDependencies = false, offlineMode = false }) {
   return {
     platform,
-    appId,
+    appId: appId.toString(),
     serverApiEndpoint: url.parse(cliUrls.appManager).hostname,
     legacyApiEndpoint: url.parse(cliUrls.legacyService).hostname,
     authorization: await ensureUserIsLoggedIn(),
@@ -150,5 +150,5 @@ export async function runPlatform(platformDir, { platform, device, simulator, re
     runOptions.push('--configuration', 'Release');
   }
 
-  await npm.run(platformDir, 'run', runOptions);
+  return await npm.run(platformDir, 'run', runOptions);
 }

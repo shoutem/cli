@@ -94,4 +94,26 @@ export class LegacyServiceClient {
 
     return body.data;
   }
+
+  async getPublishingProperties(appId) {
+    const settings = {
+      json: true,
+      resolveWithFullResponse: true,
+      method: 'GET',
+      uri: new URI(this.serviceUri).segment(`/api/applications/publishing_properties.json`).search({ nid: appId }).toString(),
+      headers: {
+        Accept: 'application/json',
+        Authorization: `Bearer ${this.apiToken}`,
+        'Content-Type': 'application/json',
+      }
+    };
+
+    const res = await request2(settings);
+    const { statusCode, body } = res;
+    if (statusCode !== 200) {
+      throw new LegacyServiceError(settings, statusCode, body);
+    }
+
+    return body;
+  }
 }
