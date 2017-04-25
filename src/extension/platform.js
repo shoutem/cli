@@ -1,12 +1,10 @@
 import url from 'url';
 import path from 'path';
-import fs from 'mz/fs';
 import glob from 'glob-promise';
 import replace from 'replace-in-file';
 import { getLinkedDirectories } from './linker';
 import { AppManagerClient } from '../clients/app-manager';
 import decompressUri from '../extension/decompress';
-import apiUrls from '../../config/services';
 import cliUrls from '../../config/services';
 import { writeJsonFile } from '../extension/data';
 import * as npm from '../extension/npm';
@@ -36,15 +34,7 @@ export async function getPlatformRootDir(dir = process.cwd()) {
 }
 
 export async function getExtensionsPaths(platformDir) {
-  const paths = await glob(path.join(platformDir, 'extensions', '*', 'app'));
-  return paths;
-}
-
-export async function uncommentBuildDir(buildDirectory) {
-  const buildGradlePath = path.join(buildDirectory, 'android', 'build.gradle');
-  let buildGradle = await fs.readFile(buildGradlePath, 'utf-8');
-  buildGradle = buildGradle.replace('//<CLI> buildDir', 'buildDir');
-  await fs.writeFile(buildGradlePath, buildGradle);
+  return await glob(path.join(platformDir, 'extensions', '*', 'app'));
 }
 
 export async function createMobileConfig(platformDir, { platform, appId, debug = true, excludePackages = ['shoutem.code-push'], production = false, linkLocalExtensions = false, skipNativeDependencies = false, offlineMode = false }) {
@@ -75,11 +65,6 @@ export async function preparePlatform(platformDir, mobileConfig) {
   await writeJsonFile(mobileConfig, configPath);
   await npm.install(path.join(platformDir, 'scripts'));
   await npm.run(platformDir, 'configure'/* , ['--configPath', configPath] */);
-
-  // android run script requires android binaries to be stored near the system's root
-  if (process.platform === 'win32') {
-    await uncommentBuildDir(platformDir);
-  }
 }
 
 export async function buildPlatform(platformDir, platform, outputDir = process.cwd()) {
@@ -89,7 +74,7 @@ export async function buildPlatform(platformDir, platform, outputDir = process.c
   ]);
 }
 
-export async function fixPlatform(platformDir) {
+export async function fixPlatform(platformDir, appId) {
   const appBuilderPath = path.join(platformDir, 'scripts', 'classes', 'app-builder.js');
 
   if (process.platform === 'win32') {
@@ -113,7 +98,15 @@ export async function fixPlatform(platformDir) {
       console.log('WARN: Could not adapt client for c:\\tmp build directory');
     }
 
-    await uncommentBuildDir(platformDir);
+    try {
+      await replace({
+        files: path.join(platformDir, 'android', 'build.gradle'),
+        from: '//<CLI> buildDir = "C:/tmp/',
+        to: `buildDir = "C:/tmp/${appId}/`
+      })
+    } catch (err) {
+      console.log('WARN: Could not set the tmp build directory for android app');
+    }
   }
 }
 
@@ -131,7 +124,7 @@ export async function downloadApp(appId, destinationDir) {
 }
 
 async function pullPlatform(version, destination) {
-  const url = `${apiUrls.mobileAppUrl}/archive/v${version}.tar.gz`;
+  const url = `${cliUrls.mobileAppUrl}/archive/v${version}.tar.gz`;
   await decompressUri(url, destination, { strip: 1 });
 }
 

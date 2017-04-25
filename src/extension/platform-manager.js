@@ -57,7 +57,7 @@ async function syncApp(opts) {
 
   await rmrf(path);
   await platform.downloadApp(appId, path);
-  await platform.fixPlatform(path);
+  await platform.fixPlatform(path, appId);
   await platform.preparePlatform(path, mobileConfig);
 
   await saveApplicationState(appId, currentAppState);
