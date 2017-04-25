@@ -5,6 +5,7 @@ import { spawn } from 'superspawn';
 import { version } from '../../package.json';
 import confirm from '../extension/confirmer';
 import * as cache from '../extension/cache';
+import { spinify } from '../extension/spinner';
 import 'colors';
 
 async function confirmUpdate() {
@@ -19,7 +20,7 @@ async function confirmUpdate() {
 }
 
 export default async function () {
-  if (await isLatest(apiUrls.cliAppUri, version)) {
+  if (await spinify(isLatest(apiUrls.cliAppUri, version), 'Checking for CLI update...')) {
     return false;
   }
 

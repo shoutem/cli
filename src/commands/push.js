@@ -15,7 +15,7 @@ import { startSpinner } from '../extension/spinner';
 
 async function setPackageNameVersion(path, name, version) {
   const data = await utils.readJsonFile(path);
-  if (data == null) {
+  if (data === null) {
     return null;
   }
 
@@ -62,7 +62,6 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
     spinner.stop(true);
   }
 
-  //{ progressHandler: createProgressHandler({ msg: 'Upload progress', total: size }), }
   await mzfs.unlink(packResult.package);
 
   const notPacked = _.difference(packResult.allDirs, packResult.packedDirs);

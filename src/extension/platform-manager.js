@@ -6,6 +6,7 @@ import rmrf from 'rmfr';
 import ip from 'ip';
 import tmp from 'tmp-promise';
 import * as tunnel from '../extension/tunnel';
+import { spinify } from '../extension/spinner';
 import { startPackager } from './react-native';
 import { mobileEnvPath } from '../clients/cli-paths';
 import * as platform from './platform';
@@ -52,7 +53,11 @@ async function syncApp(path, opts) {
 
   const mobileConfig = await platform.createMobileConfig(path, opts);
 
-  const currentAppState = await getCurrentApplicationState(appId, mobileConfig);
+  const currentAppState = await spinify(
+    getCurrentApplicationState(appId, mobileConfig),
+    'Checking for changes since last run...'
+  );
+
   const oldAppState = await getOldApplicationState(path, appId);
 
   if (_.isEqual(currentAppState, oldAppState)) {
@@ -60,8 +65,8 @@ async function syncApp(path, opts) {
   }
 
   if (!opts.mobileapp) {
-    await rmrf(path);
-    await platform.downloadApp(appId, path);
+    await spinify(rmrf(path), 'Deleting old platform code...');
+    await spinify(platform.downloadApp(appId, path), 'Downloading current platform code...');
   }
 
   await platform.fixPlatform(path, appId);
