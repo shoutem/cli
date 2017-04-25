@@ -6,20 +6,10 @@ export const command = 'run [appId]';
 export const builder = yargs => {
   return yargs
     .options({
-      platformbuild: {
-        alias: 'p',
-        description: false,
-        requiresArg: true
-      },
       mobileapp: {
         alias: 'm',
         description: 'use external mobile app (ignores platform settings)',
         requiresArg: true
-      },
-      noclean: {
-        alias: 'n',
-        description: 'don\'t clean build directory before running',
-        type: 'boolean'
       },
       local: {
         alias: 'l',

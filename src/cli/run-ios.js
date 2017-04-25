@@ -12,11 +12,6 @@ export const command = 'run-ios [appId]';
 export const builder = yargs => {
   return yargs
     .options({
-      platformbuild: {
-        alias: 'p',
-        description: false,
-        requiresArg: true
-      },
       mobileapp: {
         alias: 'm',
         description: 'use external mobile app (ignores platform settings)',
@@ -36,11 +31,6 @@ export const builder = yargs => {
         alias: 's',
         description: 'run app on a specific simulator',
         type: 'string'
-      },
-      noclean: {
-        alias: 'n',
-        description: 'don\'t clean build directory before running',
-        type: 'boolean'
       }
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);

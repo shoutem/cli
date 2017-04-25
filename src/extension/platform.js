@@ -64,7 +64,7 @@ export async function preparePlatform(platformDir, mobileConfig) {
 
   await writeJsonFile(mobileConfig, configPath);
   await npm.install(path.join(platformDir, 'scripts'));
-  await npm.run(platformDir, 'configure'/* , ['--configPath', configPath] */);
+  await npm.run(platformDir, 'configure');
 }
 
 export async function buildPlatform(platformDir, platform, outputDir = process.cwd()) {
@@ -119,7 +119,6 @@ export async function getPlatformVersion(appId) {
 
 export async function downloadApp(appId, destinationDir) {
   const mobileAppVersion = await getPlatformVersion(appId);
-
   await pullPlatform(mobileAppVersion, destinationDir);
 }
 

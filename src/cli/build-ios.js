@@ -5,14 +5,11 @@ export const description = 'Build iOS app for production';
 export const command = 'build-ios [appId]';
 export const builder = yargs => {
   return yargs.options({
-    noclean: {
-      type: 'boolean',
-      description: 'skip clean step, reuse previous build or run'
+    mobileapp: {
+      alias: 'm',
+      description: 'use external mobile app (ignores platform settings)',
+      requiresArg: true
     },
-    noconfigure: {
-      type: 'boolean',
-      description: 'skip configure step, reuse previous build or run'
-    }
   });
 };
 

@@ -4,6 +4,7 @@ import _ from 'lodash';
 import { join } from 'path';
 import rmrf from 'rmfr';
 import ip from 'ip';
+import tmp from 'tmp-promise';
 import * as tunnel from '../extension/tunnel';
 import { startPackager } from './react-native';
 import { mobileEnvPath } from '../clients/cli-paths';
@@ -30,43 +31,49 @@ async function getCurrentApplicationState(appId, buildConfig) {
   };
 }
 
-async function getApplicationStatePath(appId) {
-  return join(await getAppDir(appId), 'last_build_state.json');
+async function getApplicationStatePath(platformPath) {
+  return join(platformPath, 'last_build_state.json');
 }
 
-async function saveApplicationState(appId, state) {
-  return await writeJsonFile(state, await getApplicationStatePath(appId));
+async function saveApplicationState(path, appId, state) {
+  return await writeJsonFile(state, await getApplicationStatePath(path, appId));
 }
 
-async function getOldApplicationState(appId) {
-  return await readJsonFile(await getApplicationStatePath(appId));
+async function getOldApplicationState(path, appId) {
+  return await readJsonFile(await getApplicationStatePath(path, appId));
 }
 
-async function syncApp(opts) {
+async function syncApp(path, opts) {
   const { appId } = opts;
 
-  const path = await getAppDir(appId);
+  if (opts.mobileapp && (await readJsonFile(join(path, 'package.json')) || {}).name !== '@shoutem/mobile-app') {
+    throw new Error('Invalid mobile app project path');
+  }
+
   const mobileConfig = await platform.createMobileConfig(path, opts);
 
   const currentAppState = await getCurrentApplicationState(appId, mobileConfig);
-  const oldAppState = await getOldApplicationState(appId);
+  const oldAppState = await getOldApplicationState(path, appId);
 
   if (_.isEqual(currentAppState, oldAppState)) {
     return null;
   }
 
-  await rmrf(path);
-  await platform.downloadApp(appId, path);
+  if (!opts.mobileapp) {
+    await rmrf(path);
+    await platform.downloadApp(appId, path);
+  }
+
   await platform.fixPlatform(path, appId);
   await platform.preparePlatform(path, mobileConfig);
 
-  await saveApplicationState(appId, currentAppState);
+  await saveApplicationState(path, appId, currentAppState);
 }
 
 export async function nativeRun(opts) {
-  await syncApp(opts);
+  const path = opts.mobileapp || await getAppDir(opts.appId);
 
-  const path = await getAppDir(opts.appId);
+  await syncApp(path, opts);
 
   const [, runResult] = await Promise.all([
     startPackager(path, { resolveOnReady: true }),
@@ -85,11 +92,11 @@ export async function nativeRun(opts) {
 }
 
 export async function mobilizerRun(options) {
-  options.skipNativeDependencies = true;
-  options.platform = 'any';
-  await syncApp(options);
+  options = { ...options, skipNativeDependencies: true, platform: 'any' };
+  const path = options.mobileapp || await getAppDir(options.appId);
 
-  const path = await getAppDir(options.appId);
+  await syncApp(path, options);
+
   await startPackager(path, { resolveOnReady: true });
 
   if (options.local) {
@@ -105,4 +112,20 @@ export async function mobilizerRun(options) {
   }
 
   console.log('Packager is being run within this process. Please keep this process running if app is used in debug mode'.bold.yellow);
+}
+
+export async function build(platformName, options, outputDir = process.cwd()) {
+  options = {
+    ...options,
+    excludePackages: [],
+    debug: false,
+    production: false,
+    workingDirectories: [],
+    platform: platformName
+  };
+
+  const path = options.mobileapp || (await tmp.dir()).path;
+  await syncApp(path, options);
+
+  await platform.buildPlatform(path, platformName, outputDir);
 }

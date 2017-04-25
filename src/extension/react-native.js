@@ -24,15 +24,6 @@ export async function link(cwd = process.cwd()) {
   );
 }
 
-export async function ensurePackagerNotRunning() {
-  const [stdout] = await exec("lsof -n -i4TCP:8081 | sed '1 d' | awk '{print $2}'");
-  if (!stdout) {
-    return;
-  }
-
-  throw new Error(msg.reactNative.killPackager());
-}
-
 export async function run(cwd, platform) {
   await spawn(
     'react-native',
@@ -41,15 +32,9 @@ export async function run(cwd, platform) {
   );
 }
 
-export async function killPackager() {
-  if (process.platform === 'darwin') {
-    await exec("lsof -n -i4TCP:8081 | sed '1 d' | awk '{print $2}' | xargs kill -9");
-  }
-}
-
 export function startPackager(cwd, { resolveOnReady = false }) {
   const spawned = spawn('react-native', ['start'], {
-      stdio: ['inherit', 'pipe', 'pipe'],
+      stdio: ['ignore', 'pipe', 'pipe'],
       cwd,
       shell: true,
       env: { ...process.env, FORCE_COLOR: true }

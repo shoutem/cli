@@ -25,11 +25,6 @@ export const builder = yargs => {
         alias: 'd',
           description: 'run app on a specific device',
           requiresArg: true
-      },
-      noclean: {
-        alias: 'n',
-        description: 'don\'t clean build directory before running',
-        type: 'boolean'
       }
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);

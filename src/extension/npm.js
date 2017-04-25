@@ -14,7 +14,7 @@ export async function install(cwd = process.cwd()) {
 export async function run(cwd, task, taskArgs = []) {
   const opts = {
     cwd,
-    stdio: ['inherit', 'pipe', 'pipe'],
+    stdio: ['ignore', 'pipe', 'pipe'],
     shell: true,
     env: { ...process.env, FORCE_COLOR: true },
     capture: ['stdout', 'stderr']

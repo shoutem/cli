@@ -4,7 +4,6 @@ let spinners = [];
 
 export function startSpinner(msg) {
   const spinner = new Spinner(msg);
-  spinner.setSpinnerString('⠋⠙⠹⠸⠼⠴⠦⠧⠇⠏');
   spinner.start();
 
   spinners.push(spinner);
