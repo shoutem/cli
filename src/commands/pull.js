@@ -6,12 +6,10 @@ import { ExtensionManagerClient } from '../clients/extension-manager';
 import { AppManagerClient } from '../clients/app-manager';
 import { ensureUserIsLoggedIn } from './login';
 import { shoutemUnpack } from '../extension/packer';
-import decompressUri from '../extension/decompress';
-import { preparePlatform } from '../extension/platform';
-import apiUrls from '../../config/services';
 import { LegacyServiceClient } from '../clients/legacy-service';
 import { pathExists } from '../extension/data';
 import selectApp from '../extension/app-selector';
+import { downloadApp } from '../extension/platform';
 
 const downloadFile = bluebird.promisify(require('download-file'));
 
@@ -39,18 +37,6 @@ function removeTrailingSlash(str) {
   return str.replace(/\/$/, "");
 }
 
-export async function pullPlatform(version, destination) {
-  const url = `${apiUrls.mobileAppUrl}/archive/v${version}.tar.gz`;
-  await decompressUri(url, destination, { strip: 1 });
-}
-
-export async function downloadApp(destinationDir, appId) {
-  const appManager = new AppManagerClient(await ensureUserIsLoggedIn(), appId);
-  const { mobileAppVersion } = await appManager.getApplicationPlatform();
-
-  await pullPlatform(mobileAppVersion, destinationDir);
-}
-
 export async function pullApp({ appId }, destinationDir) {
   appId = appId || await selectApp();
 
@@ -67,15 +53,12 @@ export async function pullApp({ appId }, destinationDir) {
 
   await mkdirp(appDir);
 
-  const appManager = new AppManagerClient(await ensureUserIsLoggedIn(), appId);
-  const { mobileAppVersion } = await appManager.getApplicationPlatform();
-
   console.log(`Pulling the app \`${name}\`...`);
   await Promise.all([
     pullExtensions({ appId }, path.join(appDir, 'extensions'))
       .then(() => console.log('Pulling extensions...')),
-    pullPlatform(mobileAppVersion, appDir)]
-  );
+    downloadApp(appId, appDir)
+  ]);
 /*
   if (process.platform === 'darwin') {
     await preparePlatform(appDir, { platform: ['ios', 'android'], appId });
