@@ -20,11 +20,8 @@ export async function spinify(promise, msg) {
   const spinner = startSpinner(msg);
 
   try {
-    const ret = await promise;
+    return await promise;
+  } finally {
     spinner.stop(true);
-    return ret;
-  } catch (exc) {
-    spinner.stop(true);
-    throw exc;
   }
 }

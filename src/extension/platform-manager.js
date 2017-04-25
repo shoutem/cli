@@ -80,19 +80,21 @@ export async function nativeRun(opts) {
 
   await syncApp(path, opts);
 
-  const [, runResult] = await Promise.all([
-    startPackager(path, { resolveOnReady: true }),
-    platform.runPlatform(path, opts)
-  ]);
+  const packagerPromise = startPackager(path, { resolveOnReady: true });
 
-  const output = runResult.stdout + runResult.stderr;
+  try {
+    const runResult = await platform.runPlatform(path, opts);
+    const output = runResult.stdout + runResult.stderr;
 
-  if (output.indexOf('Code signing is required for product type') > 0) {
-    let xcodeProjectPath = path.join(path, `v${version}`, 'ios', 'ShoutemApp.xcodeproj');
-    console.log('Select ShoutemApp target from xcode and activate "Automatically manage signing", ' +
-      'select a provisioning profile and then rerun `shoutem run-ios`.');
-    await exec(`open "${xcodeProjectPath}"`);
-    return null;
+    if (output.indexOf('Code signing is required for product type') > 0) {
+      let xcodeProjectPath = path.join(path, `v${version}`, 'ios', 'ShoutemApp.xcodeproj');
+      console.log('Select ShoutemApp target from xcode and activate "Automatically manage signing", ' +
+        'select a provisioning profile and then rerun `shoutem run-ios`.');
+      await exec(`open "${xcodeProjectPath}"`);
+    }
+  } catch (exc) {
+    const packagerProcess = (await packagerPromise).childProcess;
+    packagerProcess.kill('SIGINT').catch(() => {});
   }
 }
 
@@ -132,5 +134,10 @@ export async function build(platformName, options, outputDir = process.cwd()) {
   const path = options.mobileapp || (await tmp.dir()).path;
   await syncApp(path, options);
 
-  await platform.buildPlatform(path, platformName, outputDir);
+  const { childProcess } = await startPackager(path, { resolveOnReady: true });
+  try {
+    await platform.buildPlatform(path, platformName, outputDir);
+  } finally {
+    childProcess.kill('SIGINT').catch(() => {});
+  }
 }
