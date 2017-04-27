@@ -4,15 +4,16 @@ import glob from 'glob-promise';
 import replace from 'replace-in-file';
 import { getLinkedDirectories } from './linker';
 import { AppManagerClient } from '../clients/app-manager';
-import decompressUri from '../extension/decompress';
+import decompressUri from './decompress';
 import cliUrls from '../../config/services';
-import { writeJsonFile } from '../extension/data';
-import * as npm from '../extension/npm';
+import { writeJsonFile } from './data';
+import * as npm from './npm';
 import { readJsonFile } from './data';
 import { ensureUserIsLoggedIn } from '../commands/login';
-import { ensureYarnInstalled } from '../extension/yarn';
-import { ensureNodeVersion } from '../extension/node';
-import * as reactNative from '../extension/react-native';
+import { ensureYarnInstalled } from './yarn';
+import { ensureNodeVersion } from './node';
+import * as reactNative from './react-native';
+import * as analytics from './analytics';
 
 async function isPlatformDirectory(dir) {
   const { name } = await readJsonFile(path.join(dir, 'package.json')) || {};
@@ -118,6 +119,8 @@ export async function getPlatformVersion(appId) {
 }
 
 export async function downloadApp(appId, destinationDir) {
+  analytics.setAppId(appId);
+
   const mobileAppVersion = await getPlatformVersion(appId);
   await pullPlatform(mobileAppVersion, destinationDir);
 }

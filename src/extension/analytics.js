@@ -1,6 +1,7 @@
 import * as cache from './cache';
 import ua from 'universal-analytics';
 import uuid from 'uuid/v4';
+import _ from 'lodash';
 import { getLocalDataClient } from '../clients/clients-factory';
 
 function getTrackingId() {
@@ -54,8 +55,6 @@ export function setAppId(appId) {
     finishReport()
       .catch(console.error);
   }
-
-  console.log(reportData);
 }
 
 export function setExtensionCanonicalName(name) {
@@ -65,19 +64,17 @@ export function setExtensionCanonicalName(name) {
     finishReport()
       .catch(console.error);
   }
-
-  console.log(reportData);
 }
 
 export function setArgv(argv) {
-  reportData.argv = argv;
+  reportData.argv = _.drop(argv, 2);
 }
 
 async function finishReport() {
   const { commandName, extensionCanonicalName, appId, argv, reportSent } = reportData;
   const label = extensionCanonicalName || appId;
 
-  if (commandName && reportSent) {
+  if (commandName && !reportSent) {
     await reportCliCommand(commandName, argv.join(' '), label);
     reportData.reportSent = true;
     console.log('Report finished!', reportData);
