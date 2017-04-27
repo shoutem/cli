@@ -27,11 +27,3 @@ export async function serverEnvPath() {
 
   return envPath;
 }
-
-export async function mobileAppPath() {
-  return mobileEnvPath();
-}
-
-export async function mobileAppConfigPath() {
-  return path.join(await mobileAppPath(), 'build-config.json');
-}

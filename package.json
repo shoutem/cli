@@ -65,7 +65,9 @@
     "tar.gz": "1.0.2",
     "tmp-promise": "^1.0.2",
     "underscore": "^1.8.3",
+    "universal-analytics": "^0.4.13",
     "urijs": "1.18.0",
+    "uuid": "^3.0.1",
     "yargonaut": "^1.1.2",
     "yargs": "^6.6.0"
   },

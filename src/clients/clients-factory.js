@@ -25,3 +25,7 @@ export async function getAppManager(appId) {
 export async function getLegacyServiceClient() {
   return new LegacyServiceClient(await loadApiToken());
 }
+
+export function getLocalDataClient() {
+  return localData;
+}
