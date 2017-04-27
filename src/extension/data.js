@@ -3,9 +3,14 @@ import fs from 'fs';
 import path from 'path';
 import mzfs from 'mz/fs';
 import bluebird from 'bluebird';
+import * as analytics from './analytics';
 
 export function getExtensionCanonicalName(devName, extName, extVersion) {
-  return `${devName}.${extName}-${extVersion}`;
+  const canonicalName = `${devName}.${extName}-${extVersion}`;
+
+  analytics.setExtensionCanonicalName(canonicalName);
+
+  return canonicalName;
 }
 
 export function dirHasExtensionJson(dirPath) {

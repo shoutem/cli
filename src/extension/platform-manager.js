@@ -13,6 +13,7 @@ import * as platform from './platform';
 import { readJsonFile, writeJsonFile } from './data';
 import { printMobilizerQR } from '../commands/qr-generator';
 import { getAppManager, getLegacyServiceClient } from '../clients/clients-factory';
+import * as analytics from './analytics';
 
 async function getAppDir(appId) {
   return join(await mobileEnvPath(), appId.toString());
@@ -46,6 +47,8 @@ async function getOldApplicationState(path, appId) {
 
 async function syncApp(path, opts) {
   const { appId } = opts;
+
+  analytics.setAppId(appId);
 
   if (opts.mobileapp && (await readJsonFile(join(path, 'package.json')) || {}).name !== '@shoutem/mobile-app') {
     throw new Error('Invalid mobile app project path');

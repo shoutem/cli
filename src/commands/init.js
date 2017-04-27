@@ -6,6 +6,7 @@ import { ensureDeveloperIsRegistered } from './register';
 import msg from '../user_messages';
 import { ExtensionManagerClient } from '../clients/extension-manager';
 import { ensureUserIsLoggedIn } from './login'
+import * as utils from '../extension/data';
 
 export function cwd() {
   return process.cwd();
@@ -54,5 +55,8 @@ export async function promptExtensionInit(extName) {
 export async function initExtension(extName) {
   const developer = await ensureDeveloperIsRegistered();
   const extJson = await promptExtensionInit(extName);
+
+  utils.getExtensionCanonicalName(developer.name, extJson.name, extJson.version);
+
   await instantiateTemplatePath('init', cwd(), { devName: developer.name, extJson });
 }

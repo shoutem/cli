@@ -7,6 +7,9 @@ import yargs from 'yargs';
 import { version } from '../package.json';
 import apiUrls from '../config/services';
 import autoUpdate from './commands/update-cli';
+import * as analytics from './extension/analytics';
+
+analytics.setArgv(process.argv);
 
 (async () => {
   if (await autoUpdate()) {
@@ -31,4 +34,6 @@ import autoUpdate from './commands/update-cli';
   } else if (argv._.length === 0){
     cli.showHelp();
   }
+
+  analytics.setCommandName(argv._[0]);
 })();

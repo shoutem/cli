@@ -26,6 +26,60 @@ async function reportEvent(category, action, label, value) {
   visitor.event(category, action, label, value);
 }
 
-export async function reportCliCommand(commandName, fullCommand, canonicalNameOrAppId) {
+async function reportCliCommand(commandName, fullCommand, canonicalNameOrAppId) {
   await reportEvent('CLI', fullCommand, canonicalNameOrAppId, commandName);
+}
+
+const reportData = {
+  commandName: null,
+  extensionCanonicalName: null,
+  appId: null,
+  argv: [],
+  reportSent: false
+};
+
+export function setCommandName(name) {
+  reportData.commandName = name;
+
+  if (reportData.extensionCanonicalName || reportData.appId) {
+    finishReport()
+      .catch(console.err);
+  }
+}
+
+export function setAppId(appId) {
+  reportData.appId = appId;
+
+  if (reportData.commandName) {
+    finishReport()
+      .catch(console.error);
+  }
+
+  console.log(reportData);
+}
+
+export function setExtensionCanonicalName(name) {
+  reportData.extensionCanonicalName = name;
+
+  if (reportData.commandName) {
+    finishReport()
+      .catch(console.error);
+  }
+
+  console.log(reportData);
+}
+
+export function setArgv(argv) {
+  reportData.argv = argv;
+}
+
+async function finishReport() {
+  const { commandName, extensionCanonicalName, appId, argv, reportSent } = reportData;
+  const label = extensionCanonicalName || appId;
+
+  if (commandName && reportSent) {
+    await reportCliCommand(commandName, argv.join(' '), label);
+    reportData.reportSent = true;
+    console.log('Report finished!', reportData);
+  }
 }
