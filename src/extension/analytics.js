@@ -25,6 +25,7 @@ async function getUaVisitor() {
   }
   visitor.set('isDeveloper', true);
   reportData.isDeveloper = true;
+  reportData.clientId = clientId;
 
   return visitor;
 }
@@ -86,7 +87,7 @@ async function finishReport() {
     await reportCliCommand(commandName, argv.join(' '), label);
     reportData.reportSent = true;
     if (getHostEnvName() !== 'production') {
-      console.log('Report finished!', reportData);
+      console.log('GA report finished!', reportData);
     }
   }
 }
