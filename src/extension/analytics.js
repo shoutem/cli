@@ -17,6 +17,7 @@ async function getUaVisitor() {
   const clientId = await getClientId();
 
   const visitor = ua(getTrackingId(), clientId);
+  reportData.clientId = clientId;
 
   const email = await getLocalDataClient().loadUserEmail();
   if (email) {
@@ -25,19 +26,35 @@ async function getUaVisitor() {
   }
   visitor.set('isDeveloper', true);
   reportData.isDeveloper = true;
-  reportData.clientId = clientId;
 
   return visitor;
 }
 
-async function reportEvent(category, action, label, value) {
+async function reportEvent({ category, action, label }) {
   const visitor = await getUaVisitor();
 
-  visitor.event(category, action, label, value);
+  await visitor.event(category, action, label).send(err => {
+    if (err) {
+      console.error(err);
+    } else if (getHostEnvName() !== 'production') {
+      console.error('GA Report completed', {
+        category,
+        action,
+        label,
+        clientId: reportData.clientId,
+        userId: reportData.userId,
+        isDeveloper: reportData.isDeveloper
+      });
+    }
+  });
 }
 
 async function reportCliCommand(commandName, fullCommand, canonicalNameOrAppId) {
-  await reportEvent('CLI', fullCommand, canonicalNameOrAppId, commandName);
+  await reportEvent({
+    category: 'CLI',
+    action: commandName,
+    label: canonicalNameOrAppId
+  });
 }
 
 const reportData = {
@@ -86,8 +103,5 @@ async function finishReport() {
   if (commandName && !reportSent) {
     await reportCliCommand(commandName, argv.join(' '), label);
     reportData.reportSent = true;
-    if (getHostEnvName() !== 'production') {
-      console.log('GA report finished!', reportData);
-    }
   }
 }

@@ -31,12 +31,11 @@ export async function loginUser() {
   const creds  = await promptUserCredentials();
   const { username, password } = creds;
   const apiToken = await authServiceClient.loginUser(username, password);
-  console.log(msg.login.loggedIn(creds));
 
-  return await Promise.all([
+  return (await Promise.all([
     localDataClient.saveApiToken(apiToken),
     localDataClient.saveUserEmail(username)
-  ])[0];
+  ]))[0];
 }
 
 export async function ensureUserIsLoggedIn() {
