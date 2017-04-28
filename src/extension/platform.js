@@ -37,7 +37,18 @@ export async function getExtensionsPaths(platformDir) {
   return await glob(path.join(platformDir, 'extensions', '*', 'app'));
 }
 
-export async function createMobileConfig(platformDir, { platform, appId, debug = true, excludePackages = ['shoutem.code-push'], production = false, linkLocalExtensions = false, skipNativeDependencies = false, offlineMode = false }) {
+export async function createMobileConfig(platformDir, opts) {
+  const {
+    platform,
+    appId,
+    debug = true,
+    excludePackages,
+    production,
+    linkLocalExtensions,
+    skipNativeDependencies,
+    offlineMode
+  } = opts;
+
   return {
     platform,
     appId: appId.toString(),
@@ -46,12 +57,12 @@ export async function createMobileConfig(platformDir, { platform, appId, debug =
     authorization: await ensureUserIsLoggedIn(),
     configurationFilePath: 'config.json',
     workingDirectories: linkLocalExtensions ? await getExtensionsPaths(platformDir) : await getLinkedDirectories(),
-    excludePackages,
+    excludePackages: excludePackages || ['shoutem.code-push'],
     debug,
     extensionsJsPath: "./extensions.js",
-    production,
-    skipNativeDependencies,
-    offlineMode
+    production: !!production,
+    skipNativeDependencies: !!skipNativeDependencies,
+    offlineMode: !!offlineMode
   };
 }
 

@@ -1,10 +1,10 @@
-import bluebird from 'bluebird';
+import Promise from 'bluebird';
 import { createSchema } from '../../commands/schema';
 import msg from '../../user_messages';
 import { ensureVariableName } from '../../extension/cli-parsing';
 import { handleError } from '../../extension/error-handler';
 
-const createSchemaAsync = bluebird.promisify(createSchema);
+const createSchemaAsync = Promise.promisify(createSchema);
 
 export const description = 'Add schema to current extension';
 export const command = 'add <name>';

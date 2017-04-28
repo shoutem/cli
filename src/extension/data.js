@@ -2,7 +2,7 @@
 import fs from 'fs';
 import path from 'path';
 import mzfs from 'mz/fs';
-import bluebird from 'bluebird';
+import Promise from 'bluebird';
 
 export function getExtensionCanonicalName(devName, extName, extVersion) {
   return `${devName}.${extName}-${extVersion}`;
@@ -88,7 +88,7 @@ export function saveExtensionJson(extJson, callback) {
                err => callback(err, extJson));
 }
 
-export const saveExtensionJsonAsync = bluebird.promisify(saveExtensionJson);
+export const saveExtensionJsonAsync = Promise.promisify(saveExtensionJson);
 
 export async function pathExists(path) {
   try {

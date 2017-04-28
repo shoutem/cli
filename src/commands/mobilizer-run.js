@@ -1,4 +1,3 @@
-/* eslint no-console: "off" */
 import { exec } from 'mz/child_process';
 import { handleError } from '../extension/error-handler';
 import selectApp from '../extension/app-selector';

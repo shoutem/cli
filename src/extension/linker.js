@@ -1,5 +1,6 @@
 import path from 'path';
-import bluebird from 'bluebird';
+import Promise from 'bluebird';
+import _ from 'lodash';
 import { mobileEnvPath } from '../clients/cli-paths';
 import { pathExists, readJsonFile, writeJsonFile } from './data';
 
@@ -44,23 +45,12 @@ export async function unlinkDirectory(dir) {
   dir = path.resolve(dir);
 
   const linked = await getLinkedDirectories();
-
-  const i1 = linked.indexOf(dir);
-  if (i1 >= 0) {
-    linked.splice(i1, 1);
-  }
-
-  const i2 = linked.indexOf(path.join(dir, 'app'));
-  if (i2 >= 0) {
-    linked.splice(i2, 1);
-  }
+  _.pull(linked, [dir, path.join(dir, 'app')]);
 
   await setLinkedDirectories(linked);
-
-  return i1 >= 0 || i2 >= 0;
 }
 
 async function unlinkMissingExtensions() {
-  const dirs = await bluebird.filter(await getLinkedDirectories(), pathExists);
+  const dirs = await Promise.filter(await getLinkedDirectories(), pathExists);
   await setLinkedDirectories(dirs);
 }

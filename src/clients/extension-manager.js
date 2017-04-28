@@ -2,9 +2,9 @@ import _ from 'lodash';
 import u from 'underscore';
 import request from 'request';
 import URI from 'urijs';
-import request2 from 'request-promise';
+import requestPromise from 'request-promise';
 import services from '../../config/services';
-import bluebird from 'bluebird';
+import Promise from 'bluebird';
 import { listenStream } from '../extension/stream-listener';
 import * as jsonApi from './json-api-client';
 
@@ -64,7 +64,7 @@ export class ExtensionManagerClient {
   getDeveloper() {
     const settings = this.prepareGetDeveloperRequest();
 
-    return request2(settings)
+    return requestPromise(settings)
       .then(res => {
         if (res.statusCode === 404) {
           return null;
@@ -110,7 +110,7 @@ export class ExtensionManagerClient {
   createDeveloper(devName) {
     const settings = this.prepareCreateDeveloperRequest(devName);
 
-    return request2(settings)
+    return requestPromise(settings)
       .then(res => {
         if (res.statusCode === 409) {
           return Promise.reject(new DeveloperNameError(devName));
@@ -143,7 +143,7 @@ export class ExtensionManagerClient {
   }
 
   getExtensionIdAsync(canonicalName) {
-    const getExtensionId = bluebird.promisify((name, callback) => this.getExtensionId(name, callback));
+    const getExtensionId = Promise.promisify((name, callback) => this.getExtensionId(name, callback));
 
     return getExtensionId(canonicalName);
   }
@@ -197,7 +197,7 @@ export class ExtensionManagerClient {
 
     const settings = this.prepareUploadExtensionZipRequest(canonicalName, zipStream);
 
-    return request2(settings)
+    return requestPromise(settings)
       .then(res => {
         if (res.statusCode === 200 || res.statusCode === 201) {
           return _.get(JSON.parse(res.body), 'data.id');
@@ -238,14 +238,14 @@ export class ExtensionManagerClient {
     Publish extension with given `canonicalName`.
   */
   async publishExtension(canonicalName) {
-    const { statusCode, body } = await request2(this.prepareExtensionGetRequest(canonicalName));
+    const { statusCode, body } = await requestPromise(this.prepareExtensionGetRequest(canonicalName));
     if (statusCode === 200 && body.data.attributes.published) {
       throw new Error('Can\'t publish because current version is already published');
     }
 
     const settings = this.preparePublishExtensionRequest(canonicalName);
 
-    const res = await request2(settings);
+    const res = await requestPromise(settings);
     if (res.statusCode === 200 || res.statusCode === 201) {
       return (res.body || {}).data;
     } else {
@@ -266,7 +266,7 @@ export class ExtensionManagerClient {
       resolveWithFullResponse: true,
     };
 
-    const res = await request2(requestOptions);
+    const res = await requestPromise(requestOptions);
     if (res.statusCode !== 200 && res.statusCode !== 201) {
       throw new ExtensionManagerError(requestOptions, res.statusCode, res.body);
     }

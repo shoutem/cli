@@ -5,6 +5,7 @@ import { join } from 'path';
 import rmrf from 'rmfr';
 import ip from 'ip';
 import tmp from 'tmp-promise';
+import Promise from 'bluebird';
 import * as tunnel from '../extension/tunnel';
 import { spinify } from '../extension/spinner';
 import { startPackager } from './react-native';
@@ -18,18 +19,20 @@ async function getAppDir(appId) {
   return join(await mobileEnvPath(), appId.toString());
 }
 
-async function getCurrentApplicationState(appId, buildConfig) {
-  const publishingProperties = await (await getLegacyServiceClient()).getPublishingProperties(appId);
-  const installations = await (await getAppManager(appId)).getInstallations();
-  const installationsUrls = installations.map(inst => inst.location.app.package);
-  const platformVersion = await platform.getPlatformVersion(appId);
+async function getExtensionsPackagesUrls(appId) {
+  const manager = await getAppManager(appId);
+  const installations = await manager.getInstallations();
 
-  return {
-    publishingProperties,
-    installationsUrls,
-    buildConfig,
-    platformVersion
-  };
+  return installations.map(inst => inst.location.app.package);
+}
+
+async function getCurrentApplicationState(appId, buildConfig) {
+  return await Promise.props({
+    publishingProperties: getLegacyServiceClient().then(client => client.getPublishingProperties(appId)),
+    installationsUrls: getExtensionsPackagesUrls(appId),
+    platformVersion: platform.getPlatformVersion(appId),
+    buildConfig
+  });
 }
 
 async function getApplicationStatePath(platformPath) {
@@ -47,7 +50,9 @@ async function getOldApplicationState(path, appId) {
 async function syncApp(path, opts) {
   const { appId } = opts;
 
-  if (opts.mobileapp && (await readJsonFile(join(path, 'package.json')) || {}).name !== '@shoutem/mobile-app') {
+  const packageJson = await readJsonFile(join(path, 'package.json')) || {};
+
+  if (opts.mobileapp && packageJson.name !== '@shoutem/mobile-app') {
     throw new Error('Invalid mobile app project path');
   }
 
@@ -143,13 +148,9 @@ export async function build(platformName, options, outputDir = process.cwd()) {
   await syncApp(path, options);
 
   const { childProcess } = await startPackager(path, { resolveOnReady: true });
-  try {
-    await platform.buildPlatform(path, platformName, outputDir);
-  } finally {
-    try {
-      await childProcess.kill('SIGINT');
-    } catch (err) {
-      // ignored
-    }
-  }
+  await platform.buildPlatform(path, platformName, outputDir)
+    .finally(() => {
+      return childProcess.kill('SIGINT');
+    })
+    .catch(() => { /* ignored */ })
 }

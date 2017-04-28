@@ -3,7 +3,7 @@ import request from 'request';
 import URI from 'urijs';
 import * as jsonApi from './json-api-client';
 import services from '../../config/services';
-import bluebird from 'bluebird';
+import Promise from 'bluebird';
 
 export class AppManagerError {
   /*
@@ -76,7 +76,7 @@ export class AppManagerClient {
   }
 
   async installExtensionAsync(extensionId) {
-    const installExtension = bluebird.promisify((extensionId, callback) => this.installExtension(extensionId, callback));
+    const installExtension = Promise.promisify((extensionId, callback) => this.installExtension(extensionId, callback));
 
     return await installExtension(extensionId);
   }
@@ -137,7 +137,7 @@ export class AppManagerClient {
   }
 
   async createAppAsync(app) {
-    const createApp = bluebird.promisify((app, callback) => this.createApp(app, callback));
+    const createApp = Promise.promisify((app, callback) => this.createApp(app, callback));
 
     return await createApp(app);
   }
