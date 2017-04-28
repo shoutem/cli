@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import services from '../../config/services';
 import {
   createNewApp,

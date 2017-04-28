@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import { uploadExtension } from '../commands/push';
 import msg from '../user_messages';
 import { pathExists } from '../extension/data';

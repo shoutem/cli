@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import fs from 'fs';
 import path from 'path';
 import mzfs from 'mz/fs';

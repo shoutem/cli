@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import msg from '../user_messages';
 import { ensureDeveloperIsRegistered } from '../commands/register';
 import { handleError } from '../extension/error-handler';

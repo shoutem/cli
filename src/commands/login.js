@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import inquirer from 'inquirer';
 import LocalDataClient from '../clients/local-data';
 import { AuthServiceClient } from '../clients/auth-service';

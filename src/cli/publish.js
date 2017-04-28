@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import msg from '../user_messages';
 import { publishExtension, pushAndPublish } from '../commands/publish';
 import { pushAll } from '../commands/push-all';

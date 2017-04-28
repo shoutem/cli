@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import msg from '../user_messages';
 import { isValidExtensionName } from '../extension/validation'
 import { initExtension } from '../commands/init';

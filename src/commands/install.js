@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import inquirer from 'inquirer';
 
 import { AppManagerClient } from '../clients/app-manager';

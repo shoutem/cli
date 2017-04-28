@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import { ExtensionManagerClient } from '../clients/extension-manager';
 import { ensureDeveloperIsRegistered } from './register';
 import * as utils from '../extension/data';

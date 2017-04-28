@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import LocalData from '../clients/local-data';
 import { AppManagerClient } from '../clients/app-manager';
 import * as localExtensions from '../clients/local-extensions';

@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import LocalDataClient from '../clients/local-data';
 import fs from 'mz/fs';
 

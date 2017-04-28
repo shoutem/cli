@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import { lastErrorPath } from '../clients/cli-paths';
 import fs from 'mz/fs';
 

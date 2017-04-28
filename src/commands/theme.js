@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import fs from 'mz/fs';
 import path from 'path';
 import _ from 'lodash';

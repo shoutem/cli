@@ -1,10 +1,8 @@
-/* eslint no-console: 0 */
 import fs from 'fs';
 import path from 'path';
 import mzfs from 'mz/fs';
 import * as analytics from './analytics';
 import Promise from 'bluebird';
->>>>>>> master
 
 export function getExtensionCanonicalName(devName, extName, extVersion) {
   const canonicalName = `${devName}.${extName}-${extVersion}`;

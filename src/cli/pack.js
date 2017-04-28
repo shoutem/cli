@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import shoutemPack from '../extension/packer';
 import { ensureInExtensionDir } from '../extension/data';
 import { handleError } from '../extension/error-handler';

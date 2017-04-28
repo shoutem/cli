@@ -1,4 +1,3 @@
-/* eslint no-console: 0 */
 import msg from '../user_messages';
 import { logout } from '../commands/logout';
 import { handleError } from '../extension/error-handler';
