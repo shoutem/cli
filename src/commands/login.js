@@ -33,7 +33,10 @@ export async function loginUser() {
   const apiToken = await authServiceClient.loginUser(username, password);
   console.log(msg.login.loggedIn(creds));
 
-  return await localDataClient.saveApiToken(apiToken);
+  return await Promise.all([
+    localDataClient.saveApiToken(apiToken),
+    localDataClient.saveUserEmail(username)
+  ])[0];
 }
 
 export async function ensureUserIsLoggedIn() {
@@ -47,14 +50,19 @@ export async function ensureUserIsLoggedIn() {
   const localDataClient = new LocalDataClient();
 
   try {
-    const apiToken = await localDataClient.loadApiToken();
+    const [apiToken, email] = await Promise.all([
+      localDataClient.loadApiToken(),
+      localDataClient.loadUserEmail()
+    ]);
 
-    if (apiToken) {
+    if (apiToken && email) {
       const extManager = new ExtensionManagerClient(apiToken);
       try {
         await extManager.getDeveloper();
         return apiToken;
       } catch (err) {
+        // ignored
+        // TODO refactor this WTF
       }
     }
     return await loginUser();

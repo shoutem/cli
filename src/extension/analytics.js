@@ -1,11 +1,12 @@
 import * as cache from './cache';
+import { getHostEnvName } from '../clients/server-env';
 import ua from 'universal-analytics';
 import uuid from 'uuid/v4';
 import _ from 'lodash';
 import { getLocalDataClient } from '../clients/clients-factory';
 
 function getTrackingId() {
-  return 'GTM-KT475BW';
+  return getHostEnvName() === 'production' ? 'UA-807293-5' : 'UA-807293-12';
 }
 
 async function getClientId() {
@@ -16,7 +17,14 @@ async function getUaVisitor() {
   const clientId = await getClientId();
 
   const visitor = ua(getTrackingId(), clientId);
+
+  const email = await getLocalDataClient().loadUserEmail();
+  if (email) {
+    visitor.set('userId', email);
+    reportData.userId = email;
+  }
   visitor.set('isDeveloper', true);
+  reportData.isDeveloper = true;
 
   return visitor;
 }
@@ -77,6 +85,8 @@ async function finishReport() {
   if (commandName && !reportSent) {
     await reportCliCommand(commandName, argv.join(' '), label);
     reportData.reportSent = true;
-    console.log('Report finished!', reportData);
+    if (getHostEnvName() !== 'production') {
+      console.log('Report finished!', reportData);
+    }
   }
 }

@@ -51,6 +51,21 @@ export default class LocalDataClient {
     return token;
   }
 
+  async saveUserEmail(email) {
+    await mzfs.writeFile(path.join(await serverEnvPath(), 'user-email'), email, 'utf8');
+    return email;
+  }
+
+  async loadUserEmail() {
+    try {
+      return await mzfs.readFile(path.join(await serverEnvPath(), 'user-email'), 'utf8')
+    } catch (err) {
+      if (err.code === 'ENOENT') {
+        return null;
+      }
+    }
+  }
+
   /*
     Reads developer information from file system. `callback` will receive the
     info if it exists, and `null` otherwise.
