@@ -1,4 +1,3 @@
-/* eslint no-console: "off" */
 import { getExtensionRootDir } from '../extension/data';
 import { linkExtension, linkDirectory } from '../extension/linker';
 import msg from '../user_messages';
@@ -28,8 +27,7 @@ export async function handler(args) {
     await linkDirectory(extensionDir || process.cwd());
   } else if (extensionDir) {
     await linkExtension(extensionDir);
-  } else {
-    console.log('Not an extension directory. Use `shoutem link --force` to link an arbitrary directory.')
   }
+
   console.log(msg.link.complete());
 }

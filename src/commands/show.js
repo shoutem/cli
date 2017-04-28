@@ -1,4 +1,3 @@
-/* eslint no-console: "off" */
 import { getLinkedDirectories } from '../extension/linker';
 import { getHostEnvName } from '../clients/server-env';
 import apisConfig from '../../config/services';

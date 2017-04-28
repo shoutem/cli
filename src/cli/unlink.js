@@ -1,8 +1,7 @@
-/* eslint no-console: "off" */
 import { handleError } from '../extension/error-handler';
 import { getExtensionRootDir } from '../extension/data';
 import { unlinkDirectory, setLinkedDirectories } from '../extension/linker';
-import { limitArguments } from '../extension/cli-parsing';
+import { validateArgumentCount } from '../extension/cli-parsing';
 import msg from '../user_messages';
 
 export const description = 'Unlink working directory extension from mobile environment';
@@ -21,7 +20,7 @@ export const builder = yargs => {
 };
 export async function handler(args) {
   try {
-    limitArguments(args, 0);
+    validateArgumentCount(args, 0);
 
     if (args.all) {
       await setLinkedDirectories([]);

@@ -1,2 +1,2 @@
-import bluebird from 'bluebird';
-export default bluebird.promisify(require('command-exists'));
+import Promise from 'bluebird';
+export default Promise.promisify(require('command-exists'));

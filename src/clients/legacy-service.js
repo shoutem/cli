@@ -1,7 +1,7 @@
 import request from 'request';
-import request2 from 'request-promise';
+import requestPromise from 'request-promise';
 import URI from 'urijs';
-import bluebird from 'bluebird';
+import Promise from 'bluebird';
 import services from '../../config/services';
 
 export class LegacyServiceError {
@@ -69,7 +69,7 @@ export class LegacyServiceClient {
   }
 
   async getLatestAppsAsync() {
-    return bluebird.promisify(callback => this.getLatestApps(callback))();
+    return Promise.promisify(callback => this.getLatestApps(callback))();
   }
 
   async getApp(appId) {
@@ -85,7 +85,7 @@ export class LegacyServiceClient {
       },
     };
 
-    const res = await request2(settings);
+    const res = await requestPromise(settings);
     const { statusCode, body } = res;
 
     if (statusCode !== 200) {
@@ -108,7 +108,7 @@ export class LegacyServiceClient {
       }
     };
 
-    const res = await request2(settings);
+    const res = await requestPromise(settings);
     const { statusCode, body } = res;
     if (statusCode !== 200) {
       throw new LegacyServiceError(settings, statusCode, body);

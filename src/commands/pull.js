@@ -1,4 +1,4 @@
-import bluebird from 'bluebird';
+import Promise from 'bluebird';
 import mkdirp from 'mkdirp-promise';
 import tmp from 'tmp-promise';
 import path from 'path';
@@ -11,7 +11,7 @@ import { pathExists } from '../extension/data';
 import selectApp from '../extension/app-selector';
 import { downloadApp } from '../extension/platform';
 
-const downloadFile = bluebird.promisify(require('download-file'));
+const downloadFile = Promise.promisify(require('download-file'));
 
 export async function pullExtensions({ appId }, destinationDir) {
   const appManager = new AppManagerClient(await ensureUserIsLoggedIn(), appId);
