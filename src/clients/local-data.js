@@ -1,18 +1,15 @@
 import fs from 'fs';
-import os from 'os';
 import path from 'path';
 import mzfs from 'mz/fs';
-import { serverEnvPath } from './cli-paths';
+import { serverEnvPath, localStoragePathSync } from './cli-paths';
 
 export default class LocalDataClient {
   /*
     Collection of actions we need to do on user's file system.
   */
   constructor() {
-    const dataDirPath = path.join(os.homedir(), '.shoutem');
-
     try {
-      fs.mkdirSync(dataDirPath);
+      fs.mkdirSync(localStoragePathSync());
     } catch (exc) {
       if (exc.code !== 'EEXIST') throw (exc);
     }

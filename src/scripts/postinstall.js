@@ -1,8 +1,10 @@
 const os =  require('os');
 const path = require('path');
 const rimraf = require('rmfr');
+const getHomeDir = require('../home-dir');
 
-const cliHome = path.join(os.homedir(), '.shoutem');
+
+const cliHome = getHomeDir();
 
 Promise.all([
   rimraf(path.join(cliHome, 'mobile-env')),

@@ -42,7 +42,7 @@
     "lodash": "4.11.2",
     "match-stream": "0.0.2",
     "merge2": "^1.0.3",
-    "mkdirp": "0.5.1",
+    "mkdirp": "^0.5.1",
     "mkdirp-promise": "^3.0.1",
     "mustache": "2.2.1",
     "mv": "^2.1.1",

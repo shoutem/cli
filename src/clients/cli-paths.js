@@ -1,11 +1,18 @@
-import os from 'os';
 import path from 'path';
 import mkdirp from 'mkdirp-promise';
+import { sync as mkdirp_sync } from 'mkdirp';
 import { getHostEnvName } from './server-env';
+import getHomeDir from '../home-dir';
 
 export async function localStoragePath() {
-  const storagePath = path.join(os.homedir(), '.shoutem');
+  const storagePath = getHomeDir();
   await mkdirp(storagePath);
+  return storagePath;
+}
+
+export async function localStoragePathSync() {
+  const storagePath = getHomeDir();
+  await mkdirp_sync(storagePath);
   return storagePath;
 }
 
