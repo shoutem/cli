@@ -1,6 +1,6 @@
 import path from 'path';
 import mkdirp from 'mkdirp-promise';
-import { sync as mkdirp_sync } from 'mkdirp';
+import { sync as mkdirpSync } from 'mkdirp';
 import { getHostEnvName } from './server-env';
 import getHomeDir from '../home-dir';
 
@@ -10,9 +10,9 @@ export async function localStoragePath() {
   return storagePath;
 }
 
-export async function localStoragePathSync() {
+export function localStoragePathSync() {
   const storagePath = getHomeDir();
-  await mkdirp_sync(storagePath);
+  mkdirpSync(storagePath);
   return storagePath;
 }
 

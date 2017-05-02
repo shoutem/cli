@@ -3,6 +3,7 @@ import { getHostEnvName } from '../clients/server-env';
 import apisConfig from '../../config/services';
 import msg from '../user_messages';
 import { getDeveloper } from '../commands/register';
+import getHomeDir from '../home-dir';
 
 export default async function() {
   const serverEnv = getHostEnvName();
@@ -24,4 +25,6 @@ export default async function() {
   if (developer) {
     console.log(msg.login.complete(developer));
   }
+
+  console.log(`Home directory: \`${getHomeDir()}\` (customizable through SHOUTEM_CLI_HOME env variable)`);
 }

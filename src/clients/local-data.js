@@ -1,19 +1,11 @@
-import fs from 'fs';
 import path from 'path';
 import mzfs from 'mz/fs';
-import { serverEnvPath, localStoragePathSync } from './cli-paths';
+import { serverEnvPath } from './cli-paths';
 
 export default class LocalDataClient {
   /*
     Collection of actions we need to do on user's file system.
   */
-  constructor() {
-    try {
-      fs.mkdirSync(localStoragePathSync());
-    } catch (exc) {
-      if (exc.code !== 'EEXIST') throw (exc);
-    }
-  }
 
   async getTokenFilePath() {
     return path.join(await serverEnvPath(), 'api-token');
