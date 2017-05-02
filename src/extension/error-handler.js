@@ -37,6 +37,8 @@ export function getErrorMessage(err) {
   return err;
 }
 
+let reportInfoPrinted = false;
+
 export async function handleError(err) {
   try {
       spinner.stopAll();
@@ -46,6 +48,11 @@ export async function handleError(err) {
       errorJson.stack = (err || {}).stack;
       errorJson.message = (err || {}).message;
       await writeJsonFile(errorJson, await lastErrorPath());
+      if (!reportInfoPrinted) {
+        console.error(`\nIf you think this error is caused by bug in the shoutem command, you can report the issue here: ${"https://github.com/shoutem/cli/issues".bold}`.yellow);
+        console.error(`Make sure to include the information printed using the ${"`shoutem last-error`".bold} command`.yellow);
+        reportInfoPrinted = true;
+      }
   } catch (err) {
       console.log(err);
   }
