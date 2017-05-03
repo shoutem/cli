@@ -45,6 +45,7 @@ export async function readJsonFile(filePath) {
     if (err.code === 'ENOENT') {
       return null;
     }
+    err.message = `Could not read file ${filePath}\n${err.message}`;
     throw err;
   }
 }
