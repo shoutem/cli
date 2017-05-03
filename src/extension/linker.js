@@ -9,11 +9,18 @@ async function getLinkedPath() {
 }
 
 export async function getLinkedDirectories() {
-  return await readJsonFile(await getLinkedPath()) || [];
+  const allDirectories = await readJsonFile(await getLinkedPath()) || [];
+  const existingDirectories = await Promise.filter(allDirectories, pathExists);
+
+  if (!_.isEqual(allDirectories, existingDirectories)) {
+    await setLinkedDirectories(existingDirectories);
+  }
+
+  return existingDirectories;
 }
 
 export async function setLinkedDirectories(dirs) {
-  return await writeJsonFile(dirs, await getLinkedPath());
+  await writeJsonFile(dirs, await getLinkedPath());
 }
 
 export async function linkExtension(extensionDir) {
@@ -41,16 +48,10 @@ export async function linkDirectory(dir) {
 }
 
 export async function unlinkDirectory(dir) {
-  await unlinkMissingExtensions();
   dir = path.resolve(dir);
 
   const linked = await getLinkedDirectories();
-  _.pull(linked, [dir, path.join(dir, 'app')]);
+  _.pull(linked, dir, path.join(dir, 'app'));
 
   await setLinkedDirectories(linked);
-}
-
-async function unlinkMissingExtensions() {
-  const dirs = await Promise.filter(await getLinkedDirectories(), pathExists);
-  await setLinkedDirectories(dirs);
 }

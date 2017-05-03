@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.141",
+  "version": "0.8.142",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -75,7 +75,7 @@
     "babel-cli": "^6.8.0",
     "babel-plugin-rewire": "1.0.0-rc-2",
     "chai": "3.5.0",
-    "dos2unix-cli": "^1.0.0",
+    "dos2unix-cli": "^1.0.1",
     "eslint": "2.9.0",
     "eslint-config-airbnb": "8.0.0",
     "eslint-plugin-import": "1.9.2",
