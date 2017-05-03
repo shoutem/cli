@@ -21,9 +21,9 @@ export default (readableStream, opts ) => new Promise((resolve, reject) => {
   try {
     readableStream
       .pipe(matcher)
-      .on('error', err => reject(err))
+      .on('error', err => resolve())
       .on('close', () => resolve());
   } catch (err) {
-    reject(err);
+    resolve();
   }
 });

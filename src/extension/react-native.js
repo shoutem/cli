@@ -32,7 +32,7 @@ export async function run(cwd, platform) {
   );
 }
 
-export function startPackager(cwd, { resolveOnReady = false }) {
+export async function startPackager(cwd, { resolveOnReady = false }) {
   const spawned = spawn('react-native', ['start'], {
       stdio: ['ignore', 'pipe', 'pipe'],
       cwd,
@@ -50,8 +50,10 @@ export function startPackager(cwd, { resolveOnReady = false }) {
     return spawned;
   }
 
-  return streamMatcher(
+  await streamMatcher(
     merge2([childProcess.stdout, childProcess.stderr]),
     { pattern: 'React packager ready.', inactivityTimeout: 11000 }
-  ).then(() => ({ childProcess }));
+  );
+
+  return { childProcess };
 }

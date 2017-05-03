@@ -15,6 +15,7 @@ import { readJsonFile, writeJsonFile } from './data';
 import { printMobilizerQR } from '../commands/qr-generator';
 import { getAppManager, getLegacyServiceClient } from '../clients/clients-factory';
 import * as analytics from './analytics';
+import kill from 'tree-kill';
 
 async function getAppDir(appId) {
   return join(await mobileEnvPath(), appId.toString());
@@ -155,6 +156,6 @@ export async function build(platformName, options, outputDir = process.cwd()) {
     await platform.buildPlatform(path, platformName, outputDir);
   }
   finally {
-    await childProcess.kill('SIGINT').catch(err => { /* ignored */ });
+    kill(childProcess.pid);
   }
 }

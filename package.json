@@ -64,6 +64,7 @@
     "superspawn": "^0.1.0",
     "tar.gz": "1.0.2",
     "tmp-promise": "^1.0.2",
+    "tree-kill": "^1.1.0",
     "underscore": "^1.8.3",
     "universal-analytics": "^0.4.13",
     "urijs": "1.18.0",
