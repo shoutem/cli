@@ -10,7 +10,7 @@ export async function handler(args) {
     ensureVariableName(args.name);
     const paths = await createTheme(args.name);
     paths.forEach(path => console.log(msg.theme.add.complete(args.name, path)));
-  } catch (err) {
+  } catch (error) {
     await handleError(error);
   }
 }

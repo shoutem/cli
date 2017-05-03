@@ -2,9 +2,14 @@
 // You should not change it
 import pack from './package.json';
 {{{screensImports}}}
+{{{themesImports}}}
 
 export const screens = {
 {{screensNames}}
+};
+
+export const themes = {
+{{themesNames}}
 };
 
 export function ext(resourceName) {

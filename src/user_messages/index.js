@@ -89,8 +89,7 @@ export default {
   },
   theme: {
     add: {
-      complete: (themeName, path) => `File \`${path}\` is created.`,
-      alreadyExists: themeName => `Theme \`${themeName}\` already exists. Pick another name.`
+      complete: (themeName, path) => `File \`${path}\` is created.`
     }
   },
   unlink: {

@@ -10,7 +10,7 @@ import {
   ensureInExtensionDir,
   writeJsonFile
 } from '../extension/data';
-import { load } from '../extension/template';
+import { generateExtensionJs } from '../extension/ext-js-generator';
 import msg from '../user_messages';
 
 const themeUrls = {
@@ -33,16 +33,6 @@ export async function promptThemeDetails(themeName) {
   }];
 
   return await inquirer.prompt(questions)
-}
-
-export async function exportThemeInIndexJs(themeName) {
-  const rootDir = ensureInExtensionDir();
-  const indexJsPath = path.join(rootDir, 'app', 'index.js');
-  const indexJsContent = await fs.readFile(indexJsPath, 'utf8');
-
-  const template = load('./theme/app-index.js.template', { themeName });
-  const newContent = `${indexJsContent}\n${template}\n`;
-  await fs.writeFile(indexJsPath, newContent, 'utf8');
 }
 
 export async function createThemeFile(themeName) {
@@ -96,9 +86,9 @@ export async function createTheme(name) {
     extJson.themeVariables.push(vars);
 
     await saveExtensionJsonAsync(extJson);
-    await exportThemeInIndexJs(themeName);
     const themeFilePath = await createThemeFile(themeName);
     const themeVarsPath = await createVariablesFile(themeName);
+    await generateExtensionJs(loadExtensionJsonAsync());
     return [themeFilePath, themeVarsPath];
   }
 }
