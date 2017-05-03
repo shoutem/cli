@@ -1,1 +1,1 @@
-{{{ThemeContent}}}
+{{{themeContent}}}

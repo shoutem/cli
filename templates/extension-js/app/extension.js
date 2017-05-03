@@ -1,7 +1,11 @@
 // This file is managed by Shoutem CLI
 // You should not change it
 import pack from './package.json';
+
+// screens imports
 {{{screensImports}}}
+
+// themes imports
 {{{themesImports}}}
 
 export const screens = {
