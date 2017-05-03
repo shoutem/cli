@@ -1,22 +1,19 @@
 import * as cache from './cache';
 import { getHostEnvName } from '../clients/server-env';
-import ua from 'universal-analytics';
+import analytics from 'universal-analytics';
 import uuid from 'uuid/v4';
 import _ from 'lodash';
 import { getLocalDataClient } from '../clients/clients-factory';
-
-function getTrackingId() {
-  return getHostEnvName() === 'production' ? 'UA-807293-5' : 'UA-807293-12';
-}
+import { analyticsTrackingId } from '../../config/services';
 
 async function getClientId() {
   return await cache.get('ga-client-id', null, () => uuid());
 }
 
-async function getUaVisitor() {
+async function getAnalyticsVisitor() {
   const clientId = await getClientId();
 
-  const visitor = ua(getTrackingId(), clientId);
+  const visitor = analytics(analyticsTrackingId, clientId);
   reportData.clientId = clientId;
 
   const email = await getLocalDataClient().loadUserEmail();
@@ -31,7 +28,7 @@ async function getUaVisitor() {
 }
 
 async function reportEvent({ category, action, label }) {
-  const visitor = await getUaVisitor();
+  const visitor = await getAnalyticsVisitor();
 
   await visitor.event(category, action, label).send(err => {
     if (err) {
@@ -49,7 +46,7 @@ async function reportEvent({ category, action, label }) {
   });
 }
 
-async function reportCliCommand(commandName, fullCommand, canonicalNameOrAppId) {
+async function reportCliCommand(commandName, canonicalNameOrAppId) {
   await reportEvent({
     category: 'CLI',
     action: commandName,
@@ -97,11 +94,11 @@ export function setArgv(argv) {
 }
 
 async function finishReport() {
-  const { commandName, extensionCanonicalName, appId, argv, reportSent } = reportData;
+  const { commandName, extensionCanonicalName, appId, reportSent } = reportData;
   const label = extensionCanonicalName || appId;
 
   if (commandName && !reportSent) {
-    await reportCliCommand(commandName, argv.join(' '), label);
+    await reportCliCommand(commandName, label);
     reportData.reportSent = true;
   }
 }

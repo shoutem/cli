@@ -4,6 +4,7 @@ const envValues = {
   production: {
     host: 'beta.shoutem.com',
     appBuilder: 'https://builder.shoutem.com',
+    analyticsTrackingId: 'UA-807293-5'
   },
   dev: {
     host: 'dev.sauros.hr',
@@ -40,5 +41,6 @@ module.exports = {
   extensionManager: env.extensionManager || `https://extensions.${env.host}`,
   legacyService: env.legacyService || `https://api.${env.host}`,
   cliAppUri: 'http://registry.npmjs.org/@shoutem%2fcli',
-  mobileAppUrl: 'https://github.com/shoutem/platform'
+  mobileAppUrl: 'https://github.com/shoutem/platform',
+  analyticsTrackingId: env.analyticsTrackingId || 'UA-807293-12'
 };
