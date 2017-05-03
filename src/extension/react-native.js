@@ -55,5 +55,5 @@ export async function startPackager(cwd, { resolveOnReady = false }) {
     { pattern: 'React packager ready.', inactivityTimeout: 11000 }
   );
 
-  return { childProcess };
+  return { childProcess, spawned };
 }

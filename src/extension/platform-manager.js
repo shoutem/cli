@@ -151,11 +151,12 @@ export async function build(platformName, options, outputDir = process.cwd()) {
   const path = options.mobileapp || (await tmp.dir()).path;
   await syncApp(path, options);
 
-  const { childProcess } = await startPackager(path, { resolveOnReady: true });
+  const { childProcess, spawned } = await startPackager(path, { resolveOnReady: true });
   try {
     await platform.buildPlatform(path, platformName, outputDir);
   }
   finally {
+    spawned.catch(err => { /* ignored */ });
     kill(childProcess.pid);
   }
 }
