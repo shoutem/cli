@@ -38,18 +38,22 @@ export function getExtensionRootDir() {
   return null;
 }
 
-export function readJsonFile(filePath) {
-  return mzfs
-    .readFile(filePath, 'utf8')
-    .catch(err => err.code === 'ENOENT' ? null : Promise.reject(err))
-    .then(content => JSON.parse(content));
+export async function readJsonFile(filePath) {
+  try {
+    return JSON.parse(await mzfs.readFile(filePath, 'utf8'));
+  } catch (err) {
+    if (err.code === 'ENOENT') {
+      return null;
+    }
+    err.message = `Could not read file ${filePath}\n${err.message}`;
+    throw err;
+  }
 }
 
-export function writeJsonFile(json, filePath) {
+export async function writeJsonFile(json, filePath) {
   const str = `${JSON.stringify(json, null, 2)}\n`;
-  return mzfs
-    .writeFile(filePath, str, 'utf8')
-    .then(() => str);
+  await mzfs.writeFile(filePath, str, 'utf8');
+  return str;
 }
 
 export function exit(err) {
