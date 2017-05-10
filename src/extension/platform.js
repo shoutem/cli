@@ -158,3 +158,9 @@ export async function runPlatform(platformDir, { platform, device, simulator, re
 
   return await npm.run(platformDir, 'run', runOptions);
 }
+
+export function runShoutemWatcher(platformDir) {
+  const watcherPath = path.join(platformDir, 'scripts', 'helpers', 'run-watch-in-new-window.js');
+  const runWatchInNewWindow = require(watcherPath);
+  runWatchInNewWindow();
+}
