@@ -57,5 +57,16 @@ export async function initExtension(extName) {
 
   utils.getExtensionCanonicalName(developer.name, extJson.name, extJson.version);
 
-  await instantiateTemplatePath('init', cwd(), { devName: developer.name, extJson });
+  const packageJson = {
+    name: `${developer.name}.${extJson.name}`,
+    version: extJson.version,
+    description: extJson.description
+  };
+
+  await instantiateTemplatePath('init', cwd(), {
+    devName: developer.name,
+    extJson,
+    extJsonString: JSON.stringify(extJson, null, 2),
+    packageJsonString: JSON.stringify(packageJson, null, 2)
+  });
 }
