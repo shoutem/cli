@@ -77,7 +77,7 @@ export default {
   },
   screen: {
     add: {
-      complete: (screenName, path) => `File \`${path}\` created.`,
+      complete: (screenName, path) => `Screen \`${screenName}\` created in file \`${path}\`!`,
       alreadyExists: screenName => `Screen "${screenName}" already exists. Pick another name.`
     }
   },
