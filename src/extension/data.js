@@ -88,6 +88,9 @@ export async function loadExtensionJsonAsync(rootPath = ensureInExtensionDir()) 
   return await readJsonFile(path.join(rootPath, 'extension.json'));
 }
 
+/**
+ * Persist extension.json file to extension root directory
+ */
 export function saveExtensionJson(extJson, callback) {
   const root = ensureInExtensionDir();
   fs.writeFile(path.join(root, 'extension.json'),
