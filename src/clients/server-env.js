@@ -1,9 +1,9 @@
 import path from 'path';
 import fs from 'fs';
 import mzfs from 'mz/fs';
-import { localStoragePathSync } from '../clients/cli-paths';
+import { getLocalStoragePathSync } from '../clients/cli-paths';
 
-const serverEnvNamePath = path.join(localStoragePathSync(), 'server-env');
+const serverEnvNamePath = path.join(getLocalStoragePathSync(), 'server-env');
 
 export function getHostEnvName() {
   try {

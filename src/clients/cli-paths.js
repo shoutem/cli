@@ -4,32 +4,32 @@ import { sync as mkdirpSync } from 'mkdirp';
 import { getHostEnvName } from './server-env';
 import getHomeDir from '../home-dir';
 
-export async function localStoragePath() {
+export async function getLocalStoragePath() {
   const storagePath = getHomeDir();
   await mkdirp(storagePath);
   return storagePath;
 }
 
-export function localStoragePathSync() {
+export function getLocalStoragePathSync() {
   const storagePath = getHomeDir();
   mkdirpSync(storagePath);
   return storagePath;
 }
 
 export async function lastErrorPath() {
-  return path.join(await localStoragePath(), 'last-error.json');
+  return path.join(await getLocalStoragePath(), 'last-error.json');
 }
 
 export async function mobileEnvPath() {
   const hostEnvName = getHostEnvName();
-  const envPath = path.join(await localStoragePath(), hostEnvName, 'client');
+  const envPath = path.join(await getLocalStoragePath(), hostEnvName, 'client');
   await mkdirp(envPath);
   return envPath;
 }
 
 export async function serverEnvPath() {
   const hostEnvName = getHostEnvName();
-  const envPath = path.join(await localStoragePath(), hostEnvName, 'server');
+  const envPath = path.join(await getLocalStoragePath(), hostEnvName, 'server');
   await mkdirp(envPath);
 
   return envPath;
