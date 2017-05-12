@@ -1,10 +1,10 @@
 import path from 'path';
 import mkdirp from 'mkdirp-promise'
 import { readJsonFile, writeJsonFile } from '../extension/data';
-import { localStoragePath } from '../clients/cli-paths';
+import { getLocalStoragePath } from '../clients/cli-paths';
 
 async function getCacheFilePath(key) {
-  const cacheDir = path.join(await localStoragePath(), 'cache');
+  const cacheDir = path.join(await getLocalStoragePath(), 'cache');
   await mkdirp(cacheDir);
   return path.join(cacheDir, encodeURIComponent(typeof key === 'string' ? key : JSON.stringify(key)));
 }
