@@ -11,7 +11,6 @@ import * as npm from './npm';
 import { readJsonFile } from './data';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import { ensureYarnInstalled } from './yarn';
-import { ensureNodeVersion } from './node';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
 
@@ -69,7 +68,6 @@ export async function createMobileConfig(platformDir, opts) {
 
 export async function preparePlatform(platformDir, mobileConfig) {
   await ensureYarnInstalled();
-  await ensureNodeVersion();
   await reactNative.ensureInstalled();
 
   const configPath = path.join(platformDir, 'config.json');
