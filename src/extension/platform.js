@@ -6,9 +6,8 @@ import { getLinkedDirectories } from './linker';
 import { AppManagerClient } from '../clients/app-manager';
 import decompressUri from './decompress';
 import cliUrls from '../../config/services';
-import { writeJsonFile } from './data';
+import { writeJsonFile, readJsonFile } from './data';
 import * as npm from './npm';
-import { readJsonFile } from './data';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';
@@ -157,8 +156,12 @@ export async function runPlatform(platformDir, { platform, device, simulator, re
   return await npm.run(platformDir, 'run', runOptions);
 }
 
-export function runShoutemWatcher(platformDir) {
-  const watcherPath = path.join(platformDir, 'scripts', 'helpers', 'run-watch-in-new-window.js');
-  const runWatchInNewWindow = require(watcherPath);
-  runWatchInNewWindow();
+export async function runShoutemWatcher(platformDir) {
+  const { workingDirectories } = await readJsonFile(path.join(platformDir, 'config.json')) || {};
+
+  if ((workingDirectories || []).length > 0) {
+    const watcherPath = path.join(platformDir, 'scripts', 'helpers', 'run-watch-in-new-window.js');
+    const runWatchInNewWindow = require(watcherPath);
+    runWatchInNewWindow();
+  }
 }
