@@ -31,6 +31,11 @@ export const builder = yargs => {
         alias: 's',
         description: 'run app on a specific simulator',
         type: 'string'
+      },
+      clean: {
+        alias: 'c',
+        description: 'forces the client platform to be cleaned up, configured, linked and compiled from scratch',
+        type: 'boolean'
       }
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);
