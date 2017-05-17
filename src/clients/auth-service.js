@@ -1,22 +1,21 @@
-import _ from 'lodash';
-import request from 'request-promise';
 import URI from 'urijs';
-
+import { getClient } from './json-api-client';
 import services from '../../config/services';
-
+import * as cache from '../extension/cache';
+import { getHostEnvName } from './server-env';
+import * as intercept from '@shoutem/fetch-token-intercept';
+import * as logger from '../extension/logger';
 
 export class AuthServiceError {
   /*
     Used whenever AuthService misbehaves and returns errors not listed in the
     API specification.
   */
-  constructor(reqSettings, resStatus, resBody) {
-    this.message = 'Unexpected response from AuthService';
-    this.request = reqSettings;
-    this.response = {
-      body: resBody,
-      statusCode: resStatus,
-    };
+  constructor(message, url, response, code) {
+    this.message = message;
+    this.url = url;
+    this.response = response;
+    this.code = code;
   }
 }
 
@@ -29,50 +28,105 @@ export class UnauthorizedError {
   }
 }
 
+const tokensUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
 
-export class AuthServiceClient {
-  /*
-    Client for authenication service.
-    https://github.com/shoutem/docs/tree/feature/api-for-em/api-specs/AuthService
-  */
-  constructor(authServiceUri = services.authService) {
-    this.serviceUri = new URI(authServiceUri);
+export async function createRefreshToken(email, password) {
+  const response = await getClient('post', tokensUrl).auth(email, password);
+
+  const { body: { data: { tokenType, token } } } = response;
+
+  if (tokenType !== 'refresh-token') {
+    throw new AuthServiceError('Did not get refresh token', tokensUrl, response);
   }
 
-  prepareLoginUserRequest(username, password) {
-    const encoded = new Buffer(`${username}:${password}`).toString('base64');
-    return {
-      json: true,
+  if (!token) {
+    throw new AuthServiceError('Got null refresh token', tokensUrl, response);
+  }
+
+  return token;
+}
+
+function getRefreshTokenKey() {
+  return getHostEnvName() + '.refresh-token';
+}
+
+function getAccessTokenKey() {
+  return getHostEnvName() + '.access-token';
+}
+
+export async function getRefreshToken({ email, password } = {}) {
+  const refreshToken = await cache.getValue(getRefreshTokenKey());
+
+  if (!refreshToken && email && password) {
+    return await cache.setValue(getRefreshTokenKey(), await createRefreshToken(email, password));
+  }
+
+  if (!refreshToken) {
+    throw new AuthServiceError('Login with email and password required.', null, null, 'LOGIN_REQUIRED');
+  }
+
+  return refreshToken;
+}
+
+export async function clearTokens() {
+  await cache.setValue(getAccessTokenKey(), null);
+  await cache.setValue(getRefreshToken(), null);
+}
+
+const authorizationConfig = {
+  createAccessTokenRequest(refreshToken){
+    return new Request(tokensUrl, {
       method: 'POST',
-      uri: new URI(this.serviceUri).segment('/v1/login').toString(),
+      uri: tokensUrl,
       headers: {
+        Authorization: `Bearer ${refreshToken}`,
         Accept: 'application/vnd.api+json',
-        Authorization: `Basic ${encoded}`,
+        'Content-Type': 'application/vnd.api+json'
       },
-      resolveWithFullResponse: true,
-      simple: false,
-    };
-  }
-
-  /*
-    Passes `username` and `password` to authentication service for validation.
-    If credentials are valid, `callback` will receive an API token.
-  */
-  loginUser(username, password) {
-    const settings = this.prepareLoginUserRequest(username, password);
-    return request(settings)
-      .then(response => {
-        const body = response.body;
-        if (response.statusCode === 401) {
-          return Promise.reject(new UnauthorizedError());
+      json: {
+        data: {
+          type: 'shoutem.auth.tokens',
+          attributes: {
+            tokenType: 'access-token'
+          }
         }
-
-        const apiToken = _.get(body, 'meta.authHeaderToken');
-        if (response.statusCode !== 200 || !apiToken) {
-          return Promise.reject(new AuthServiceError(settings, 200, body));
-        }
-
-        return apiToken;
-      });
+      }
+    });
+  },
+  parseAccessToken(response) {
+    logger.info('parseAccessToken', response);
+    return response.body.data.accessToken;
+  },
+  shouldIntercept() {
+    return true;
+  },
+  shouldInvalidateAccessToken() {
+    return false;
+  },
+  authorizeRequest(request, accessToken) {
+    logger.info('authorizeRequest', accessToken);
+    if (!request.headers.Authorization) {
+      request.headers.Authorization = `Bearer ${accessToken}`;
+    }
+    return request;
   }
+};
+
+export async function authorizeRequests(creds = {}) {
+  try {
+    const refreshToken = await getRefreshToken(creds);
+    intercept.configure(authorizationConfig);
+    intercept.authorize(refreshToken, await cache.getValue(getAccessTokenKey()));
+    return true;
+  } catch (err) {
+    logger.info(err);
+    if (err.code !== 'LOGIN_REQUIRED') {
+      throw err;
+    }
+    return false;
+  }
+}
+
+export async function refreshTokenExists() {
+  return !!await cache.getValue(getRefreshTokenKey());
 }

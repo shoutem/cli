@@ -2,7 +2,8 @@ import request from 'request';
 import requestPromise from 'request-promise';
 import URI from 'urijs';
 import Promise from 'bluebird';
-import services from '../../config/services';
+import { legacyService } from '../../config/services';
+import * as jsonApi from './json-api-client';
 
 export class LegacyServiceError {
   /*
@@ -17,6 +18,10 @@ export class LegacyServiceError {
       statusCode: resStatus,
     };
   }
+}
+
+export async function getLatestApps() {
+  const body = await jsonApi.get(new URI(legacyService).segment('/v1/apps').toString());
 }
 
 export class LegacyServiceClient {
@@ -44,7 +49,7 @@ export class LegacyServiceClient {
       },
       headers: {
         Accept: 'application/vnd.api+json',
-        Authorization: `Bearer ${this.apiToken}`,
+        //Authorization: `Bearer ${this.apiToken}`,
         'Content-Type': 'application/vnd.api+json',
       },
     };
@@ -69,6 +74,8 @@ export class LegacyServiceClient {
   }
 
   async getLatestAppsAsync() {
+    const body = await jsonApi.get(new URI(this.serviceUri).segment('/v1/apps').toString());
+    body.data.map(app =>)
     return Promise.promisify(callback => this.getLatestApps(callback))();
   }
 
@@ -80,7 +87,7 @@ export class LegacyServiceClient {
       uri: new URI(this.serviceUri).segment(`/v1/apps/${appId}`).toString(),
       headers: {
         Accept: 'application/vnd.api+json',
-        Authorization: `Bearer ${this.apiToken}`,
+        //Authorization: `Bearer ${this.apiToken}`,
         'Content-Type': 'application/vnd.api+json',
       },
     };
@@ -103,7 +110,7 @@ export class LegacyServiceClient {
       uri: new URI(this.serviceUri).segment(`/api/applications/publishing_properties.json`).search({ nid: appId }).toString(),
       headers: {
         Accept: 'application/json',
-        Authorization: `Bearer ${this.apiToken}`,
+        //Authorization: `Bearer ${this.apiToken}`,
         'Content-Type': 'application/json',
       }
     };

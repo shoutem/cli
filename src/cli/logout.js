@@ -1,11 +1,11 @@
 import msg from '../user_messages';
-import { logout } from '../commands/logout';
+import { clearTokens } from '../clients/auth-service';
 import { handleError } from '../extension/error-handler';
 
 export const description = 'Erase all locally stored credentials.';
 export const command = 'logout';
 export function handler() {
-  logout()
+  clearTokens()
     .then(() => console.log(msg.logout.complete()))
     .catch(handleError);
 }

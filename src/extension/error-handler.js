@@ -57,3 +57,11 @@ export async function handleError(err) {
       console.log(err);
   }
 }
+
+export async function executeAndHandleError(func) {
+  try {
+    await func();
+  } catch (err) {
+    await handleError(err);
+  }
+}

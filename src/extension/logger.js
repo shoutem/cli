@@ -1,6 +1,6 @@
 import _ from 'underscore';
 
-export async function info(msg, object) {
+export function info(msg, object) {
   if (isVerbose()) {
     console.log(msg, object);
   }
