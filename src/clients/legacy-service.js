@@ -22,13 +22,14 @@ export class LegacyServiceError {
 
 export async function getLatestApps() {
   const body = await jsonApi.get(new URI(legacyService).segment('/v1/apps').toString());
+  return body.data;
 }
 
 export class LegacyServiceClient {
   /*
     Client for LegacyService.
   */
-  constructor(apiToken, legacyServiceUri = services.legacyService) {
+  constructor(apiToken, legacyServiceUri = legacyService) {
     this.apiToken = apiToken;
     this.serviceUri = new URI(legacyServiceUri);
 
@@ -74,8 +75,6 @@ export class LegacyServiceClient {
   }
 
   async getLatestAppsAsync() {
-    const body = await jsonApi.get(new URI(this.serviceUri).segment('/v1/apps').toString());
-    body.data.map(app =>)
     return Promise.promisify(callback => this.getLatestApps(callback))();
   }
 

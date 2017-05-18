@@ -1,12 +1,9 @@
-import { LegacyServiceClient } from '../clients/legacy-service';
-import { ensureUserIsLoggedIn } from '../commands/login';
+import { getLatestApps } from '../clients/legacy-service';
 import { spinify } from './spinner';
 import { prompt } from 'inquirer';
 
 export default async function(defaultAppId) {
-  const apiToken = await ensureUserIsLoggedIn();
-
-  const apps = await spinify(await new LegacyServiceClient(apiToken).getLatestAppsAsync(), 'Fetching applications');
+  const apps = await spinify(getLatestApps(), 'Fetching applications');
 
   return (await prompt({
     type: 'list',
