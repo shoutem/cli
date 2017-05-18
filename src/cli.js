@@ -2,8 +2,8 @@ require('yargonaut')
   .helpStyle('green.underline')
   .errorsStyle('red.bold');
 
-import 'fetch-everywhere';
 import 'colors';
+import 'fetch-everywhere';
 import yargs from 'yargs';
 import { version } from '../package.json';
 import apiUrls from '../config/services';

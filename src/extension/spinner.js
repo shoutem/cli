@@ -1,8 +1,14 @@
-import { Spinner } from 'cli-spinner';
+import { Spinner } from 'cli-spinner'
+import { isVerbose } from './logger';
 
 let spinners = [];
 
 export function startSpinner(msg) {
+  if (isVerbose()) {
+    console.log(msg);
+    return { stop(){} };
+  }
+
   const spinner = new Spinner(msg);
   spinner.start();
 

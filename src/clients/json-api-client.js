@@ -1,16 +1,17 @@
 import superagentJsonapify from 'superagent-jsonapify';
 import superagent from 'superagent';
-import fetch from 'fetch-everywhere';
-import JsonApiSerializer from 'json-api-serializer';
+import { Deserializer } from 'jsonapi-serializer';
 
-const Serializer = new JsonApiSerializer();
+const deserializer = new Deserializer();
 
 superagentJsonapify(superagent);
 
 export class JsonApiError {
-  constructor(errors, request = {}) {
-    this.errors = errors;
-    this.request = request;
+  constructor(message, response, body, status) {
+    this.message = message;
+    this.response = response;
+    this.status = status;
+    this.body = body;
   }
 }
 
@@ -30,7 +31,11 @@ export async function execute(method, url, opts = {}) {
   });
   const response = await fetch(req);
   const json = await response.json();
-  return Serializer.deserialize(json);
+  if (response.ok) {
+    return deserializer.deserialize(json);
+  }
+
+  throw new JsonApiError(null, response, json, response.status);
 }
 
 export function get(uri) {

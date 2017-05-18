@@ -16,6 +16,10 @@ export function getErrorMessage(err) {
     return '';
   }
 
+  if (err.status === 401) {
+    return 'Access denied, use `shoutem login` command to login';
+  }
+
   if (_.get(err, 'response.body.errors')) {
     return getJsonApiErrorMessage(err.response.body.errors);
   }
