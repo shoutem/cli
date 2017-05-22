@@ -74,28 +74,33 @@ export async function clearTokens() {
 }
 
 const authorizationConfig = {
-  createAccessTokenRequest(refreshToken){
+  createAccessTokenRequest(refreshToken) {
+    logger.info('createAccessTokenRequest', refreshToken);
     return new Request(tokensUrl, {
       method: 'POST',
-      uri: tokensUrl,
       headers: {
         Authorization: `Bearer ${refreshToken}`,
         Accept: 'application/vnd.api+json',
         'Content-Type': 'application/vnd.api+json'
       },
-      json: {
+      body: JSON.stringify({
         data: {
           type: 'shoutem.auth.tokens',
           attributes: {
             tokenType: 'access-token'
           }
         }
-      }
+      })
     });
   },
-  parseAccessToken(response) {
+  async parseAccessToken(response) {
+    if (response.ok) {
+      const { data: { attributes: { token } } } = await response.json();
+      console.log('parseAccessToken', token);
+      return token;
+    }
     logger.info('parseAccessToken', response);
-    return response.body.data.accessToken;
+    throw new AuthServiceError('Could not get access token', tokensUrl, response, 'ACCESS_TOKEN_FAILURE');
   },
   shouldIntercept() {
     return true;
@@ -104,10 +109,8 @@ const authorizationConfig = {
     return false;
   },
   authorizeRequest(request, accessToken) {
-    logger.info('authorizeRequest', accessToken);
-    if (!request.headers.Authorization) {
-      request.headers.Authorization = `Bearer ${accessToken}`;
-    }
+    request.headers.set('Authorization', `Bearer ${accessToken}`);
+    logger.info('authorizeRequest', request.headers);
     return request;
   }
 };

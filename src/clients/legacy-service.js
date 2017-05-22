@@ -4,6 +4,7 @@ import URI from 'urijs';
 import Promise from 'bluebird';
 import { legacyService } from '../../config/services';
 import * as jsonApi from './json-api-client';
+import * as logger from '../extension/logger';
 
 export class LegacyServiceError {
   /*
@@ -22,7 +23,8 @@ export class LegacyServiceError {
 
 export async function getLatestApps() {
   const body = await jsonApi.get(new URI(legacyService).segment('/v1/apps').toString());
-  return body.data;
+  logger.info('getLatestApps', body);
+  return body;
 }
 
 export class LegacyServiceClient {
