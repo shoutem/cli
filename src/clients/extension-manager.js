@@ -33,7 +33,6 @@ export class DeveloperNameError {
   }
 }
 
-
 export class ExtensionManagerClient {
   /*
     Client for ExtensionManager service.

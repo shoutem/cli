@@ -1,11 +1,8 @@
 import inquirer from 'inquirer';
-
-import { AppManagerClient } from '../clients/app-manager';
+import { AppManagerClient, installExtension, createApp } from '../clients/app-manager';
 import { LegacyServiceClient } from '../clients/legacy-service';
-import { ExtensionManagerClient } from '../clients/extension-manager';
 import { ensureDeveloperIsRegistered } from './register';
 import * as utils from '../extension/data';
-
 import msg from '../user_messages';
 
 
@@ -48,44 +45,40 @@ export async function promptAppName() {
   return appName;
 }
 
-async function getNewApp(appManager) {
+async function getNewApp() {
   const name = await promptAppName();
-  return await appManager.createAppAsync({ name });
+  return await createApp({ name });
 }
 
 export async function ensureApp() {
   const { apiToken } = await ensureDeveloperIsRegistered();
   const legacyService = new LegacyServiceClient(apiToken);
-  const appManager = new AppManagerClient(apiToken, null);
   const appList = await legacyService.getLatestAppsAsync();
 
   if (appList.length === 0) {
     if (!await promptCreateNewApp()) {
-      return await getNewApp(appManager);
+      return await getNewApp();
     }
   }
 
   const appId = await promptAppSelect(appList);
-  return appList.filter(app => app.id === appId)[0] || await getNewApp(appManager);
+  return appList.filter(app => app.id === appId)[0] || await getNewApp();
 }
 
 export async function createNewApp(name) {
-  const { apiToken } = await ensureDeveloperIsRegistered();
-  const appManager = new AppManagerClient(apiToken, null);
-  return await appManager.createAppAsync({ name });
+  return await createApp({ name });
 }
 
 export async function installLocalExtension(appId) {
-  const dev = await ensureDeveloperIsRegistered();
-  const appManager = new AppManagerClient(dev.apiToken, appId);
-  const extensionManager = new ExtensionManagerClient(dev.apiToken);
-
   const { name, version } = await utils.loadExtensionJsonAsync();
-  const canonicalName = utils.getExtensionCanonicalName(dev.name, name, version);
+
+  // TODO developer's name!
+  const canonicalName = utils.getExtensionCanonicalName('???', name, version);
+
   const extensionId = await extensionManager.getExtensionIdAsync(canonicalName);
 
   if (extensionId) {
-    await appManager.installExtensionAsync(extensionId);
+    await installExtension(appId, extensionId);
   } else {
     throw new Error(msg.install.notExtensionDir());
   }

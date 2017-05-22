@@ -46,6 +46,17 @@ export function del(uri) {
   return execute('delete', uri);
 }
 
+export function post(url, body = null, opts = {}) {
+  if (body) {
+    return execute('post', url, {
+      ...opts,
+      body: JSON.stringify(body)
+    });
+  }
+
+  return execute('post', url, opts);
+}
+
 export function getClient(method, url) {
   return superagent[method](url).set('Accept', 'application/vnd.api+json');
 }

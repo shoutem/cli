@@ -20,6 +20,36 @@ export class AppManagerError {
   }
 }
 
+export async function installExtension(appId, extensionId) {
+  const url = new URI(services.appManager).segment(`/v1/apps/${appId}/installations`).toString();
+  return await jsonApi.post(url, {
+    data: {
+      type: 'shoutem.core.installations',
+      attributes: { extension: extensionId },
+    }
+  });
+}
+
+export async function uninstallExtension(appId, extensionId) {
+  const uri = new URI(services.appManager).segment(`/v1/apps/${appId}/installations/${extensionId}`).toString();
+  return jsonApi.del(uri);
+}
+
+export async function getExtInstallations(appId) {
+  const uri = new URI(services.appManager).segment(`/v1/apps/${appId}/installations`).toString();
+  return await jsonApi.get(uri);
+}
+
+export async function createApp(app) {
+  const url = new URI(services.appManager).segment('/v1/apps/base/actions/clone').toString();
+  return await jsonApi.post(url, {
+    data: {
+      type: 'shoutem.core.application-clones',
+      attributes: app,
+    },
+  });
+}
+
 export class AppManagerClient {
   /*
     Client for AppManager service.
