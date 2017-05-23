@@ -1,8 +1,8 @@
 import inquirer from 'inquirer';
-import { AppManagerClient, installExtension, createApp } from '../clients/app-manager';
-import { LegacyServiceClient } from '../clients/legacy-service';
-import { ensureDeveloperIsRegistered } from './register';
+import { installExtension, createApp } from '../clients/app-manager';
+import { getLatestApps } from '../clients/legacy-service';
 import * as utils from '../extension/data';
+import * as extensionManager from '../clients/extension-manager';
 import msg from '../user_messages';
 
 
@@ -51,9 +51,7 @@ async function getNewApp() {
 }
 
 export async function ensureApp() {
-  const { apiToken } = await ensureDeveloperIsRegistered();
-  const legacyService = new LegacyServiceClient(apiToken);
-  const appList = await legacyService.getLatestAppsAsync();
+  const appList = await getLatestApps();
 
   if (appList.length === 0) {
     if (!await promptCreateNewApp()) {
@@ -71,11 +69,10 @@ export async function createNewApp(name) {
 
 export async function installLocalExtension(appId) {
   const { name, version } = await utils.loadExtensionJsonAsync();
+  const dev = await extensionManager.getDeveloper();
 
-  // TODO developer's name!
-  const canonicalName = utils.getExtensionCanonicalName('???', name, version);
-
-  const extensionId = await extensionManager.getExtensionIdAsync(canonicalName);
+  const canonicalName = utils.getExtensionCanonicalName(dev.name, name, version);
+  const extensionId = await extensionManager.getExtensionId(canonicalName);
 
   if (extensionId) {
     await installExtension(appId, extensionId);
@@ -84,10 +81,4 @@ export async function installLocalExtension(appId) {
   }
 
   return extensionId;
-}
-
-export async function installExtensionById(extensionId, appId) {
-  const { apiToken } = await ensureDeveloperIsRegistered();
-  const appManager = new AppManagerClient(apiToken, appId);
-  return await appManager.installExtension(extensionId);
 }

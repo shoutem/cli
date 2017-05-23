@@ -21,12 +21,12 @@ const jsonApiHeaders = {
 };
 
 export async function execute(method, url, opts = {}) {
-  const req = new Request(url, {
+  const req = new Request(url.toString(), {
     ...opts,
     method: method,
     headers: {
-      ...opts.headers,
-      ...jsonApiHeaders
+      ...jsonApiHeaders,
+      ...opts.headers
     }
   });
   const response = await fetch(req);
@@ -42,15 +42,26 @@ export function get(uri) {
   return execute('get', uri);
 }
 
+export function put(url, jsonBody = null, opts) {
+  if (jsonBody) {
+    return execute('put', url, {
+      ...opts,
+      body: JSON.stringify(jsonBody)
+    });
+  }
+
+  return execute('put', url, opts);
+}
+
 export function del(uri) {
   return execute('delete', uri);
 }
 
-export function post(url, body = null, opts = {}) {
-  if (body) {
+export function post(url, jsonBody = null, opts = {}) {
+  if (jsonBody) {
     return execute('post', url, {
       ...opts,
-      body: JSON.stringify(body)
+      body: JSON.stringify(jsonBody)
     });
   }
 

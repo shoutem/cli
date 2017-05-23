@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import mzfs from 'mz/fs';
-import { ExtensionManagerClient } from '../clients/extension-manager';
+import * as extensionManager from '../clients/extension-manager';
 import { getHostEnvName } from '../clients/server-env';
 import { ensureInExtensionDir } from '../extension/data';
 import { ensureDeveloperIsRegistered } from './register';
@@ -46,7 +46,6 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
   const stream = fs.createReadStream(packResult.package);
 
   const id = utils.getExtensionCanonicalName(dev.name, extJson.name, extJson.version);
-  const extensionManager = new ExtensionManagerClient(dev.apiToken);
 
   console.log(msg.push.uploadingInfo(extJson, getHostEnvName()));
   let spinner = null;

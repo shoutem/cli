@@ -3,7 +3,7 @@ import path from 'path';
 import glob from 'glob-promise';
 import replace from 'replace-in-file';
 import { getLinkedDirectories } from './linker';
-import { AppManagerClient } from '../clients/app-manager';
+import * as appManager from '../clients/app-manager';
 import decompressUri from './decompress';
 import cliUrls from '../../config/services';
 import { writeJsonFile, readJsonFile } from './data';
@@ -120,8 +120,7 @@ export async function fixPlatform(platformDir, appId) {
 }
 
 export async function getPlatformVersion(appId) {
-  const appManager = new AppManagerClient(await ensureUserIsLoggedIn(), appId);
-  const { mobileAppVersion } = await appManager.getApplicationPlatform();
+  const { mobileAppVersion } = await appManager.getApplicationPlatform(appId);
 
   return mobileAppVersion;
 }

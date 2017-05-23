@@ -2,7 +2,6 @@ import services from '../../config/services';
 import {
   createNewApp,
   ensureApp,
-  installExtensionById,
   installLocalExtension,
 } from '../commands/install';
 import msg from '../user_messages';

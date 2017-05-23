@@ -1,4 +1,4 @@
-import { ExtensionManagerClient } from '../clients/extension-manager';
+import * as extensionManager from '../clients/extension-manager';
 import { ensureDeveloperIsRegistered } from './register';
 import * as utils from '../extension/data';
 import { uploadExtension } from '../commands/push';
@@ -7,7 +7,6 @@ import msg from '../user_messages';
 
 export async function publishExtension(extDir) {
   const dev = await ensureDeveloperIsRegistered();
-  const extensionManager = new ExtensionManagerClient(dev.apiToken);
 
   const extJson = await utils.loadExtensionJsonAsync(extDir);
   console.log(msg.publish.publishInfo(extJson));

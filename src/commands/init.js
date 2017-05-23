@@ -3,8 +3,7 @@ import inquirer from 'inquirer';
 import { instantiateTemplatePath } from '../extension/template';
 import { ensureDeveloperIsRegistered } from './register';
 import msg from '../user_messages';
-import { ExtensionManagerClient } from '../clients/extension-manager';
-import { ensureUserIsLoggedIn } from './login'
+import { getPlatforms } from '../clients/extension-manager';
 import * as utils from '../extension/data';
 
 export function cwd() {
@@ -22,9 +21,7 @@ export async function promptExtensionInit(extName) {
   const name = _.kebabCase(extName);
   const title = _.upperFirst(extName.toLowerCase());
 
-  const apiToken = await ensureUserIsLoggedIn();
-  const extClient = new ExtensionManagerClient(apiToken);
-  const platforms = await extClient.getPlatforms();
+  const platforms = await getPlatforms();
   const platformVersions = platforms.map(p => p.attributes.version);
 
   const version = '0.0.1';

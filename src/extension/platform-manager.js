@@ -13,7 +13,8 @@ import { mobileEnvPath } from '../clients/cli-paths';
 import * as platform from './platform';
 import { readJsonFile, writeJsonFile } from './data';
 import { printMobilizerQR } from '../commands/qr-generator';
-import { getAppManager, getLegacyServiceClient } from '../clients/clients-factory';
+import { getInstallations } from '../clients/app-manager';
+import { getPublishingProperties } from '../clients/legacy-service';
 import * as analytics from './analytics';
 import kill from 'tree-kill';
 
@@ -22,15 +23,13 @@ async function getAppDir(appId) {
 }
 
 async function getExtensionsPackagesUrls(appId) {
-  const manager = await getAppManager(appId);
-  const installations = await manager.getInstallations();
-
+  const installations = await getInstallations(appId);
   return installations.map(inst => inst.location.app.package);
 }
 
 async function getCurrentApplicationState(appId, buildConfig) {
   return await Promise.props({
-    publishingProperties: getLegacyServiceClient().then(client => client.getPublishingProperties(appId)),
+    publishingProperties: getPublishingProperties(appId),
     installationsUrls: getExtensionsPackagesUrls(appId),
     platformVersion: platform.getPlatformVersion(appId),
     buildConfig

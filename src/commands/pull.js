@@ -2,11 +2,10 @@ import Promise from 'bluebird';
 import mkdirp from 'mkdirp-promise';
 import tmp from 'tmp-promise';
 import path from 'path';
-import { ExtensionManagerClient } from '../clients/extension-manager';
-import { AppManagerClient } from '../clients/app-manager';
-import { ensureUserIsLoggedIn } from './login';
+import { getExtension } from '../clients/extension-manager';
+import * as appManager from '../clients/app-manager';
 import { shoutemUnpack } from '../extension/packer';
-import { LegacyServiceClient } from '../clients/legacy-service';
+import { getApp } from '../clients/legacy-service';
 import { pathExists } from '../extension/data';
 import selectApp from '../extension/app-selector';
 import { downloadApp } from '../extension/platform';
@@ -14,8 +13,7 @@ import { downloadApp } from '../extension/platform';
 const downloadFile = Promise.promisify(require('download-file'));
 
 export async function pullExtensions({ appId }, destinationDir) {
-  const appManager = new AppManagerClient(await ensureUserIsLoggedIn(), appId);
-  const installations = await appManager.getInstallations();
+  const installations = await appManager.getInstallations(appId);
 
   await Promise.all(installations.map(async ({ extension, canonicalName }) => {
     const url = await getExtensionUrl(extension);
@@ -26,8 +24,7 @@ export async function pullExtensions({ appId }, destinationDir) {
 }
 
 async function getExtensionUrl(extId) {
-  const extManager = new ExtensionManagerClient(await ensureUserIsLoggedIn());
-  const resp = await extManager.getExtension(extId);
+  const resp = await getExtension(extId);
   const { location: { extension } } = resp;
 
  return `${removeTrailingSlash(extension.package)}/extension.tgz`;
@@ -40,7 +37,7 @@ function removeTrailingSlash(str) {
 export async function pullApp({ appId }, destinationDir) {
   appId = appId || await selectApp();
 
-  const { attributes: { name } } = await new LegacyServiceClient(await ensureUserIsLoggedIn()).getApp(appId);
+  const { attributes: { name } } = await getApp(appId);
   const spacelessName = name.replace(/ /g, '_');
 
   const appDir = path.join(destinationDir, spacelessName);
