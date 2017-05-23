@@ -1,34 +1,29 @@
-import _ from 'lodash';
-import inquirer from 'inquirer';
-import {
-  loadExtensionJsonAsync,
-  saveExtensionJsonAsync,
-} from '../extension/data';
+import * as shortcut from '../extension/shortcut';
+import { loadExtensionJsonAsync, saveExtensionJsonAsync } from '../extension/data';
 import msg from '../user_messages';
 
-export async function createShortcut(shortcutName, screenName = null) {
+export async function createShortcut(shortcutName) {
   const extJson = await loadExtensionJsonAsync();
-  extJson.shortcuts = extJson.shortcuts || [];
-
-  const names = extJson.shortcuts.map(s => s.name);
-  if (_.includes(names, shortcutName)) {
+  if (shortcut.containsShortcut(extJson, shortcutName)) {
     throw new Error(msg.shortcut.add.alreadyExists(shortcutName));
   }
 
   console.log('Enter shortcut information.');
-  const { title } =  await inquirer.prompt([{
-    message: 'Title',
-    name: 'title',
-    type: 'input',
-    default: _.upperFirst(shortcutName),
-    validate: input => input.length > 0
-  }]);
+  const shortcutData = await shortcut.promptShortcutInfo(shortcutName);
 
-  const shortcut = { title,  name: shortcutName };
-  if (screenName) {
-    shortcut.screen = `@.${screenName}`;
+  shortcut.addShortcut(extJson, shortcutData);
+  await saveExtensionJsonAsync(extJson);
+}
+
+export async function createShortcutForScreen(shortcutData, screenName) {
+  const shortcutName = shortcutData.name;
+
+  const extJson = await loadExtensionJsonAsync();
+  if (shortcut.containsShortcut(extJson, shortcutName)) {
+    throw new Error(msg.shortcut.add.alreadyExists(shortcutName));
   }
-  extJson.shortcuts.push(shortcut);
 
+  shortcutData.screen = `@.${screenName}`;
+  shortcut.addShortcut(extJson, shortcutData);
   await saveExtensionJsonAsync(extJson);
 }
