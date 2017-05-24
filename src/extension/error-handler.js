@@ -6,9 +6,14 @@ import { writeJsonFile } from '../extension/data';
 import * as spinner from './spinner';
 
 function getJsonApiErrorMessage(errors) {
-  return _.get(errors, '[0].detail') ||
-    _.get(errors, '[0].title') ||
-    JSON.stringify(errors);
+  const generalDetail = _.upperFirst(_.get(errors, '[0].detail') || _.get(errors, '[0].title'));
+  const specificDetail = _.upperFirst(_.get(errors, '[0].meta.trace.detail'));
+
+  if (generalDetail && specificDetail) {
+    return `${generalDetail} (${specificDetail})`;
+  }
+
+  return specificDetail || generalDetail || '';
 }
 
 export function getErrorMessage(err) {
@@ -20,8 +25,8 @@ export function getErrorMessage(err) {
     return 'Access denied, use `shoutem login` command to login';
   }
 
-  if (_.get(err, 'response.body.errors')) {
-    return getJsonApiErrorMessage(err.response.body.errors);
+  if (_.get(err, 'body.errors')) {
+    return getJsonApiErrorMessage(err.body.errors);
   }
 
   if (typeof(_.get(err, 'response.body')) === 'string') {
@@ -38,7 +43,7 @@ export function getErrorMessage(err) {
     return err.message;
   }
 
-  return err;
+  return err instanceof String ? err : stringify(err);
 }
 
 let reportInfoPrinted = false;

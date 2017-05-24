@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import _ from 'lodash';
 
 export function info(msg, object) {
   if (isVerbose()) {
@@ -6,6 +6,6 @@ export function info(msg, object) {
   }
 }
 
-export async function isVerbose() {
-  return _.contains(process.argv, '--verbose');
+export function isVerbose() {
+  return _.includes(process.argv, '--verbose');
 }

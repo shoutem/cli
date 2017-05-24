@@ -1,9 +1,8 @@
 import URI from 'urijs';
-import { getClient } from './json-api-client';
+import { post } from './json-api-client';
 import services from '../../config/services';
 import * as cache from '../extension/cache';
 import { getHostEnvName } from './server-env';
-import * as intercept from '@shoutem/fetch-token-intercept';
 import * as logger from '../extension/logger';
 
 export class AuthServiceError {
@@ -23,27 +22,36 @@ export class UnauthorizedError {
   /*
     Used when bad username or password is supplied.
   */
-  constructor() {
+  constructor(url, response, statusCode) {
     this.message = 'Username or password is not valid';
+    this.url = url;
+    this.response = response;
+    this.statusCode = statusCode;
   }
 }
 
 const tokensUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
 
+function getBasicAuthHeaderValue(email, password) {
+  return 'Basic ' + new Buffer(`${email}:${password}`).toString('base64');
+}
+
 export async function createRefreshToken(email, password) {
-  const response = await getClient('post', tokensUrl).auth(email, password);
+  try {
+    const response = await post(tokensUrl, null, {
+      headers: {
+        Authorization: getBasicAuthHeaderValue(email, password)
+      }
+    });
+    const { token } = response;
+    return token;
 
-  const { body: { data: { tokenType, token } } } = response;
-
-  if (tokenType !== 'refresh-token') {
-    throw new AuthServiceError('Did not get refresh token', tokensUrl, response);
+  } catch (err) {
+    if (err.statusCode === 401) {
+      throw new UnauthorizedError(err.url, err.response, err.statusCode);
+    }
+    throw err;
   }
-
-  if (!token) {
-    throw new AuthServiceError('Got null refresh token', tokensUrl, response);
-  }
-
-  return token;
 }
 
 function getRefreshTokenKey() {
@@ -55,17 +63,11 @@ function getAccessTokenKey() {
 }
 
 export async function getRefreshToken({ email, password } = {}) {
-  const refreshToken = await cache.getValue(getRefreshTokenKey());
-
-  if (!refreshToken && email && password) {
+  if (email && password) {
     return await cache.setValue(getRefreshTokenKey(), await createRefreshToken(email, password));
   }
 
-  if (!refreshToken) {
-    throw new AuthServiceError('Login with email and password required.', null, null, 'LOGIN_REQUIRED');
-  }
-
-  return refreshToken;
+  return await cache.getValue(getRefreshTokenKey());
 }
 
 export async function clearTokens() {
@@ -96,14 +98,13 @@ const authorizationConfig = {
   async parseAccessToken(response) {
     if (response.ok) {
       const { data: { attributes: { token } } } = await response.json();
-      console.log('parseAccessToken', token);
       return token;
     }
     logger.info('parseAccessToken', response);
     throw new AuthServiceError('Could not get access token', tokensUrl, response, 'ACCESS_TOKEN_FAILURE');
   },
-  shouldIntercept() {
-    return true;
+  shouldIntercept(request) {
+    return !request.headers.get('Authorization');
   },
   shouldInvalidateAccessToken() {
     return false;
@@ -115,15 +116,15 @@ const authorizationConfig = {
   }
 };
 
-export async function authorizeRequests(creds = {}) {
+export async function authorizeRequests(refreshToken) {
   try {
-    const refreshToken = await getRefreshToken(creds);
+    const intercept = require('@shoutem/fetch-token-intercept');
     intercept.configure(authorizationConfig);
     intercept.authorize(refreshToken, await cache.getValue(getAccessTokenKey()));
     return true;
   } catch (err) {
     logger.info(err);
-    if (err.code !== 'LOGIN_REQUIRED') {
+    if (err.statusCode !== 401) {
       throw err;
     }
     return false;

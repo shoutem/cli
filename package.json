@@ -11,7 +11,7 @@
   },
   "scripts": {
     "lint": "eslint ./",
-    "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\"",
+    "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\"",
     "shoutem": "node src/shoutem.js",
     "postinstall": "node src/scripts/postinstall.js",
     "prepublish": "dos2unix src/shoutem.js"
@@ -53,6 +53,7 @@
     "mz": "^2.4.0",
     "ngrok": "^2.2.6",
     "pipe-streams-to-promise": "^0.2.0",
+    "prettyjson": "^1.2.1",
     "progress": "^1.1.8",
     "qrcode-terminal": "^0.11.0",
     "replace-in-file": "^2.5.0",
@@ -93,5 +94,21 @@
   },
   "engines": {
     "node": ">=7.0.0"
+  },
+  "babel": {
+    "presets": [
+      "node6"
+    ],
+    "plugins": [
+      "transform-object-rest-spread",
+      "transform-async-to-generator"
+    ],
+    "ignore": false,
+    "only": [
+      "config",
+      "src",
+      "templates"
+    ],
+    "sourceMaps": "both"
   }
 }

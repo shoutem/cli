@@ -23,22 +23,18 @@ export class ExtensionManagerError {
 
 export async function getDeveloper() {
   const url = extensionManagerUri.segment('/v1/devs/me');
-  const { data } = await jsonApi.get(url);
-
-  return { ...data.attributes, id: data.id };
+  return await jsonApi.get(url);
 }
 
 export async function createDeveloper(devName) {
   const url = extensionManagerUri.segment('/v1/devs');
 
-  const { data } = await jsonApi.post(url, {
+  return await jsonApi.post(url, {
     data: {
       type: 'shoutem.core.developers',
       attributes: { name: devName },
     },
   });
-
-  return { ...data.attributes, id: data.id };
 }
 
 export async function uploadExtension(canonicalName, tgzStream, progressHandler, size) {
@@ -50,7 +46,7 @@ export async function uploadExtension(canonicalName, tgzStream, progressHandler,
   const form = new FormData();
   form.append('extension', tgzStream);
 
-  const { data: id } = await jsonApi.put(uri, null, {
+  const { id } = await jsonApi.put(uri, null, {
     body: form,
     headers: { 'Content-Type': 'multipart/form-data' }
   });
@@ -66,8 +62,7 @@ export async function getExtensionId(canonicalName) {
 
 export async function getExtension(canonicalName) {
   const url = extensionManagerUri.segment(`/v1/extensions/${canonicalName}`);
-  const { data } = await jsonApi.get(url);
-  return data;
+  return await jsonApi.get(url);
 }
 
 export async function publishExtension(canonicalName) {
@@ -77,9 +72,7 @@ export async function publishExtension(canonicalName) {
 
 export async function getPlatforms() {
   const url = extensionManagerUri.segment('/v1/platforms');
-  const { data } = await jsonApi.get(url);
-
-  return data;
+  return await jsonApi.get(url);
 }
 
 export class DeveloperNameError {

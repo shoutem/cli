@@ -11,7 +11,7 @@ import autoUpdate from './commands/update-cli';
 import * as analytics from './extension/analytics';
 import { isAscii, containsSpace } from './extension/validation';
 import getHomeDir from './home-dir';
-import { authorizeRequests } from './clients/auth-service';
+import { authorizeRequests, getRefreshToken } from './clients/auth-service';
 
 const cliReferenceUrl = 'https://shoutem.github.io/docs/extensions/reference/cli';
 
@@ -29,7 +29,7 @@ analytics.setArgv(process.argv);
   if (await autoUpdate()) {
     return null;
   }
-  await authorizeRequests();
+  await authorizeRequests(await getRefreshToken());
 
   const cli = yargs.usage('Usage: shoutem [command] [-h]')
     .option('version', {

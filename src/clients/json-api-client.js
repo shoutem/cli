@@ -1,27 +1,36 @@
 import superagentJsonapify from 'superagent-jsonapify';
 import superagent from 'superagent';
 import { Deserializer } from 'jsonapi-serializer';
+import * as logger from '../extension/logger';
 
-const deserializer = new Deserializer();
+const deserializer = new Deserializer({
+  keyForAttribute: 'camelCase'
+});
 
 superagentJsonapify(superagent);
 
 export class JsonApiError {
-  constructor(message, response, body, status) {
+  constructor(message, url, method, body, response, statusCode) {
     this.message = message;
-    this.response = response;
-    this.status = status;
+    this.url = url;
+    this.method = method;
     this.body = body;
+    this.response = response;
+    this.statusCode = statusCode;
   }
 }
 
-const jsonApiHeaders = {
-  Accept: 'application/vnd.api+json',
-  'Content-Type': 'application/vnd.api+json'
-};
-
 export async function execute(method, url, opts = {}) {
-  const req = new Request(url.toString(), {
+  url = url.toString();
+
+  const jsonApiHeaders = {
+    Accept: 'application/vnd.api+json',
+  };
+  if (opts.body) {
+    jsonApiHeaders['Content-Type'] = 'application/vnd.api+json';
+  }
+
+  const req = new Request(url, {
     ...opts,
     method: method,
     headers: {
@@ -29,13 +38,16 @@ export async function execute(method, url, opts = {}) {
       ...opts.headers
     }
   });
+
+  logger.info(`${method} ${url}`, req);
   const response = await fetch(req);
   const json = await response.json();
   if (response.ok) {
-    return deserializer.deserialize(json);
+    return await deserializer.deserialize(json);
   }
 
-  throw new JsonApiError(null, response, json, response.status);
+  delete response._raw;
+  throw new JsonApiError(null, url, method, json, response, response.status);
 }
 
 export function get(uri) {
