@@ -1,13 +1,9 @@
-import superagentJsonapify from 'superagent-jsonapify';
-import superagent from 'superagent';
 import { Deserializer } from 'jsonapi-serializer';
 import * as logger from '../extension/logger';
 
 const deserializer = new Deserializer({
   keyForAttribute: 'camelCase'
 });
-
-superagentJsonapify(superagent);
 
 export class JsonApiError {
   constructor(message, url, method, body, response, statusCode) {
@@ -43,7 +39,12 @@ export async function execute(method, url, opts = {}) {
   const response = await fetch(req);
   const json = await response.json();
   if (response.ok) {
-    return await deserializer.deserialize(json);
+    try {
+      return await deserializer.deserialize(json);
+    } catch (err) {
+      // if non json-api object is returned, use the object as-is
+      return json;
+    }
   }
 
   delete response._raw;
@@ -78,8 +79,4 @@ export function post(url, jsonBody = null, opts = {}) {
   }
 
   return execute('post', url, opts);
-}
-
-export function getClient(method, url) {
-  return superagent[method](url).set('Accept', 'application/vnd.api+json');
 }

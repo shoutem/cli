@@ -1,8 +1,7 @@
 import 'colors';
 import _ from 'lodash';
 import stringify from 'json-stringify-safe';
-import { lastErrorPath } from '../clients/cli-paths';
-import { writeJsonFile } from '../extension/data';
+import * as cache from './cache-env';
 import * as spinner from './spinner';
 
 function getJsonApiErrorMessage(errors) {
@@ -56,7 +55,7 @@ export async function handleError(err) {
       const errorJson = JSON.parse(stringify(err));
       errorJson.stack = (err || {}).stack;
       errorJson.message = (err || {}).message;
-      await writeJsonFile(errorJson, await lastErrorPath());
+      await cache.setValue('last-error', errorJson);
       if (!reportInfoPrinted) {
         console.error(`\nIf you think this error is caused by bug in the shoutem command, you can report the issue here: ${"https://github.com/shoutem/cli/issues".bold}`.yellow);
         console.error(`Make sure to include the information printed using the ${"`shoutem last-error`".bold} command`.yellow);

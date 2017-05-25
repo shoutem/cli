@@ -1,12 +1,11 @@
 import 'colors';
 import prettyJson from 'prettyjson';
-import { lastErrorPath } from '../clients/cli-paths';
-import { readJsonFile } from '../extension/data';
+import * as cache from '../extension/cache-env';
 
 export const description = null;
 export const command = 'last-error';
 export async function handler() {
-  const lastError = await readJsonFile(await lastErrorPath());
+  const lastError = await cache.getValue('last-error');
   if (lastError) {
     console.log(prettyJson.render(lastError, {
       keysColor: 'cyan',

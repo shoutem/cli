@@ -6,17 +6,17 @@ import * as logger from '../extension/logger';
 const legacyServiceUri = new URI(legacyService);
 
 export async function getLatestApps() {
-  const body = await jsonApi.get(legacyServiceUri.segment('/v1/apps'));
+  const body = await jsonApi.get(legacyServiceUri.clone().segment('/v1/apps'));
   logger.info('getLatestApps', body);
   return body;
 }
 
 export async function getApp(appId) {
-  const url = legacyServiceUri.segment(`/v1/apps/${appId}`);
+  const url = legacyServiceUri.clone().segment(`/v1/apps/${appId}`);
   return await jsonApi.get(url);
 }
 
 export async function getPublishingProperties(appId) {
-  const url = legacyServiceUri.segment(`/api/applications/publishing_properties.json`).search({nid: appId});
+  const url = legacyServiceUri.clone().segment(`/api/applications/publishing_properties.json`).search({nid: appId});
   return await jsonApi.get(url);
 }

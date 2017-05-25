@@ -21,4 +21,5 @@ Promise.all([
 
   rimraf(path.join(cliHome, 'platforms')),
   rimraf(path.join(cliHome, '*/client/build-config.json'), { glob: true }),
+  rimraf(path.join(cliHome, 'last-error.json'))
 ]).catch(err => {});

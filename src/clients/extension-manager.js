@@ -6,28 +6,13 @@ import FormData from 'form-data';
 
 const extensionManagerUri = new URI(extensionManager);
 
-export class ExtensionManagerError {
-  /*
-    Used whenever ExtensionManager misbehaves and returns errors not listed in
-    the API specification.
-  */
-  constructor(reqSettings, resStatus, resBody) {
-    this.message = 'Unexpected response from ExtensionManager';
-    this.request = reqSettings;
-    this.response = {
-      body: resBody,
-      statusCode: resStatus,
-    };
-  }
-}
-
 export async function getDeveloper() {
-  const url = extensionManagerUri.segment('/v1/devs/me');
+  const url = extensionManagerUri.clone().segment('/v1/devs/me');
   return await jsonApi.get(url);
 }
 
 export async function createDeveloper(devName) {
-  const url = extensionManagerUri.segment('/v1/devs');
+  const url = extensionManagerUri.clone().segment('/v1/devs');
 
   return await jsonApi.post(url, {
     data: {
@@ -42,7 +27,7 @@ export async function uploadExtension(canonicalName, tgzStream, progressHandler,
     listenStream(tgzStream, progressHandler, size);
   }
 
-  const uri = extensionManagerUri.segment(`/v1/extensions/${canonicalName}`);
+  const uri = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}`);
   const form = new FormData();
   form.append('extension', tgzStream);
 
@@ -61,17 +46,17 @@ export async function getExtensionId(canonicalName) {
 }
 
 export async function getExtension(canonicalName) {
-  const url = extensionManagerUri.segment(`/v1/extensions/${canonicalName}`);
+  const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}`);
   return await jsonApi.get(url);
 }
 
 export async function publishExtension(canonicalName) {
-  const url = extensionManagerUri.segment(`/v1/extensions/${canonicalName}/publish`);
+  const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}/publish`);
   return await jsonApi.post(url);
 }
 
 export async function getPlatforms() {
-  const url = extensionManagerUri.segment('/v1/platforms');
+  const url = extensionManagerUri.clone().segment('/v1/platforms');
   return await jsonApi.get(url);
 }
 

@@ -4,7 +4,7 @@ import mzfs from 'mz/fs';
 import * as extensionManager from '../clients/extension-manager';
 import { getHostEnvName } from '../clients/server-env';
 import { ensureInExtensionDir } from '../extension/data';
-import { ensureDeveloperIsRegistered } from './register';
+import { ensureUserIsLoggedIn } from './login';
 import * as utils from '../extension/data';
 import shoutemPack from '../extension/packer';
 import msg from '../user_messages';
@@ -36,7 +36,7 @@ function setExtNameVersionInPackageJson(extName, version, root = utils.getExtens
 }
 
 export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
-  const dev = await ensureDeveloperIsRegistered();
+  const dev = await ensureUserIsLoggedIn();
 
   const extJson = await utils.loadExtensionJsonAsync(extensionDir);
   await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version, extensionDir);

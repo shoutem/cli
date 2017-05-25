@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import inquirer from 'inquirer';
 import { instantiateTemplatePath } from '../extension/template';
-import { ensureDeveloperIsRegistered } from './register';
+import { ensureUserIsLoggedIn } from '../commands/login';
 import msg from '../user_messages';
 import { getPlatforms } from '../clients/extension-manager';
 import * as utils from '../extension/data';
@@ -49,7 +49,7 @@ export async function promptExtensionInit(extName) {
 }
 
 export async function initExtension(extName) {
-  const developer = await ensureDeveloperIsRegistered();
+  const developer = await ensureUserIsLoggedIn();
   const extJson = await promptExtensionInit(extName);
 
   utils.getExtensionCanonicalName(developer.name, extJson.name, extJson.version);

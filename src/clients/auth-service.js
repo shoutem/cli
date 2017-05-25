@@ -1,8 +1,7 @@
 import URI from 'urijs';
 import { post } from './json-api-client';
 import services from '../../config/services';
-import * as cache from '../extension/cache';
-import { getHostEnvName } from './server-env';
+import * as cache from '../extension/cache-env';
 import * as logger from '../extension/logger';
 
 export class AuthServiceError {
@@ -54,25 +53,19 @@ export async function createRefreshToken(email, password) {
   }
 }
 
-function getRefreshTokenKey() {
-  return getHostEnvName() + '.refresh-token';
-}
-
-function getAccessTokenKey() {
-  return getHostEnvName() + '.access-token';
-}
-
 export async function getRefreshToken({ email, password } = {}) {
   if (email && password) {
-    return await cache.setValue(getRefreshTokenKey(), await createRefreshToken(email, password));
+    const refreshToken = await cache.setValue('refresh-token', await createRefreshToken(email, password));
+    await cache.setValue('access-token', null);
+    return refreshToken;
   }
 
-  return await cache.getValue(getRefreshTokenKey());
+  return await cache.getValue('refresh-token');
 }
 
 export async function clearTokens() {
-  await cache.setValue(getAccessTokenKey(), null);
-  await cache.setValue(getRefreshToken(), null);
+  await cache.setValue('access-token', null);
+  await cache.setValue('refresh-token', null);
 }
 
 const authorizationConfig = {
@@ -98,6 +91,7 @@ const authorizationConfig = {
   async parseAccessToken(response) {
     if (response.ok) {
       const { data: { attributes: { token } } } = await response.json();
+      await cache.setValue('access-token', token);
       return token;
     }
     logger.info('parseAccessToken', response);
@@ -120,7 +114,7 @@ export async function authorizeRequests(refreshToken) {
   try {
     const intercept = require('@shoutem/fetch-token-intercept');
     intercept.configure(authorizationConfig);
-    intercept.authorize(refreshToken, await cache.getValue(getAccessTokenKey()));
+    intercept.authorize(refreshToken, await cache.getValue('access-token'));
     return true;
   } catch (err) {
     logger.info(err);
@@ -129,8 +123,4 @@ export async function authorizeRequests(refreshToken) {
     }
     return false;
   }
-}
-
-export async function refreshTokenExists() {
-  return !!await cache.getValue(getRefreshTokenKey());
 }

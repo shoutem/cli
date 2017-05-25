@@ -8,10 +8,10 @@ import decompressUri from './decompress';
 import cliUrls from '../../config/services';
 import { writeJsonFile, readJsonFile } from './data';
 import * as npm from './npm';
-import { ensureUserIsLoggedIn } from '../commands/login';
 import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
+import * as cache from './cache-env';
 
 async function isPlatformDirectory(dir) {
   const { name } = await readJsonFile(path.join(dir, 'package.json')) || {};
@@ -53,7 +53,7 @@ export async function createMobileConfig(platformDir, opts) {
     appId: appId.toString(),
     serverApiEndpoint: url.parse(cliUrls.appManager).hostname,
     legacyApiEndpoint: url.parse(cliUrls.legacyService).hostname,
-    authorization: await ensureUserIsLoggedIn(),
+    authorization: await cache.getValue('access-token'),
     configurationFilePath: 'config.json',
     workingDirectories: linkLocalExtensions ? await getExtensionsPaths(platformDir) : await getLinkedDirectories(),
     excludePackages: excludePackages || ['shoutem.code-push'],

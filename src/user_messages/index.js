@@ -102,7 +102,7 @@ export default {
   use: {
     complete: (serverEnv, developer) => `Using server \`${serverEnv}\`` + (developer ? ` as user ${developer.name}.` : '.'),
     invalidEnv: serverEnv => `${serverEnv} is not a valid option\nRun shoutem use -h for possible options.`,
-    show: serverEnv => `Using server \`${serverEnv}\`:`,
+    show: serverEnv => `Using server \`${serverEnv}\``,
   },
   run: {
     missingId: () => 'Shoutem app id is required for the first run.',
