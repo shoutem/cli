@@ -5,6 +5,7 @@ import {
   installLocalExtension,
 } from '../commands/install';
 import msg from '../user_messages';
+import { ensureUserIsLoggedIn } from '../commands/login';
 import { handleError } from '../extension/error-handler';
 
 export const description = 'Install the current extension to an application.';
@@ -28,6 +29,7 @@ export const builder = yargs => {
 
 export async function handler(options) {
   try {
+    await ensureUserIsLoggedIn();
     const appCreationRequested = options.new || options.new === '';
 
     let appId;

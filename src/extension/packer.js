@@ -3,15 +3,13 @@ import fs from 'mz/fs';
 import path from 'path';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';
-import fs2 from 'fs-extra';
 import targz from 'tar.gz';
 import { buildNodeProject } from './builder';
 import { readJsonFile, writeJsonFile } from './data';
 import { startSpinner } from '../extension/spinner';
-const copy = Promise.promisify(fs2.copy);
 const mv = Promise.promisify(require('mv'));
 import move from 'glob-move';
-import { pathExists } from '../extension/data';
+import { pathExists, copy } from 'fs-extra';
 import decompress from 'decompress';
 
 function hasPackageJson(dir) {

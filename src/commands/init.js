@@ -21,8 +21,7 @@ export async function promptExtensionInit(extName) {
   const name = _.kebabCase(extName);
   const title = _.upperFirst(extName.toLowerCase());
 
-  const platforms = await getPlatforms();
-  const platformVersions = platforms.map(p => p.attributes.version);
+  const platformVersions = (await getPlatforms()).map(({ version }) => version);
 
   const version = '0.0.1';
 

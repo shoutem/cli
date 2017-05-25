@@ -1,6 +1,6 @@
 import { uploadExtension } from '../commands/push';
 import msg from '../user_messages';
-import { pathExists } from '../extension/data';
+import { pathExists } from 'fs-extra';
 import { handleError } from '../extension/error-handler';
 import bluebird from 'bluebird';
 import path from 'path';

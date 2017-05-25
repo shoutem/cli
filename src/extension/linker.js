@@ -1,7 +1,7 @@
 import path from 'path';
 import Promise from 'bluebird';
 import _ from 'lodash';
-import { pathExists } from './data';
+import { pathExists } from 'fs-extra';
 import * as cache from './cache';
 
 export async function getLinkedDirectories() {

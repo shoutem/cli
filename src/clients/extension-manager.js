@@ -29,11 +29,13 @@ export async function uploadExtension(canonicalName, tgzStream, progressHandler,
 
   const uri = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}`);
   const form = new FormData();
-  form.append('extension', tgzStream);
+  form.append('extension', tgzStream, {
+    contentType: 'application/gzip'
+  });
 
   const { id } = await jsonApi.put(uri, null, {
     body: form,
-    headers: { 'Content-Type': 'multipart/form-data' }
+    headers: form.getHeaders()
   });
 
   return id;

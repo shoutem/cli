@@ -100,15 +100,3 @@ export function saveExtensionJson(extJson, callback) {
 }
 
 export const saveExtensionJsonAsync = Promise.promisify(saveExtensionJson);
-
-export async function pathExists(path) {
-  try {
-    await mzfs.stat(path);
-    return true;
-  } catch (err) {
-    if (err.code === 'ENOENT' || err.code === 'ENOTDIR') {
-      return false;
-    }
-    throw err;
-  }
-}

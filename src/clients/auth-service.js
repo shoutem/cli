@@ -111,6 +111,9 @@ const authorizationConfig = {
 };
 
 export async function authorizeRequests(refreshToken) {
+  if (!refreshToken) {
+    return;
+  }
   try {
     const intercept = require('@shoutem/fetch-token-intercept');
     intercept.configure(authorizationConfig);

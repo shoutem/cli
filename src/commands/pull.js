@@ -6,9 +6,10 @@ import { getExtension } from '../clients/extension-manager';
 import * as appManager from '../clients/app-manager';
 import { shoutemUnpack } from '../extension/packer';
 import { getApp } from '../clients/legacy-service';
-import { pathExists } from '../extension/data';
+import { pathExists } from 'fs-extra';
 import selectApp from '../extension/app-selector';
 import { downloadApp } from '../extension/platform';
+import { ensureUserIsLoggedIn } from './login';
 
 const downloadFile = Promise.promisify(require('download-file'));
 
@@ -35,9 +36,10 @@ function removeTrailingSlash(str) {
 }
 
 export async function pullApp({ appId }, destinationDir) {
+  await ensureUserIsLoggedIn();
   appId = appId || await selectApp();
 
-  const { attributes: { name } } = await getApp(appId);
+  const { name } = await getApp(appId);
   const spacelessName = name.replace(/ /g, '_');
 
   const appDir = path.join(destinationDir, spacelessName);

@@ -30,7 +30,7 @@ export async function handler(args) {
   try {
     if (args.paths.length === 0) {
       const result = await pushAndPublish(args);
-      console.log(msg.publish.complete(result.attributes));
+      console.log(msg.publish.complete(result));
     } else {
       args.paths = multiglob(args.paths);
       const { pushed, notPushed } = await pushAll(args);

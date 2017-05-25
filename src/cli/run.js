@@ -1,6 +1,5 @@
 import mobilizerRunCommand from '../commands/mobilizer-run';
 import { executeAndHandleError } from '../extension/error-handler';
-import selectApp from '../extension/app-selector';
 
 export const description = 'Run shoutem application on using Shoutem preview app';
 export const command = 'run [appId]';
@@ -37,6 +36,5 @@ export const builder = yargs => {
     .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 export async function handler(args) {
-  //await executeAndHandleError(() => mobilizerRunCommand(args));
-  await executeAndHandleError(() => selectApp());
+  await executeAndHandleError(() => mobilizerRunCommand(args));
 }

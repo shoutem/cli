@@ -6,10 +6,9 @@ const deserializer = new Deserializer({
 });
 
 export class JsonApiError {
-  constructor(message, url, method, body, response, statusCode) {
+  constructor(message, request, body, response, statusCode) {
     this.message = message;
-    this.url = url;
-    this.method = method;
+    this.request = request;
     this.body = body;
     this.response = response;
     this.statusCode = statusCode;
@@ -48,7 +47,7 @@ export async function execute(method, url, opts = {}) {
   }
 
   delete response._raw;
-  throw new JsonApiError(null, url, method, json, response, response.status);
+  throw new JsonApiError(null, req, json, response, response.status);
 }
 
 export function get(uri) {

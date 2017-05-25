@@ -37,6 +37,7 @@ function promptDeveloperName() {
 export async function loginUser() {
   const credentials = await promptUserCredentials();
   const refreshToken = await getRefreshToken(credentials);
+  await authorizeRequests(refreshToken);
   let developer = null;
 
   try {
@@ -48,8 +49,6 @@ export async function loginUser() {
       throw err;
     }
   }
-
-  await authorizeRequests(refreshToken);
 
   console.log(msg.login.complete(developer));
   logger.info('logged in as developer', developer);

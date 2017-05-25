@@ -1,7 +1,7 @@
 import fs from 'mz/fs';
 import path from 'path';
 import Mustache from 'mustache';
-import { pathExists } from './data';
+import { pathExists } from 'fs-extra';
 import mkdirp from 'mkdirp-promise';
 
 const templatesDirectory = path.join(__dirname, '..', '..', 'templates');

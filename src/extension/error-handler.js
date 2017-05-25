@@ -8,7 +8,7 @@ function getJsonApiErrorMessage(errors) {
   const generalDetail = _.upperFirst(_.get(errors, '[0].detail') || _.get(errors, '[0].title'));
   const specificDetail = _.upperFirst(_.get(errors, '[0].meta.trace.detail'));
 
-  if (generalDetail && specificDetail) {
+  if (generalDetail && specificDetail && generalDetail !== specificDetail) {
     return `${generalDetail} (${specificDetail})`;
   }
 
@@ -20,7 +20,7 @@ export function getErrorMessage(err) {
     return '';
   }
 
-  if (err.status === 401) {
+  if (err.statusCode === 401) {
     return 'Access denied, use `shoutem login` command to login';
   }
 
