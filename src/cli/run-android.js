@@ -25,6 +25,11 @@ export const builder = yargs => {
         alias: 'd',
           description: 'run app on a specific device',
           requiresArg: true
+      },
+      clean: {
+        alias: 'c',
+        description: 'forces the client platform to be cleaned up, configured, linked and compiled from scratch',
+        type: 'boolean'
       }
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);

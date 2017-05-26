@@ -26,6 +26,11 @@ export const builder = yargs => {
         alias: 's',
         description: 'display smaller ASCII QR code which could be unreadable in some fonts',
         type: 'boolean'
+      },
+      clean: {
+        alias: 'c',
+        description: 'forces the client platform to be cleaned up, configured, linked and compiled from scratch',
+        type: 'boolean'
       }
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);

@@ -69,8 +69,8 @@ async function syncApp(path, opts) {
 
   const oldAppState = await getOldApplicationState(path, appId);
 
-  if (_.isEqual(currentAppState, oldAppState)) {
-    platform.runShoutemWatcher(path);
+  if (!opts.clean && _.isEqual(currentAppState, oldAppState)) {
+    await platform.runShoutemWatcher(path);
     return null;
   }
 
