@@ -56,22 +56,13 @@ export async function writeJsonFile(json, filePath) {
   return str;
 }
 
-export function exit(err) {
-  console.log(err.message);
-  process.exit(1);
-}
-
 export function ensureInExtensionDir() {
-  const msg = 'Not an extension directory.';
-  let root;
+  const root = getExtensionRootDir();
 
-  try {
-    root = getExtensionRootDir();
-  } catch (exc) {
-    exit(exc);
+  if (!root) {
+    throw new Error('Not an extension directory.');
   }
 
-  if (!root) exit(new Error(msg));
   return root;
 }
 
