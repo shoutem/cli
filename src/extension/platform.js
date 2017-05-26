@@ -12,6 +12,7 @@ import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
 import * as cache from './cache-env';
+import { lookup } from './kill';
 
 async function isPlatformDirectory(dir) {
   const { name } = await readJsonFile(path.join(dir, 'package.json')) || {};
@@ -158,7 +159,7 @@ export async function runPlatform(platformDir, { platform, device, simulator, re
 export async function runShoutemWatcher(platformDir) {
   const { workingDirectories } = await readJsonFile(path.join(platformDir, 'config.json')) || {};
 
-  if ((workingDirectories || []).length > 0) {
+  if ((workingDirectories || []).length > 0 && (await lookup({ arguments: 'launchWatch' })).length < 0) {
     const watcherPath = path.join(platformDir, 'scripts', 'helpers', 'run-watch-in-new-window.js');
     const runWatchInNewWindow = require(watcherPath);
     runWatchInNewWindow();

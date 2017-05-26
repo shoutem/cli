@@ -77,7 +77,7 @@ async function syncApp(path, opts) {
   }
 
   if (!opts.mobileapp) {
-    await kill('adb.exe');
+    //await kill('adb.exe');
     await spinify(rmrf(path), 'Deleting old platform code...');
     await spinify(platform.downloadApp(appId, path), 'Downloading current platform code...');
   }
