@@ -10,7 +10,9 @@ module.exports = (_, extPath, { extJson }) => {
       console.log('Installing packages for server...'.green.bold);
     })
     .then(() => install(path.join(extPath, extJson.name, 'server')))
-    .then(() => console.log('Installing packages for app...'.green.bold))
-    .then(() => install(path.join(extPath, extJson.name, 'app')))
+    .then(() => {
+      console.log('Installing packages for app...'.green.bold);
+      return install(path.join(extPath, extJson.name, 'app'));
+    })
     .then(() => console.log('Packages installed.'));
 };
