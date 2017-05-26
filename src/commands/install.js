@@ -1,28 +1,10 @@
 import inquirer from 'inquirer';
 import { installExtension, createApp } from '../clients/app-manager';
 import { getLatestApps } from '../clients/legacy-service';
-import * as utils from '../extension/data';
+import { getExtensionCanonicalName } from '../clients/local-extensions';
 import * as extensionManager from '../clients/extension-manager';
+import selectApp from '../extension/app-selector';
 import msg from '../user_messages';
-
-
-export async function promptAppSelect(apps) {
-  const { appId } = await inquirer.prompt({
-    type: 'list',
-    name: 'appId',
-    message: 'Select app to install extension',
-    choices: apps.map(app => ({ name: `${app.name} (${app.id})`, value: app.id })).concat([
-      new inquirer.Separator(),
-      {
-        name: 'Create a new app',
-        value: null,
-        short: 'new app',
-      },
-    ])
-  });
-
-  return appId;
-}
 
 export async function promptCreateNewApp() {
   const { answerNew } = await inquirer.prompt({
@@ -59,7 +41,7 @@ export async function ensureApp() {
     }
   }
 
-  const appId = await promptAppSelect(appList);
+  const appId = await selectApp(appList);
   return appList.filter(app => app.id === appId)[0] || await getNewApp();
 }
 
@@ -68,10 +50,7 @@ export async function createNewApp(name) {
 }
 
 export async function installLocalExtension(appId) {
-  const { name, version } = await utils.loadExtensionJsonAsync();
-  const dev = await extensionManager.getDeveloper();
-
-  const canonicalName = utils.getExtensionCanonicalName(dev.name, name, version);
+  const canonicalName = await getExtensionCanonicalName();
   const extensionId = await extensionManager.getExtensionId(canonicalName);
 
   if (extensionId) {

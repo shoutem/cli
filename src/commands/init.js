@@ -16,8 +16,6 @@ function generateNoPatchSemver(version) {
 }
 
 export async function promptExtensionInit(extName) {
-  /* eslint no-confusing-arrow: 0 */
-  /* eslint no-param-reassign: 0 */
   const name = _.kebabCase(extName);
   const title = _.upperFirst(extName.toLowerCase());
 

@@ -3,6 +3,7 @@ import path from 'path';
 import mzfs from 'mz/fs';
 import * as extensionManager from '../clients/extension-manager';
 import { getHostEnvName } from '../clients/server-env';
+import { getExtensionCanonicalName } from '../clients/local-extensions';
 import { ensureInExtensionDir } from '../extension/data';
 import { ensureUserIsLoggedIn } from './login';
 import * as utils from '../extension/data';
@@ -37,7 +38,6 @@ function setExtNameVersionInPackageJson(extName, version, root = utils.getExtens
 
 export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
   const dev = await ensureUserIsLoggedIn();
-
   const extJson = await utils.loadExtensionJsonAsync(extensionDir);
   await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version, extensionDir);
   const packResult = await shoutemPack(extensionDir, { packToTempDir: true, nobuild: opts.nobuild });
@@ -45,7 +45,7 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
   const { size } = await mzfs.stat(packResult.package);
   const stream = fs.createReadStream(packResult.package);
 
-  const id = utils.getExtensionCanonicalName(dev.name, extJson.name, extJson.version);
+  const id = await getExtensionCanonicalName(extensionDir);
 
   console.log(msg.push.uploadingInfo(extJson, getHostEnvName()));
   let spinner = null;
