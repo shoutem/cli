@@ -6,8 +6,9 @@ import rmrf from 'rmfr';
 import ip from 'ip';
 import tmp from 'tmp-promise';
 import Promise from 'bluebird';
-import * as tunnel from '../extension/tunnel';
-import { spinify } from '../extension/spinner';
+import * as tunnel from './tunnel';
+import { spinify } from './spinner';
+import * as cache from './cache-env';
 import { startPackager } from './react-native';
 import { mobileEnvPath } from '../clients/cli-paths';
 import * as platform from './platform';
@@ -16,7 +17,8 @@ import { printMobilizerQR } from '../commands/qr-generator';
 import { getInstallations } from '../clients/app-manager';
 import { getPublishingProperties } from '../clients/legacy-service';
 import * as analytics from './analytics';
-import kill from 'tree-kill';
+import treeKill from 'tree-kill';
+import kill from './kill';
 
 async function getAppDir(appId) {
   return join(await mobileEnvPath(), appId.toString());
@@ -51,6 +53,7 @@ async function getOldApplicationState(path, appId) {
 async function syncApp(path, opts) {
   const { appId } = opts;
 
+  await cache.setValue('last-used-app', appId);
   analytics.setAppId(appId);
 
   const packageJson = await readJsonFile(join(path, 'package.json')) || {};
@@ -74,6 +77,7 @@ async function syncApp(path, opts) {
   }
 
   if (!opts.mobileapp) {
+    await kill('adb.exe');
     await spinify(rmrf(path), 'Deleting old platform code...');
     await spinify(platform.downloadApp(appId, path), 'Downloading current platform code...');
   }
@@ -157,6 +161,6 @@ export async function build(platformName, options, outputDir = process.cwd()) {
   }
   finally {
     spawned.catch(err => { /* ignored */ });
-    kill(childProcess.pid);
+    treeKill(childProcess.pid);
   }
 }

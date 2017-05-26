@@ -6,7 +6,11 @@ import * as logger from '../extension/logger';
 const legacyServiceUri = new URI(legacyService);
 
 export async function getLatestApps() {
-  const body = await jsonApi.get(legacyServiceUri.clone().segment('/v1/apps'));
+  const body = await jsonApi.get(legacyServiceUri.clone()
+    .segment('/v1/apps')
+    .search({ sort: '-modificationTime' })
+  );
+
   logger.info('getLatestApps', body);
   return body;
 }

@@ -2,8 +2,10 @@ import { getLatestApps } from '../clients/legacy-service';
 import { spinify } from './spinner';
 import { prompt } from 'inquirer';
 import * as logger from './logger';
+import * as cache from './cache-env';
 
-export default async function(defaultAppId) {
+export default async function() {
+  const defaultAppId = await cache.getValue('last-used-app');
   const apps = await spinify(getLatestApps(), 'Fetching applications');
   logger.info('appSelector', apps);
 

@@ -7,17 +7,13 @@ import targz from 'tar.gz';
 import { buildNodeProject } from './builder';
 import { readJsonFile, writeJsonFile } from './data';
 import { startSpinner } from '../extension/spinner';
-const mv = Promise.promisify(require('mv'));
 import move from 'glob-move';
 import { pathExists, copy } from 'fs-extra';
 import decompress from 'decompress';
+const mv = Promise.promisify(require('mv'));
 
 function hasPackageJson(dir) {
-  const packageJsonPath = path.join(dir, 'package.json');
-  return fs
-    .access(packageJsonPath, fs.F_OK)
-    .then(() => true)
-    .catch(() => false);
+  return pathExists(path.join(dir, 'package.json'));
 }
 
 async function npmPack(dir, destinationDir) {
@@ -37,7 +33,7 @@ async function npmPack(dir, destinationDir) {
 
   await mv(packagePath, resultFilename);
 
-  if (originalFileContent != null) {
+  if (originalFileContent !== null) {
     await fs.writeFile(packageJsonPath, originalFileContent, 'utf8');
   }
 }
@@ -62,11 +58,7 @@ export async function shoutemUnpack(tgzFile, destinationDir) {
 }
 
 function hasExtensionsJson(dir) {
-  const extensionJsonPath = path.join(dir, 'extension.json');
-  return fs
-    .access(extensionJsonPath, fs.F_OK)
-    .then(() => true)
-    .catch(() => false);
+  return pathExists(path.join(dir, 'extension.json'));
 }
 
 export default async function shoutemPack(dir, options) {
