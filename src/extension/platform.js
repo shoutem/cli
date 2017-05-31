@@ -12,6 +12,7 @@ import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
 import * as cache from './cache-env';
+import { pathExists } from 'fs-extra';
 import { lookup } from './kill';
 
 async function isPlatformDirectory(dir) {
@@ -131,6 +132,10 @@ export async function downloadApp(appId, destinationDir) {
 
   const mobileAppVersion = await getPlatformVersion(appId);
   await pullPlatform(mobileAppVersion, destinationDir);
+
+  if (!await pathExists(destinationDir)) {
+    throw new Error('Platform code could be downloaded from github. Make sure that platform is setup correctly.');
+  }
 }
 
 async function pullPlatform(version, destination) {
