@@ -19,8 +19,6 @@ export async function promptExtensionInit(extName) {
   const name = _.kebabCase(extName);
   const title = _.upperFirst(extName.toLowerCase());
 
-  const platformVersions = (await getPlatforms()).map(({ version }) => version);
-
   const version = '0.0.1';
 
   const questions = [{
@@ -41,6 +39,10 @@ export async function promptExtensionInit(extName) {
 
   console.log(msg.init.requestInfo());
   const answer = await inquirer.prompt(questions);
+
+  const platformVersions = (await getPlatforms())
+    .filter(({ published }) => published)
+    .map(({ version }) => version);
 
   return { name, ...answer, platform: generateNoPatchSemver(_.first(platformVersions)) };
 }
