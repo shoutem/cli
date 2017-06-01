@@ -24,7 +24,7 @@ export async function promptExtensionInit(extName) {
 
   const apiToken = await ensureUserIsLoggedIn();
   const extClient = new ExtensionManagerClient(apiToken);
-  const platforms = await extClient.getPlatforms();
+  const platforms = (await extClient.getPlatforms()).filter(({ attributes: { published } }) => published);
   const platformVersions = platforms.map(p => p.attributes.version);
 
   const version = '0.0.1';
