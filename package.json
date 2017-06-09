@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.151",
+  "version": "0.8.153-beta",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -27,6 +27,7 @@
     "babel-preset-node7": "^1.5.0",
     "babel-register": "^6.24.0",
     "bluebird": "^3.4.6",
+    "cached-request": "^1.1.1",
     "child-process-promise": "^2.2.0",
     "cli-spinner": "^0.2.6",
     "colors": "^1.1.2",
@@ -59,6 +60,7 @@
     "qrcode-terminal": "^0.11.0",
     "replace-in-file": "^2.5.0",
     "request": "^2.72.0",
+    "request-progress": "^3.0.0",
     "request-promise": "^4.1.1",
     "request-promise-native": "^1.0.3",
     "rmfr": "^1.0.1",

@@ -127,20 +127,20 @@ export async function getPlatformVersion(appId) {
   return mobileAppVersion;
 }
 
-export async function downloadApp(appId, destinationDir) {
+export async function downloadApp(appId, destinationDir, options) {
   analytics.setAppId(appId);
 
   const mobileAppVersion = await getPlatformVersion(appId);
-  await pullPlatform(mobileAppVersion, destinationDir);
+  await pullPlatform(mobileAppVersion, destinationDir, options);
 
   if (!await pathExists(destinationDir)) {
     throw new Error('Platform code could be downloaded from github. Make sure that platform is setup correctly.');
   }
 }
 
-async function pullPlatform(version, destination) {
+async function pullPlatform(version, destination, options) {
   const url = `${cliUrls.mobileAppUrl}/archive/v${version}.tar.gz`;
-  await decompressUri(url, destination, { strip: 1 });
+  await decompressUri(url, destination, { ...options, strip: 1, useCache: true });
 }
 
 export async function runPlatform(platformDir, { platform, device, simulator, release }) {

@@ -16,6 +16,7 @@ import { readJsonFile, writeJsonFile } from './data';
 import { printMobilizerQR } from '../commands/qr-generator';
 import { getInstallations } from '../clients/app-manager';
 import { getPublishingProperties } from '../clients/legacy-service';
+import { createProgressBar } from './progress-bar';
 import * as analytics from './analytics';
 import treeKill from 'tree-kill';
 import kill from './kill';
@@ -79,7 +80,7 @@ async function syncApp(path, opts) {
   if (!opts.mobileapp) {
     //await kill('adb.exe');
     await spinify(rmrf(path), 'Deleting old platform code...');
-    await spinify(platform.downloadApp(appId, path), 'Downloading current platform code...');
+    await platform.downloadApp(appId, path, { progress: createProgressBar('Downloading shoutem platform') });
   }
 
   await platform.fixPlatform(path, appId);
