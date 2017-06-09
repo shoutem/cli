@@ -53,7 +53,7 @@ export async function loginUser() {
   console.log(msg.login.complete(developer));
   logger.info('logged in as developer', developer);
 
-  return cache.setValue('developer', { ...developer, email: credentials.email, refreshToken });
+  return cache.setValue('developer', { ...developer, email: credentials.email });
 }
 
 /**

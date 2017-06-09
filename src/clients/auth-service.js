@@ -107,6 +107,9 @@ const authorizationConfig = {
     request.headers.set('Authorization', `Bearer ${accessToken}`);
     logger.info('authorizeRequest', request.headers);
     return request;
+  },
+  isResponseUnauthorized({ status }) {
+    return status === 401 || status === 403;
   }
 };
 
