@@ -6,7 +6,7 @@ import { getExtension } from '../clients/extension-manager';
 import * as appManager from '../clients/app-manager';
 import { shoutemUnpack } from '../extension/packer';
 import { getApp } from '../clients/legacy-service';
-import { pathExists } from 'fs-extra';
+import { pathExists, copy } from 'fs-extra';
 import selectApp from '../extension/app-selector';
 import { downloadApp } from '../extension/platform';
 import { ensureUserIsLoggedIn } from './login';
@@ -35,7 +35,7 @@ function removeTrailingSlash(str) {
   return str.replace(/\/$/, "");
 }
 
-export async function pullApp({ appId }, destinationDir) {
+export async function pullApp({ appId, mobileapp }, destinationDir) {
   await ensureUserIsLoggedIn();
   appId = appId || await selectApp();
 
@@ -56,7 +56,7 @@ export async function pullApp({ appId }, destinationDir) {
   await Promise.all([
     pullExtensions({ appId }, path.join(appDir, 'extensions'))
       .then(() => console.log('Pulling extensions...')),
-    downloadApp(appId, appDir)
+    mobileapp ? copy(mobileapp, appDir) : downloadApp(appId, appDir)
   ]);
 /*
   if (process.platform === 'darwin') {

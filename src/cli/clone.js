@@ -2,9 +2,16 @@ import { handleError } from '../extension/error-handler';
 import { pullApp } from '../commands/pull';
 
 export const description = 'Downloads a shoutem application with all it\'s extensions';
-export const command = 'pull-app [appId]';
+export const command = 'clone [appId]';
 export const builder = yargs => {
   return yargs
+    .options({
+      mobileapp: {
+        alias: 'm',
+        description: 'use external mobile app (ignores platform settings)',
+        requiresArg: true
+      }
+    })
     .usage(`shoutem ${command} \n\n${description}`);
 };
 
