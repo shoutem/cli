@@ -21,7 +21,7 @@ export function getErrorMessage(err) {
     return '';
   }
 
-  if (err.statusCode === 401) {
+  if (err.statusCode === 401 || err.statusCode === 403) {
     return 'Access denied, use `shoutem login` command to login';
   }
 
@@ -43,7 +43,7 @@ export function getErrorMessage(err) {
     return err.message;
   }
 
-  return err instanceof String ? err : stringify(err);
+  return 'Unrecognized error. Run `shoutem last-error` for more additional details'
 }
 
 let reportInfoPrinted = false;
