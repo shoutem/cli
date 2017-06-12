@@ -110,7 +110,8 @@ const authorizationConfig = {
   },
   isResponseUnauthorized({ status }) {
     return status === 401 || status === 403;
-  }
+  },
+  shouldWaitForTokenRenewal: true
 };
 
 export async function authorizeRequests(refreshToken) {
