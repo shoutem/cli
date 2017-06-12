@@ -1,29 +1,17 @@
-import MatchStream from 'match-stream';
+import StreamSearch from 'streamsearch';
 import 'colors';
 
-export default (readableStream, opts ) => new Promise((resolve, reject) => {
-  let patternFound = false;
-  let timeoutObject = null;
+export default (stream, pattern) => new Promise((resolve, reject) => {
+  const search = new StreamSearch(pattern);
+  let matched = false;
 
-  const matcher = new MatchStream({ pattern: opts.pattern }, function (buf, matched) {
-    this.push(buf);
-    patternFound = patternFound || matched;
-    if (!patternFound) {
-      return;
-    }
-
-    clearTimeout(timeoutObject);
-    timeoutObject = setTimeout(() => {
+  search.on('info', isMatch => {
+    if (isMatch) {
       resolve();
-    }, opts.inactivityTimeout || 0);
+      matched = true;
+    }
   });
-
-  try {
-    readableStream
-      .pipe(matcher)
-      .on('error', err => reject(err))
-      .on('close', () => resolve());
-  } catch (err) {
-    reject(err);
-  }
+  search.on('error', err => reject(err));
+  search.on('finish', () => matched ? null : reject(new Error(`Match ${pattern} not found`)));
+  stream.on('data', data => search.push(data));
 });

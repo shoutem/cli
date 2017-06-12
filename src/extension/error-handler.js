@@ -3,6 +3,7 @@ import _ from 'lodash';
 import stringify from 'json-stringify-safe';
 import * as cache from './cache-env';
 import * as spinner from './spinner';
+import 'exit-code';
 
 function getJsonApiErrorMessage(errors) {
   const generalDetail = _.upperFirst(_.get(errors, '[0].detail') || _.get(errors, '[0].title'));
@@ -49,6 +50,9 @@ let reportInfoPrinted = false;
 
 export async function handleError(err) {
   try {
+    if (err) {
+      process.exitCode = err.code || -1;
+    }
       spinner.stopAll();
       console.error(getErrorMessage(err).red.bold);
 

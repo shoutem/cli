@@ -19,7 +19,6 @@ import { getPublishingProperties } from '../clients/legacy-service';
 import { createProgressBar } from './progress-bar';
 import * as analytics from './analytics';
 import treeKill from 'tree-kill';
-import kill from './kill';
 
 async function getAppDir(appId) {
   return join(await mobileEnvPath(), appId.toString());
@@ -126,7 +125,7 @@ export async function mobilizerRun(options) {
 
   await syncApp(path, options);
 
-  await startPackager(path, { resolveOnReady: true });
+  const { packagerProcess } = await startPackager(path);
 
   if (options.local) {
     console.log('Make sure that the phone running Shoutem app is connected to the same network as this computer'.yellow);
@@ -140,7 +139,14 @@ export async function mobilizerRun(options) {
     await printMobilizerQR(url.parse(await tunnel.start(8081)).hostname, 80, options);
   }
 
-  console.log('Packager is being run within this process. Please keep this process running if app is used in debug mode'.bold.yellow);
+  console.log('Keep this process running if app is used in debug mode'.bold.yellow);
+
+  try {
+    await packagerProcess;
+  } catch (err) {
+    await tunnel.stop();
+    throw err;
+  }
 }
 
 export async function build(platformName, options, outputDir = process.cwd()) {

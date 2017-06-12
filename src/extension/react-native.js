@@ -1,9 +1,9 @@
+import Promise from 'bluebird';
 import { spawn } from 'child-process-promise';
 import msg from '../user_messages';
 import { exec, fork } from 'mz/child_process';
 import commandExists from './command-exists';
 import streamMatcher from './stream-matcher';
-import merge2 from 'merge2';
 
 export async function ensureInstalled() {
   try {
@@ -32,9 +32,9 @@ export async function run(cwd, platform) {
   );
 }
 
-export async function startPackager(cwd, { resolveOnReady = false }) {
+export async function startPackager(cwd) {
   const spawned = spawn('react-native', ['start'], {
-      stdio: ['ignore', 'pipe', 'pipe'],
+      stdio: ['ignore', 'pipe', 'inherit'],
       cwd,
       shell: true,
       env: { ...process.env, FORCE_COLOR: true }
@@ -44,16 +44,9 @@ export async function startPackager(cwd, { resolveOnReady = false }) {
   const { childProcess } = spawned;
 
   childProcess.stdout.pipe(process.stdout);
-  childProcess.stderr.pipe(process.stderr);
 
-  if (!resolveOnReady) {
-    return spawned;
-  }
+  await streamMatcher(childProcess.stdout, 'React packager ready');
+  await Promise.delay(5 * 1000);
 
-  await streamMatcher(
-    merge2([childProcess.stdout, childProcess.stderr]),
-    { pattern: 'React packager ready.', inactivityTimeout: 11000 }
-  );
-
-  return { childProcess, spawned };
+  return { packagerProcess: spawned };
 }
