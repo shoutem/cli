@@ -4,7 +4,7 @@ import { unlinkDirectory, setLinkedDirectories } from '../extension/linker';
 import { validateArgumentCount } from '../extension/cli-parsing';
 import msg from '../user_messages';
 
-export const description = 'Unlink working directory extension from mobile environment';
+export const description = null; //'Unlink working directory extension from mobile environment';
 export const command = 'unlink';
 
 export const builder = yargs => {

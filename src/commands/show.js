@@ -12,7 +12,7 @@ export default async function() {
   if (serverEnv !== 'production') {
     console.log(prettyJson.render({ [msg.use.show(serverEnv)]: apisConfig }));
   }
-
+/*
   const extDirs = await getLinkedDirectories();
 
   if (extDirs.length === 0) {
@@ -20,7 +20,7 @@ export default async function() {
   } else {
     console.log(msg.show.listExtensions(extDirs));
   }
-
+*/
   const developer = await getValue('developer');
   if (developer) {
     console.log(msg.login.complete(developer));

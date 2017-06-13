@@ -3,7 +3,7 @@ import { linkExtension, linkDirectory } from '../extension/linker';
 import msg from '../user_messages';
 import { handleError } from '../extension/error-handler';
 
-export const description = 'Link working directory extension with mobile environment';
+export const description = null; //'Link working directory extension with mobile environment';
 export const command = 'link';
 export const builder = yargs => {
   return yargs
