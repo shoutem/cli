@@ -79,7 +79,7 @@ export async function clone(opts, destinationDir) {
   console.log('Done.\n'.green.bold);
   console.log('To run your app on iOS:'.bold);
   console.log(`    cd ${appDir}`);
-  console.log('    treact-native run-ios');
+  console.log('    react-native run-ios');
 
   console.log('To run your app on Android:'.bold);
   console.log(`    cd ${appDir}`);
