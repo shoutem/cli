@@ -29,7 +29,7 @@ export async function getPlatformRootDir(dir = process.cwd()) {
   const parentDir = path.join(dir, '..');
 
   if (parentDir === dir) {
-    return null;
+    throw new Error('Not a platform directory');
   }
   return await getPlatformRootDir(parentDir);
 }
@@ -74,13 +74,6 @@ export async function configurePlatform(platformDir, mobileConfig) {
   await writeJsonFile(mobileConfig, configPath);
   await npm.install(path.join(platformDir, 'scripts'));
   await npm.run(platformDir, 'configure');
-}
-
-export async function buildPlatform(platformDir, platform, outputDir = process.cwd()) {
-  await npm.run(platformDir, 'build', [
-    '--platform', platform,
-    '--outputDirectory', outputDir
-  ]);
 }
 
 export async function fixPlatform(platformDir, appId) {

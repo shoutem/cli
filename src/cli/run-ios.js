@@ -7,7 +7,7 @@ import commandExists from '../extension/command-exists';
 import * as cache from '../extension/cache';
 import _ from 'lodash';
 
-export const description = 'Run shoutem application on ios platform';
+export const description = null;//'Run shoutem application on ios platform';
 export const command = 'run-ios [appId]';
 export const builder = yargs => {
   return yargs

@@ -120,12 +120,7 @@ export async function nativeRun(opts) {
 }
 
 export async function mobilizerRun(options) {
-  options = { ...options, skipNativeDependencies: true, platform: 'any' };
-  const path = options.mobileapp || await getAppDir(options.appId);
-
-  await syncApp(path, options);
-
-  const { packagerProcess } = await startPackager(path);
+  const { packagerProcess } = await startPackager(options.path);
 
   if (options.local) {
     console.log('Make sure that the phone running Shoutem app is connected to the same network as this computer'.yellow);
@@ -149,25 +144,3 @@ export async function mobilizerRun(options) {
   }
 }
 
-export async function build(platformName, options, outputDir = process.cwd()) {
-  options = {
-    ...options,
-    excludePackages: [],
-    debug: false,
-    production: false,
-    workingDirectories: [],
-    platform: platformName
-  };
-
-  const path = options.mobileapp || (await tmp.dir()).path;
-  await syncApp(path, options);
-
-  const { childProcess, spawned } = await startPackager(path, { resolveOnReady: true });
-  try {
-    await platform.buildPlatform(path, platformName, outputDir);
-  }
-  finally {
-    spawned.catch(err => { /* ignored */ });
-    treeKill(childProcess.pid);
-  }
-}

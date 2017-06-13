@@ -8,6 +8,7 @@ export default async function (options) {
   try {
     await ensureUserIsLoggedIn();
     options.appId = options.appId || await selectApp();
+    options.path = process.cwd();
     await platformManager.mobilizerRun(options);
   } catch (err) {
     await handleError(err);

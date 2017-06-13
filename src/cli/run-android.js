@@ -1,7 +1,7 @@
 import runPlatform from '../commands/run-platform';
 import { handleError } from '../extension/error-handler';
 
-export const description = 'Run shoutem application on android platform';
+export const description = null;//'Run shoutem application on android platform';
 export const command = 'run-android [appId]';
 export const builder = yargs => {
   return yargs
