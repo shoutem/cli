@@ -40,7 +40,6 @@ export async function getExtensionsPaths(platformDir) {
 
 export async function createMobileConfig(platformDir, opts) {
   const {
-    platform,
     appId,
     debug = true,
     excludePackages,
@@ -51,7 +50,6 @@ export async function createMobileConfig(platformDir, opts) {
   } = opts;
 
   return {
-    platform,
     appId: appId.toString(),
     serverApiEndpoint: url.parse(cliUrls.appManager).hostname,
     legacyApiEndpoint: url.parse(cliUrls.legacyService).hostname,
@@ -67,7 +65,7 @@ export async function createMobileConfig(platformDir, opts) {
   };
 }
 
-export async function preparePlatform(platformDir, mobileConfig) {
+export async function configurePlatform(platformDir, mobileConfig) {
   await ensureYarnInstalled();
   await reactNative.ensureInstalled();
 

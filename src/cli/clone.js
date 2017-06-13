@@ -10,6 +10,18 @@ export const builder = yargs => {
         alias: 'p',
         description: 'use external mobile app (ignores platform settings)',
         requiresArg: true
+      },
+      noconfigure: {
+        description: 'skip platform configuration step',
+        type: 'boolean'
+      },
+      dir: {
+        description: 'directory name for the cloned app',
+        requiresArg: true
+      },
+      force: {
+        description: 'destroys destination directory if it already exists',
+        type: 'boolean'
       }
     })
     .usage(`shoutem ${command} \n\n${description}`);

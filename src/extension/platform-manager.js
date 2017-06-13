@@ -83,7 +83,7 @@ async function syncApp(path, opts) {
   }
 
   await platform.fixPlatform(path, appId);
-  await platform.preparePlatform(path, mobileConfig);
+  await platform.configurePlatform(path, mobileConfig);
 
   await saveApplicationState(path, appId, currentAppState);
 }
