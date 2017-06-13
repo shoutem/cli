@@ -23,12 +23,14 @@ export function createProgressBar(msg) {
       return;
     }
 
-    const { percent, size: { total, transferred } } = state;
+    const { percent, size: { total } } = state;
     if (!progressBar) {
       progressBar = new ProgressBar(`   ${msg} [:bar] :percent (:etas)`, { total, width: 20, clear: true });
     }
     if (percent) {
       progressBar.update(percent);
+    } else {
+      progressBar.tick();
     }
   };
 }

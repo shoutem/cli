@@ -10,10 +10,12 @@ import { pathExists, copy } from 'fs-extra';
 import selectApp from '../extension/app-selector';
 import { downloadApp } from '../extension/platform';
 import { ensureUserIsLoggedIn } from './login';
+import { createProgressBar } from '../extension/progress-bar';
+import { spinify } from '../extension/spinner';
 
 const downloadFile = Promise.promisify(require('download-file'));
 
-export async function pullExtensions({ appId }, destinationDir) {
+export async function pullExtensions(appId , destinationDir) {
   const installations = await appManager.getInstallations(appId);
 
   await Promise.all(installations.map(async ({ extension, canonicalName }) => {
@@ -35,16 +37,16 @@ function removeTrailingSlash(str) {
   return str.replace(/\/$/, "");
 }
 
-export async function pullApp({ appId, mobileapp }, destinationDir) {
+export async function clone({ appId, platform }, destinationDir) {
   await ensureUserIsLoggedIn();
   appId = appId || await selectApp();
 
   const { name } = await getApp(appId);
-  const spacelessName = name.replace(/ /g, '_');
+  const directoryName = `${name.replace(/ /g, '_')}_${appId}`;
 
-  const appDir = path.join(destinationDir, spacelessName);
+  const appDir = path.join(destinationDir, directoryName);
   if (await pathExists(appDir)) {
-    throw new Error(`Directory ${appDir} already exists`);
+    throw new Error(`Directory ${directoryName} already exists`);
   }
   if (appDir.indexOf(' ') >= 0) {
     throw new Error('Due to a bug in the `npm`, app\'s path can\'t contain spaces');
@@ -53,19 +55,14 @@ export async function pullApp({ appId, mobileapp }, destinationDir) {
   await mkdirp(appDir);
 
   console.log(`Pulling the app \`${name}\`...`);
-  await Promise.all([
-    pullExtensions({ appId }, path.join(appDir, 'extensions'))
-      .then(() => console.log('Pulling extensions...')),
-    mobileapp ? copy(mobileapp, appDir) : downloadApp(appId, appDir)
-  ]);
-/*
-  if (process.platform === 'darwin') {
-    await preparePlatform(appDir, { platform: ['ios', 'android'], appId });
+
+  if (platform) {
+    await spinify(copy(platform, appDir), 'Copying platform code');
   } else {
-    await preparePlatform(appDir, {platform: 'android', appId});
+    await downloadApp(appId, appDir, { progress: createProgressBar('Downloading shoutem platform') });
   }
 
-  console.log('Success!');
-  */
-  console.log(`Change your working directory to \`${spacelessName}\``);
+  await spinify(pullExtensions(appId, path.join(appDir, 'extensions')), 'Downloading extensions');
+
+  console.log(`Your app is now ready. Change directory to \`${directoryName}\` and run it with \`react-native run-android/ios\` or \`shoutem run\` with shoutem preview app.`);
 }
