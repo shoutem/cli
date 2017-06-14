@@ -45,8 +45,12 @@ export async function startPackager(cwd) {
 
   childProcess.stdout.pipe(process.stdout);
 
-  await streamMatcher(childProcess.stdout, 'React packager ready');
-  await Promise.delay(5 * 1000);
+  // Promise.race() is required to avoid unhandled promise
+  // rejection if react-packager fails before becoming 'ready'
+  await Promise.race([
+    streamMatcher(childProcess.stdout, 'Loading dependency graph, done'),
+    spawned
+  ]);
 
   return { packagerProcess: spawned };
 }
