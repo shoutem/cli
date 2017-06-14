@@ -12,7 +12,7 @@ import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
 import * as cache from './cache-env';
-import { pathExists } from 'fs-extra';
+import { pathExists, readJson } from 'fs-extra';
 import { lookup } from './kill';
 
 async function isPlatformDirectory(dir) {
@@ -39,29 +39,16 @@ export async function getExtensionsPaths(platformDir) {
 }
 
 export async function createMobileConfig(platformDir, opts) {
-  const {
-    appId,
-    debug = true,
-    excludePackages,
-    production,
-    linkLocalExtensions,
-    skipNativeDependencies,
-    offlineMode
-  } = opts;
+  const configTemplate = await readJson(path.join(platformDir, 'config.template.json'));
 
   return {
-    appId: appId.toString(),
+    ...configTemplate,
+    ...opts,
     serverApiEndpoint: url.parse(cliUrls.appManager).hostname,
     legacyApiEndpoint: url.parse(cliUrls.legacyService).hostname,
     authorization: await cache.getValue('access-token'),
     configurationFilePath: 'config.json',
-    workingDirectories: linkLocalExtensions ? await getExtensionsPaths(platformDir) : await getLinkedDirectories(),
-    excludePackages,
-    debug,
-    extensionsJsPath: "./extensions.js",
-    production: !!production,
-    skipNativeDependencies: !!skipNativeDependencies,
-    offlineMode: !!offlineMode
+    extensionsJsPath: "./extensions.js"
   };
 }
 
