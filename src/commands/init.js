@@ -1,14 +1,13 @@
 import _ from 'lodash';
 import inquirer from 'inquirer';
+import { pathExists } from 'fs-extra';
+import path from 'path';
 import { instantiateTemplatePath } from '../extension/template';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import msg from '../user_messages';
 import { getPlatforms } from '../clients/extension-manager';
 import * as utils from '../extension/data';
 
-export function cwd() {
-  return process.cwd();
-}
 
 function generateNoPatchSemver(version) {
   const [a, b] = version.split('.');
@@ -59,7 +58,12 @@ export async function initExtension(extName) {
     description: extJson.description
   };
 
-  await instantiateTemplatePath('init', cwd(), {
+  const dirname = `${developer.name}.${extJson.name}`;
+  if (await pathExists(path.join(process.cwd(), dirname))) {
+    throw new Error(`Folder ${dirname} already exists. Rename the folder.`);
+  }
+
+  await instantiateTemplatePath('init', process.cwd(), {
     devName: developer.name,
     extJson,
     extJsonString: JSON.stringify(extJson, null, 2),

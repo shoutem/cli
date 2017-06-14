@@ -2,7 +2,6 @@ import url from 'url';
 import path from 'path';
 import glob from 'glob-promise';
 import replace from 'replace-in-file';
-import { getLinkedDirectories } from './linker';
 import * as appManager from '../clients/app-manager';
 import decompressUri from './decompress';
 import cliUrls from '../../config/services';

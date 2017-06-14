@@ -21,6 +21,10 @@ export function getErrorMessage(err) {
     return '';
   }
 
+  if (err.message) {
+    return err.message;
+  }
+
   if (err.statusCode === 401 || err.statusCode === 403) {
     return 'Access denied, use `shoutem login` command to login';
   }
@@ -39,8 +43,8 @@ export function getErrorMessage(err) {
     }
   }
 
-  if (err.message) {
-    return err.message;
+  if (err.statusCode === 401 || err.statusCode === 403) {
+    return 'Access denied, use `shoutem login` command to login';
   }
 
   return 'Unrecognized error. Run `shoutem last-error` for more additional details'
@@ -61,8 +65,8 @@ export async function handleError(err) {
       errorJson.message = (err || {}).message;
       await cache.setValue('last-error', errorJson);
       if (!reportInfoPrinted) {
-        console.error(`\nIf you think this error is caused by bug in the shoutem command, you can report the issue here: ${"https://github.com/shoutem/cli/issues".bold}`.yellow);
-        console.error(`Make sure to include the information printed using the ${"`shoutem last-error`".bold} command`.yellow);
+        console.error(`\nUse ${"`shoutem last-error`".bold} for more info`.yellow);
+        console.error(`If you think this error is caused by bug in the shoutem command, you can report the issue here: ${"https://github.com/shoutem/cli/issues".bold}`.yellow);
         reportInfoPrinted = true;
       }
   } catch (err) {

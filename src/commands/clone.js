@@ -13,19 +13,26 @@ import { downloadApp, fixPlatform, configurePlatform, createMobileConfig } from 
 import { ensureUserIsLoggedIn } from './login';
 import { createProgressBar } from '../extension/progress-bar';
 import { spinify } from '../extension/spinner';
+import { clearCache } from '../extension/decompress';
 import 'colors';
 
 const downloadFile = Promise.promisify(require('download-file'));
 
-export async function pullExtensions(appId , destinationDir) {
+export async function pullExtensions(appId, destinationDir) {
   const installations = await appManager.getInstallations(appId);
+  await Promise.all(installations.map(inst => pullExtension(destinationDir, inst)));
+}
 
-  await Promise.all(installations.map(async ({ extension, canonicalName }) => {
+async function pullExtension(destinationDir, { extension, canonicalName }) {
+  try {
     const url = await getExtensionUrl(extension);
     const tgzDir = (await tmp.dir()).path;
-    await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
+    await downloadFile(url, {directory: tgzDir, filename: 'extension.tgz'});
     await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), path.join(destinationDir, canonicalName));
-  }));
+  } catch (err) {
+    err.message = `Could not fetch extension ${canonicalName}`;
+    throw err;
+  }
 }
 
 async function getExtensionUrl(extId) {
@@ -49,6 +56,7 @@ export async function clone(opts, destinationDir) {
   const appDir = path.join(destinationDir, directoryName);
 
   if (opts.force) {
+    await clearCache();
     await spinify(rmrf(appDir), `Destroying directory ${directoryName}`);
   } else if (await pathExists(appDir)) {
     throw new Error(`Directory ${directoryName} already exists`);

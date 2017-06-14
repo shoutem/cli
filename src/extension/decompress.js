@@ -6,10 +6,12 @@ import pipeStreams from 'pipe-streams-to-promise';
 import fs from 'fs';
 import request from 'request';
 import progress from 'request-progress';
-const cachedRequest = require('cached-request')(request);
+let cachedRequest = require('cached-request')(request);
 import getHomeDir from '../home-dir';
+import rmfr from 'rmfr';
 
-cachedRequest.setCacheDirectory(path.join(getHomeDir(), 'cache', 'cached-requests'));
+const cacheDir = path.join(getHomeDir(), 'cache', 'cached-requests');
+cachedRequest.setCacheDirectory(cacheDir);
 cachedRequest.setValue('ttl', 1000 * 3600 * 24 * 180);
 
 export default async function(url, destination, options) {
@@ -24,4 +26,9 @@ export default async function(url, destination, options) {
 
   await pipeStreams([readStream, fs.createWriteStream(tmpPath)]);
   await decompress(tmpPath, destination, options);
+}
+
+export async function clearCache() {
+  await rmfr(cacheDir);
+  cachedRequest = require('cached-request')(request);
 }
