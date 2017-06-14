@@ -56,7 +56,7 @@ export async function createMobileConfig(platformDir, opts) {
     authorization: await cache.getValue('access-token'),
     configurationFilePath: 'config.json',
     workingDirectories: linkLocalExtensions ? await getExtensionsPaths(platformDir) : await getLinkedDirectories(),
-    excludePackages: excludePackages || ['shoutem.code-push'],
+    excludePackages,
     debug,
     extensionsJsPath: "./extensions.js",
     production: !!production,

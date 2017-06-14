@@ -72,7 +72,10 @@ export async function clone(opts, destinationDir) {
 
   await fixPlatform(appDir, opts.appId);
   if (!opts.noconfigure) {
-    const config = await createMobileConfig(appDir, { appId: opts.appId });
+    const config = await createMobileConfig(appDir, {
+      appId: opts.appId,
+      excludePackages: ['shoutem.code-push']
+    });
     await configurePlatform(appDir, config);
   }
 
