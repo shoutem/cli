@@ -46,6 +46,14 @@ function removeTrailingSlash(str) {
   return str.replace(/\/$/, "");
 }
 
+const excludePackages = [
+  'shoutem.firebase',
+  'shoutem.notification-center',
+  'shoutem.push-notifications',
+  'shoutem.shoutem-notification-center',
+  'shoutem.code-push'
+];
+
 export async function clone(opts, destinationDir) {
   await ensureUserIsLoggedIn();
   opts.appId = opts.appId || await selectApp();
@@ -82,7 +90,7 @@ export async function clone(opts, destinationDir) {
   if (!opts.noconfigure) {
     const config = await createMobileConfig(appDir, {
       appId: opts.appId,
-      excludePackages: ['shoutem.code-push']
+      excludePackages
     });
     await configurePlatform(appDir, config);
   }

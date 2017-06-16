@@ -53,6 +53,27 @@ export async function createRefreshToken(email, password) {
   }
 }
 
+export async function createAppAccessToken(appId, refreshToken) {
+  const body = {
+    data: {
+      type: 'shoutem.auth.tokens',
+      attributes: {
+        tokenType: 'access-token',
+        subjectType: 'application',
+        subjectId: appId.toString()
+      }
+    }
+  };
+
+  const { token } = await post(tokensUrl, body, {
+    headers: {
+      Authorization: `Bearer ${refreshToken}`
+    }
+  });
+
+  return token;
+}
+
 export async function getRefreshToken({ email, password } = {}) {
   if (email && password) {
     const refreshToken = await cache.setValue('refresh-token', await createRefreshToken(email, password));

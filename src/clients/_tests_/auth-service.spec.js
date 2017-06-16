@@ -22,7 +22,13 @@ describe('Auth service client integration tests', () => {
       throw new Error('401 error should have been reported by the shoutem api when invalid password is used');
     });
 
-
+    it('should create an app token', async () => {
+      const refreshToken = await authService.getRefreshToken({ email: 'cli-test@shoutem.com', password: 'password' });
+      const appToken = await authService.createAppAccessToken(3777, refreshToken);
+      console.log(appToken);
+      assert.isOk(appToken, 'a token was returned');
+      assert.isAtLeast(appToken.length, 10, 'a token is too short');
+    });
 
   })
 });
