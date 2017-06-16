@@ -14,6 +14,7 @@ import { ensureUserIsLoggedIn } from './login';
 import { createProgressBar } from '../extension/progress-bar';
 import { spinify } from '../extension/spinner';
 import { clearCache } from '../extension/decompress';
+import commandExists from '../extension/command-exists';
 import 'colors';
 
 const downloadFile = Promise.promisify(require('download-file'));
@@ -104,4 +105,8 @@ export async function clone(opts, destinationDir) {
   console.log(`    cd ${appDir}`);
   console.log('    Have an Android simulator running or a device connected');
   console.log('    react-native run-android');
+
+  if (process.os !== 'win32' && !await commandExists('watchman')) {
+    console.log('HINT: You should probably install Facebook\'s `watchman` before running react-native commands'.bold.yellow);
+  }
 }
