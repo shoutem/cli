@@ -1,7 +1,7 @@
 import ProgressBar from 'progress';
 
 export function createProgressHandler(msg, total, onFinished) {
-  const bar = new ProgressBar(`   ${msg} [:bar] :percent (:etas)`, { total, clear: true, width: 20 });
+  const bar = new ProgressBar(`   ${msg} [:bar] :percent (remaining :etas)`, { total, clear: true, width: 20 });
 
   return ({ increment }) => {
     bar.tick(increment);
@@ -25,7 +25,7 @@ export function createProgressBar(msg) {
 
     const { percent, size: { total } } = state;
     if (!progressBar) {
-      progressBar = new ProgressBar(`   ${msg} [:bar] :percent (:etas)`, { total: total || 1, width: 20, clear: true });
+      progressBar = new ProgressBar(`   ${msg} [:bar] :percent (remaining :etas)`, { total: total || 1, width: 20, clear: true });
     }
     if (percent) {
       progressBar.update(percent);
