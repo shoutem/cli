@@ -1,5 +1,4 @@
 import { spawn } from 'child-process-promise';
-import stripAnsi from 'strip-ansi';
 import _ from 'lodash';
 
 export async function install(cwd = process.cwd()) {
@@ -11,18 +10,18 @@ export async function install(cwd = process.cwd()) {
   });
 }
 
-export async function run(cwd, task, taskArgs = []) {
+export async function run(cwd, task, taskArgs = [], npmOptions = []) {
   const opts = {
     cwd,
-    stdio: ['ignore', 'inherit', 'inherit'],
+    stdio: 'inherit',
     shell: true
   };
 
   taskArgs = taskArgs.map(arg => _.includes(arg, ' ') ? `"${arg}"` : arg);
 
   const spawned = taskArgs.length ?
-    spawn('npm', ['run', task, '--', ...taskArgs], opts) :
-    spawn('npm', ['run', task], opts);
+    spawn('npm', ['run', task, ...npmOptions, '--', ...taskArgs], opts) :
+    spawn('npm', ['run', task, ...npmOptions], opts);
 
   return await spawned;
 }

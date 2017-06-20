@@ -10,6 +10,7 @@
     "shoutem": "./src/shoutem.js"
   },
   "scripts": {
+    "extlint": "eslint",
     "lint": "eslint ./",
     "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\"",
     "shoutem": "node src/shoutem.js",
@@ -35,6 +36,7 @@
     "decompress": "^4.0.0",
     "download": "^5.0.3",
     "download-file": "latest",
+    "eslint": "^4.0.0",
     "exit-code": "^1.0.2",
     "fetch-everywhere": "^1.0.5",
     "form-data": "^2.1.4",
@@ -83,7 +85,6 @@
     "babel-plugin-rewire": "1.0.0-rc-2",
     "chai": "3.5.0",
     "dos2unix-cli": "^1.0.1",
-    "eslint": "2.9.0",
     "eslint-config-airbnb": "8.0.0",
     "eslint-plugin-import": "1.9.2",
     "eslint-plugin-jsx-a11y": "1.5.3",

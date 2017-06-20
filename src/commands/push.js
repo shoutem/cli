@@ -12,6 +12,7 @@ import msg from '../user_messages';
 import _ from 'lodash';
 import { createProgressHandler } from '../extension/progress-bar';
 import { startSpinner } from '../extension/spinner';
+import extLint from '../extension/extlint';
 
 async function setPackageNameVersion(path, name, version) {
   const data = await utils.readJsonFile(path);
@@ -37,6 +38,15 @@ function setExtNameVersionInPackageJson(extName, version, root = utils.getExtens
 }
 
 export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
+  if (!opts.nocheck) {
+    console.log('Checking the extension code for syntax errors...');
+    try {
+      await extLint(extensionDir);
+    } catch (err) {
+      err.message = 'Syntax errors detected, aborting push! Use `shoutem push --nocheck` to override';
+      throw err;
+    }
+  }
   const dev = await ensureUserIsLoggedIn();
   const extJson = await utils.loadExtensionJsonAsync(extensionDir);
   await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version, extensionDir);
