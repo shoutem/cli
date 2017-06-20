@@ -106,7 +106,7 @@ export async function clone(opts, destinationDir) {
   console.log('    Have an Android simulator running or a device connected');
   console.log('    react-native run-android');
 
-  if (process.os !== 'win32' && !await commandExists('watchman')) {
+  if (!/^win/.test(process.platform) && !await commandExists('watchman')) {
     console.log('HINT: You should probably install Facebook\'s `watchman` before running react-native commands'.bold.yellow);
   }
 }
