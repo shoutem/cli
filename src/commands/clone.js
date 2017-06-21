@@ -3,6 +3,7 @@ import mkdirp from 'mkdirp-promise';
 import tmp from 'tmp-promise';
 import rmrf from 'rmfr';
 import path from 'path';
+import semver from 'semver';
 import { getExtension } from '../clients/extension-manager';
 import * as appManager from '../clients/app-manager';
 import { shoutemUnpack } from '../extension/packer';
@@ -55,6 +56,17 @@ const excludePackages = [
   'shoutem.code-push'
 ];
 
+function ensurePlatformComptability(platform) {
+  const msg = `Your app is using platform version ${platform.version}`+
+    `, but cloning is supported only on Shoutem Platform 1.1.2 or later.\n`+
+    `Please, update the Platform through Settings page on the Builder or install older (and unsupported) version of ` +
+    `the Shoutem CLI by running 'npm install -g @shoutem/cli@0.0.152'`;
+
+  if (semver.lte(platform.version, '1.1.1')) {
+    throw new Error(msg);
+  }
+}
+
 export async function clone(opts, destinationDir) {
   if (!await commandExists('git')) {
     throw new Error('Missing `git` command');
@@ -86,6 +98,8 @@ export async function clone(opts, destinationDir) {
   if (opts.platform) {
     await spinify(copy(opts.platform, appDir), 'Copying platform code');
   } else {
+    const platform = await appManager.getApplicationPlatform(opts.appId);
+    ensurePlatformComptability(platform);
     await downloadApp(opts.appId, appDir, { progress: createProgressBar('Downloading shoutem platform') });
   }
 
