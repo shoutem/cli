@@ -59,7 +59,7 @@ const excludePackages = [
 function ensurePlatformComptability(platform) {
   const msg = `Your app is using platform version ${platform.version}`+
     `, but cloning is supported only on Shoutem Platform 1.1.2 or later.\n`+
-    `Please, update the Platform through Settings page on the Builder or install older (and unsupported) version of ` +
+    `Please, update the Platform through Settings -> Shoutem Platform -> Install page on the Builder or install older (and unsupported) version of ` +
     `the Shoutem CLI by running 'npm install -g @shoutem/cli@0.0.152'`;
 
   if (semver.lte(platform.version, '1.1.1')) {
