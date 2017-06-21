@@ -13,7 +13,7 @@ export async function install(cwd = process.cwd()) {
 export async function run(cwd, task, taskArgs = [], npmOptions = []) {
   const opts = {
     cwd,
-    stdio: 'inherit',
+    stdio: ['ignore', 'inherit', 'inherit'],
     shell: true
   };
 

@@ -56,7 +56,11 @@ const excludePackages = [
 ];
 
 export async function clone(opts, destinationDir) {
+  if (!await commandExists('git')) {
+    throw new Error('Missing `git` command');
+  }
   await ensureUserIsLoggedIn();
+
   opts.appId = opts.appId || await selectApp();
 
   const { name } = await getApp(opts.appId);

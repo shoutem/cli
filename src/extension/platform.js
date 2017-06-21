@@ -51,8 +51,7 @@ export async function createMobileConfig(platformDir, opts) {
     serverApiEndpoint: url.parse(cliUrls.appManager).hostname,
     legacyApiEndpoint: url.parse(cliUrls.legacyService).hostname,
     authorization,
-    configurationFilePath: 'config.json',
-    extensionsJsPath: "./extensions.js"
+    configurationFilePath: 'config.json'
   };
 }
 

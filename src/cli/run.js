@@ -2,7 +2,7 @@ import mobilizerRunCommand from '../commands/mobilizer-run';
 import { executeAndHandleError } from '../extension/error-handler';
 
 export const description = 'Run shoutem application on using Shoutem preview app';
-export const command = 'run [appId]';
+export const command = 'run';
 export const builder = yargs => {
   return yargs
     .options({
