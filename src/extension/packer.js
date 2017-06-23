@@ -62,8 +62,6 @@ function hasExtensionsJson(dir) {
 }
 
 export default async function shoutemPack(dir, options) {
-  const spinner = startSpinner('Packing extension... %s');
-
   const packedDirectories = ['app', 'server'].map(d => path.join(dir, d));
 
   if (!await hasExtensionsJson(dir)) {
@@ -83,6 +81,7 @@ export default async function shoutemPack(dir, options) {
     await buildNodeProject(path.join(dir, 'app'));
   }
 
+  const spinner = startSpinner('Packing extension... %s');
   for (const dir of dirsToPack) {
     await npmPack(dir, packageDir);
   }
