@@ -10,7 +10,7 @@ export default async function (options) {
     await platformManager.mobilizerRun({ ...options, path: process.cwd() });
   } catch (err) {
     if (!/^win/.test(process.platform) && !await commandExists('watchman')) {
-      console.log('HINT: You should probably install Facebook\'s `watchman` before running react-native commands'.bold.yellow);
+      console.log('HINT: You should probably install Facebook\'s `watchman` before running `shoutem run` command'.bold.yellow);
     }
     await handleError(err);
   }
