@@ -34,7 +34,7 @@ export async function run(cwd, platform) {
 
 export async function startPackager(cwd) {
   const spawned = spawn('react-native', ['start'], {
-      stdio: ['ignore', 'pipe', 'inherit'],
+      stdio: ['inherit', 'pipe', 'inherit'],
       cwd,
       shell: true,
       env: { ...process.env, FORCE_COLOR: true }

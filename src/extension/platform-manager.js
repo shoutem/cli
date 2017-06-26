@@ -4,7 +4,6 @@ import _ from 'lodash';
 import { join } from 'path';
 import rmrf from 'rmfr';
 import ip from 'ip';
-import tmp from 'tmp-promise';
 import Promise from 'bluebird';
 import * as tunnel from './tunnel';
 import { spinify } from './spinner';
@@ -18,7 +17,6 @@ import { getInstallations } from '../clients/app-manager';
 import { getPublishingProperties } from '../clients/legacy-service';
 import { createProgressBar } from './progress-bar';
 import * as analytics from './analytics';
-import treeKill from 'tree-kill';
 
 async function getAppDir(appId) {
   return join(await mobileEnvPath(), appId.toString());
@@ -143,4 +141,3 @@ export async function mobilizerRun(options) {
     throw err;
   }
 }
-
