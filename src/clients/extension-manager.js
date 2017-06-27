@@ -23,6 +23,9 @@ export async function createDeveloper(devName) {
 }
 
 export async function uploadExtension(canonicalName, tgzStream, progressHandler, size) {
+  // a temporary workaround, forces access token to refresh
+  await getDeveloper();
+
   if (progressHandler) {
     listenStream(tgzStream, progressHandler, size);
   }
