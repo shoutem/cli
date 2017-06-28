@@ -1,5 +1,3 @@
-import mobilizerRunCommand from '../commands/mobilizer-run';
-import { executeAndHandleError } from '../extension/error-handler';
 import forkTerminal from 'fork-terminal';
 import path from 'path';
 

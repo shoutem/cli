@@ -20,7 +20,7 @@ function waitForEnter() {
   });
 }
 
-const mobilizerRun = require('../commands/mobilizer-run').default;
+const mobilizerRun = require('../commands/run').default;
 const options = require('../cli/run').builder(require('yargs')).argv;
 
 mobilizerRun(options)

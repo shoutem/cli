@@ -15,15 +15,6 @@ export async function ensureInstalled() {
   }
 }
 
-export async function link(cwd = process.cwd()) {
-  await ensureInstalled(cwd);
-  await spawn(
-    'react-native',
-    ['link'],
-    { cwd, stdio: 'inherit', shell: true },
-  );
-}
-
 export async function run(cwd, platform) {
   await spawn(
     'react-native',

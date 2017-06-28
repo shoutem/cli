@@ -11,7 +11,6 @@ import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
 import { pathExists, readJson } from 'fs-extra';
-import { lookup } from './kill';
 
 async function isPlatformDirectory(dir) {
   const { name } = await readJsonFile(path.join(dir, 'package.json')) || {};
@@ -32,7 +31,7 @@ export async function getPlatformRootDir(dir = process.cwd()) {
   return await getPlatformRootDir(parentDir);
 }
 
-export async function createMobileConfig(platformDir, opts) {
+export async function createPlatformConfig(platformDir, opts) {
   const configTemplate = await readJson(path.join(platformDir, 'config.template.json'));
 
   let authorization;
@@ -53,6 +52,10 @@ export async function createMobileConfig(platformDir, opts) {
     authorization,
     configurationFilePath: 'config.json'
   };
+}
+
+export async function getPlatformConfig(platformDir = null) {
+  return await readJson(path.join(platformDir || await getPlatformRootDir(), 'config.json'));
 }
 
 export async function configurePlatform(platformDir, mobileConfig) {
@@ -102,52 +105,18 @@ export async function fixPlatform(platformDir, appId) {
   }
 }
 
-export async function getPlatformVersion(appId) {
-  const { mobileAppVersion } = await appManager.getApplicationPlatform(appId);
-
-  return mobileAppVersion;
-}
-
 export async function downloadApp(appId, destinationDir, options) {
   analytics.setAppId(appId);
 
-  const mobileAppVersion = await getPlatformVersion(appId);
+  const { mobileAppVersion } = await appManager.getApplicationPlatform(appId)
   await pullPlatform(mobileAppVersion, destinationDir, options);
 
   if (!await pathExists(destinationDir)) {
-    throw new Error('Platform code could be downloaded from github. Make sure that platform is setup correctly.');
+    throw new Error('Platform code could not be downloaded from github. Make sure that platform is setup correctly.');
   }
 }
 
 async function pullPlatform(version, destination, options) {
   const url = `${cliUrls.mobileAppUrl}/archive/v${version}.tar.gz`;
   await decompressUri(url, destination, { ...options, strip: 1, useCache: true });
-}
-
-export async function runPlatform(platformDir, { platform, device, simulator, release }) {
-  const runOptions = ['--platform', platform];
-
-  if (device) {
-    runOptions.push('--device', device);
-  }
-
-  if (simulator) {
-    runOptions.push('--simulator', simulator);
-  }
-
-  if (release) {
-    runOptions.push('--configuration', 'Release');
-  }
-
-  return await npm.run(platformDir, 'run', runOptions);
-}
-
-export async function runShoutemWatcher(platformDir) {
-  const { workingDirectories } = await readJsonFile(path.join(platformDir, 'config.json')) || {};
-
-  if ((workingDirectories || []).length > 0 && (await lookup({ arguments: 'launchWatch' })).length < 0) {
-    const watcherPath = path.join(platformDir, 'scripts', 'helpers', 'run-watch-in-new-window.js');
-    const runWatchInNewWindow = require(watcherPath);
-    runWatchInNewWindow();
-  }
 }
