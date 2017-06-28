@@ -40,7 +40,7 @@ export async function handler(args) {
       for (const extPath of pushed) {
         try {
           const result = await publishExtension(extPath);
-          console.log(msg.publish.complete(result.attributes).green.bold);
+          console.log(msg.publish.complete(result).green.bold);
           published.push(extPath);
         } catch (err) {
           await handleError(err);
