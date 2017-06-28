@@ -16,13 +16,13 @@ export const builder = yargs => {
     .options({
       app: {
         alias: 'a',
-          description: 'app id to install current extension to',
-          requiresArg: true
+        description: 'app id to install current extension to',
+        requiresArg: true
       },
       new: {
         alias: 'n',
-          description: 'install to a new app with given name',
-          type: 'string'
+        description: 'install to a new app with given name',
+        type: 'string'
       }})
     .usage(`usage: shoutem ${command} [options]\n\n${description}`);
 };
