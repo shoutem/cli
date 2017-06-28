@@ -15,14 +15,6 @@ export async function ensureInstalled() {
   }
 }
 
-export async function run(cwd, platform) {
-  await spawn(
-    'react-native',
-    [`run-${platform}`],
-    { cwd, stdio: 'inherit', shell: true }
-  );
-}
-
 export async function startPackager(cwd) {
   const spawned = spawn('react-native', ['start'], {
       stdio: ['inherit', 'pipe', 'inherit'],
