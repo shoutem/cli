@@ -23,7 +23,12 @@ const downloadFile = Promise.promisify(require('download-file'));
 
 export async function pullExtensions(appId, destinationDir) {
   const installations = await appManager.getInstallations(appId);
-  await Promise.all(installations.map(inst => pullExtension(destinationDir, inst)));
+  const n = installations.length;
+  let i = 0;
+  for(const inst of installations) {
+    i++;
+    await spinify(pullExtension(destinationDir, inst), `Downloading extension ${i}/${n}: ${inst.canonicalName}`);
+  }
 }
 
 async function pullExtension(destinationDir, { extension, canonicalName }) {
@@ -160,7 +165,7 @@ export async function clone(opts, destinationDir) {
     await downloadApp(opts.appId, appDir, { progress: createProgressBar('Downloading shoutem platform') });
   }
 
-  await spinify(pullExtensions(opts.appId, path.join(appDir, 'extensions')), 'Downloading extensions');
+  await pullExtensions(opts.appId, path.join(appDir, 'extensions'));
 
   await fixPlatform(appDir, opts.appId);
   if (!opts.noconfigure) {
