@@ -4,6 +4,7 @@ import tmp from 'tmp-promise';
 import rmrf from 'rmfr';
 import path from 'path';
 import semver from 'semver';
+import inquirer from 'inquirer';
 import { getExtension } from '../clients/extension-manager';
 import * as appManager from '../clients/app-manager';
 import { shoutemUnpack } from '../extension/packer';
@@ -56,7 +57,7 @@ const excludePackages = [
   'shoutem.code-push'
 ];
 
-function ensurePlatformComptability(platform) {
+function ensurePlatformCompatibility(platform) {
   const msg = `Your app is using platform version ${platform.version}`+
     `, but cloning is supported only on Shoutem Platform 1.1.2 or later.\n`+
     `Please, update the Platform through Settings -> Shoutem Platform -> Install page on the Builder or install older (and unsupported) version of ` +
@@ -65,6 +66,51 @@ function ensurePlatformComptability(platform) {
   if (semver.lte(platform.version, '1.1.1')) {
     throw new Error(msg);
   }
+}
+
+async function queryPathExistsAction(destinationDir, oldDirectoryName) {
+  const { action } = await inquirer.prompt({
+    type: 'list',
+    name: 'action',
+    message: `Directory ${oldDirectoryName} already exists`,
+    choices: [{
+      name: 'Overwrite',
+      value: 'overwrite'
+    }, {
+      name: 'Abort',
+      value: 'abort',
+    }, {
+      name: 'Different app directory name',
+      value: 'rename'
+    }]
+  });
+
+  if (action === 'overwrite') {
+    return { type: 'overwrite' };
+  } else if (action === 'abort') {
+    return { type: 'abort' };
+  }
+
+  const { newDirectoryName } = await inquirer.prompt({
+    type: 'input',
+    name: 'newDirectoryName',
+    message: 'New directory name',
+    async validate(dirName) {
+      if (dirName.indexOf(' ') > -1) {
+        return 'No spaces are allowed';
+      }
+      if (await pathExists(path.join(destinationDir, dirName))) {
+        return `Directory ${dirName} already exists.`
+      }
+      return true;
+    }
+  });
+
+  return {
+    type: 'rename',
+    newDirectoryName,
+    newAppDir: path.join(destinationDir, newDirectoryName)
+  };
 }
 
 export async function clone(opts, destinationDir) {
@@ -76,15 +122,26 @@ export async function clone(opts, destinationDir) {
   opts.appId = opts.appId || await selectApp();
 
   const { name } = await getApp(opts.appId);
-  const directoryName = opts.dir || `${name.replace(/ /g, '_')}_${opts.appId}`;
 
-  const appDir = path.join(destinationDir, directoryName);
+  let directoryName = opts.dir || name.replace(/ /g, '_');
+  let appDir = path.join(destinationDir, directoryName);
 
   if (opts.force) {
     await clearCache();
     await spinify(rmrf(appDir), `Destroying directory ${directoryName}`);
-  } else if (await pathExists(appDir)) {
-    throw new Error(`Directory ${directoryName} already exists`);
+  }
+
+  if (await pathExists(appDir)) {
+    const action = await queryPathExistsAction(destinationDir, directoryName);
+    if (action.type === 'overwrite') {
+      await spinify(rmrf(appDir), `Destroying directory ${directoryName}`);
+    } else if (action.type === 'abort') {
+      console.log('Clone aborted.'.bold.yellow);
+      return;
+    } else {
+      directoryName = action.newDirectoryName;
+      appDir = action.newAppDir;
+    }
   }
 
   if (appDir.indexOf(' ') >= 0) {
@@ -99,7 +156,7 @@ export async function clone(opts, destinationDir) {
     await spinify(copy(opts.platform, appDir), 'Copying platform code');
   } else {
     const platform = await appManager.getApplicationPlatform(opts.appId);
-    ensurePlatformComptability(platform);
+    ensurePlatformCompatibility(platform);
     await downloadApp(opts.appId, appDir, { progress: createProgressBar('Downloading shoutem platform') });
   }
 
