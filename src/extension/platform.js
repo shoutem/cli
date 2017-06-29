@@ -108,7 +108,7 @@ export async function fixPlatform(platformDir, appId) {
 export async function downloadApp(appId, destinationDir, options) {
   analytics.setAppId(appId);
 
-  const { mobileAppVersion } = await appManager.getApplicationPlatform(appId)
+  const { mobileAppVersion } = await appManager.getApplicationPlatform(appId);
   await pullPlatform(mobileAppVersion, destinationDir, options);
 
   if (!await pathExists(destinationDir)) {
