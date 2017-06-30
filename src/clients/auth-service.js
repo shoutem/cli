@@ -119,7 +119,7 @@ const authorizationConfig = {
     throw new AuthServiceError('Could not get access token', tokensUrl, response, 'ACCESS_TOKEN_FAILURE');
   },
   shouldIntercept(request) {
-    return !request.headers.get('Authorization');
+    return !request.headers.get('Authorization') && new URI(request.url).host() !== 'github.com';
   },
   shouldInvalidateAccessToken() {
     return false;

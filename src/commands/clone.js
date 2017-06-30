@@ -15,7 +15,6 @@ import { downloadApp, fixPlatform, configurePlatform, createPlatformConfig } fro
 import { ensureUserIsLoggedIn } from './login';
 import { createProgressBar } from '../extension/progress-bar';
 import { spinify } from '../extension/spinner';
-import { clearCache } from '../extension/decompress';
 import commandExists from '../extension/command-exists';
 import 'colors';
 
@@ -35,7 +34,7 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
   try {
     const url = await getExtensionUrl(extension);
     const tgzDir = (await tmp.dir()).path;
-    await downloadFile(url, {directory: tgzDir, filename: 'extension.tgz'});
+    await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
     await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), path.join(destinationDir, canonicalName));
   } catch (err) {
     err.message = `Could not fetch extension ${canonicalName}`;
@@ -132,7 +131,6 @@ export async function clone(opts, destinationDir) {
   let appDir = path.join(destinationDir, directoryName);
 
   if (opts.force) {
-    await clearCache();
     await spinify(rmrf(appDir), `Destroying directory ${directoryName}`);
   }
 
@@ -162,7 +160,7 @@ export async function clone(opts, destinationDir) {
   } else {
     const platform = await appManager.getApplicationPlatform(opts.appId);
     ensurePlatformCompatibility(platform);
-    await downloadApp(opts.appId, appDir, { progress: createProgressBar('Downloading shoutem platform') });
+    await downloadApp(opts.appId, appDir, { progress: createProgressBar('Downloading shoutem platform'), useCache: !opts.force });
   }
 
   await pullExtensions(opts.appId, path.join(appDir, 'extensions'));
