@@ -62,7 +62,7 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
   const extensionId = await extensionManager.uploadExtension(
     id,
     stream,
-    createProgressHandler('Upload progress', size, () => spinner = startSpinner('Processing upload... %s')),
+    createProgressHandler({ msg: 'Upload progress', total: size, onFinished: () => spinner = startSpinner('Processing upload... %s') }),
     size
   );
 

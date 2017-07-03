@@ -13,7 +13,7 @@ import { pathExists, copy } from 'fs-extra';
 import selectApp from '../extension/app-selector';
 import { downloadApp, fixPlatform, configurePlatform, createPlatformConfig } from '../extension/platform';
 import { ensureUserIsLoggedIn } from './login';
-import { createProgressBar } from '../extension/progress-bar';
+import { createProgressHandler } from '../extension/progress-bar';
 import { spinify } from '../extension/spinner';
 import commandExists from '../extension/command-exists';
 import 'colors';
@@ -160,7 +160,7 @@ export async function clone(opts, destinationDir) {
   } else {
     const platform = await appManager.getApplicationPlatform(opts.appId);
     ensurePlatformCompatibility(platform);
-    await downloadApp(opts.appId, appDir, { progress: createProgressBar('Downloading shoutem platform'), useCache: !opts.force });
+    await downloadApp(opts.appId, appDir, { progress: createProgressHandler({ msg: 'Downloading shoutem platform' }), useCache: !opts.force });
   }
 
   await pullExtensions(opts.appId, path.join(appDir, 'extensions'));

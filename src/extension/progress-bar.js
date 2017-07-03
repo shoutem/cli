@@ -1,36 +1,43 @@
 import ProgressBar from 'progress';
 
-export function createProgressHandler(msg, total, onFinished) {
-  const bar = new ProgressBar(`   ${msg} [:bar] :percent (remaining :etas)`, { total, clear: true, width: 20 });
-
-  return ({ increment }) => {
-    bar.tick(increment);
-
-    if (bar.complete && onFinished) {
-      onFinished();
+function createProgressBar(msg, { total }) {
+  return new ProgressBar(
+    `   ${msg} [:bar] :percent (remaining :etas)`,
+    {
+      total,
+      clear: true,
+      width: 20,
+      renderThrottle: 50
     }
-  };
+  );
 }
 
-export function createProgressBar(msg) {
-  let progressBar = null;
+export function createProgressHandler({ msg, total, onFinished = () => {} }) {
+  let bar = null;
+  if (total) {
+    bar = createProgressBar(msg, { total });
+  }
 
-  return (state) => {
+  return state => {
+    // finished!
     if (!state) {
-      if (progressBar) {
-        progressBar.terminate();
+      if (bar) {
+        bar.terminate();
+        bar = null;
       }
+      onFinished();
       return;
     }
+    const { length, total } = state;
 
-    const { percent, size: { total } } = state;
-    if (!progressBar) {
-      progressBar = new ProgressBar(`   ${msg} [:bar] :percent (remaining :etas)`, { total: total || 1, width: 20, clear: true });
+    // total length not known until now
+    if (bar === null && total !== undefined) {
+      bar = createProgressBar(msg, { total });
     }
-    if (percent) {
-      progressBar.update(percent);
-    } else {
-      progressBar.tick();
+
+    bar.tick(length);
+    if (bar.complete) {
+      onFinished();
     }
   };
 }
