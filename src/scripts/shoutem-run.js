@@ -1,3 +1,4 @@
+require('fetch-everywhere');
 const readline = require('readline');
 const semver = require('semver');
 
