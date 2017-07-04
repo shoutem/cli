@@ -1,4 +1,5 @@
 import ProgressBar from 'progress';
+import { startSpinner } from './spinner';
 
 function createProgressBar(msg, { total }) {
   return new ProgressBar(
@@ -14,6 +15,7 @@ function createProgressBar(msg, { total }) {
 
 export function createProgressHandler({ msg, total, onFinished = () => {} }) {
   let bar = null;
+
   if (total) {
     bar = createProgressBar(msg, { total });
   }
@@ -28,11 +30,18 @@ export function createProgressHandler({ msg, total, onFinished = () => {} }) {
       onFinished();
       return;
     }
-    const { length, total } = state;
+    let { length, total } = state;
+    total = total || 0;
 
     // total length not known until now
-    if (bar === null && total !== undefined) {
-      bar = createProgressBar(msg, { total });
+    if (bar === null) {
+      if (total > 0) {
+        bar = createProgressBar(msg, {total});
+      } else {
+        bar = startSpinner(msg);
+        bar.tick = () => {};
+        bar.terminate = () => { bar.stop() };
+      }
     }
 
     bar.tick(length);

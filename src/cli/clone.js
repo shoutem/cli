@@ -20,6 +20,7 @@ export const builder = yargs => {
         requiresArg: true
       },
       force: {
+        alias: 'f',
         description: 'destroys destination directory if it already exists',
         type: 'boolean'
       }
