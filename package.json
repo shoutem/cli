@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.153-beta28",
+  "version": "0.8.153-beta29",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -34,7 +34,7 @@
     "colors": "^1.1.2",
     "command-exists": "^1.0.2",
     "decompress": "^4.0.0",
-    "download-cached": "file:///C:\\dev\\download-cached",
+    "download-cached": "^1.0.8",
     "download-file": "latest",
     "eslint": "^2.9.0",
     "eslint-plugin-react-native": "^1.0.2",
