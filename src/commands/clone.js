@@ -53,14 +53,6 @@ function removeTrailingSlash(str) {
   return str.replace(/\/$/, "");
 }
 
-const excludePackages = [
-  'shoutem.firebase',
-  'shoutem.notification-center',
-  'shoutem.push-notifications',
-  'shoutem.shoutem-notification-center',
-  'shoutem.code-push'
-];
-
 function ensurePlatformCompatibility(platform) {
   const msg = `Your app is using Shoutem Platform ${platform.version}`+
     `, but cloning is supported only on Shoutem Platform 1.1.2 or later.\n`+
@@ -168,8 +160,7 @@ export async function clone(opts, destinationDir) {
   await fixPlatform(appDir, opts.appId);
   if (!opts.noconfigure) {
     const config = await createPlatformConfig(appDir, {
-      appId: opts.appId,
-      excludePackages
+      appId: opts.appId
     });
     await configurePlatform(appDir, config);
   }

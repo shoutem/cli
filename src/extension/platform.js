@@ -82,26 +82,6 @@ export async function fixPlatform(platformDir, appId) {
     } catch (err) {
       console.log('WARN: Could not rename ./gradle to gradle');
     }
-
-    try {
-      await replace({
-        files: appBuilderPath,
-        from: "const apkPath = path.join('android', 'app', 'build', 'outputs', 'apk');",
-        to: "const apkPath = path.join('c:/', 'tmp', 'ShoutemApp', 'app', 'outputs', 'apk');"
-      });
-    } catch (err) {
-      console.log('WARN: Could not adapt client for c:\\tmp build directory');
-    }
-
-    try {
-      await replace({
-        files: path.join(platformDir, 'android', 'build.gradle'),
-        from: '//<CLI> buildDir = "C:/tmp/',
-        to: `buildDir = "C:/tmp/${appId}/`
-      })
-    } catch (err) {
-      console.log('WARN: Could not set the tmp build directory for android app');
-    }
   }
 }
 
