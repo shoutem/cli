@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.8.152",
+  "version": "0.8.154",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -51,7 +51,7 @@
     "pipe-streams-to-promise": "^0.2.0",
     "progress": "^1.1.8",
     "qrcode-terminal": "^0.11.0",
-    "replace-in-file": "^2.5.0",
+    "replace-in-file": "2.5.0",
     "request": "^2.72.0",
     "request-promise": "^4.1.1",
     "request-promise-native": "^1.0.3",
