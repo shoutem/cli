@@ -152,7 +152,16 @@ export async function clone(opts, destinationDir) {
   } else {
     const platform = await appManager.getApplicationPlatform(opts.appId);
     ensurePlatformCompatibility(platform);
-    await downloadApp(opts.appId, appDir, { progress: createProgressHandler({ msg: 'Downloading shoutem platform' }), useCache: !opts.force });
+    await downloadApp(opts.appId, appDir, {
+      progress: createProgressHandler({ msg: 'Downloading shoutem platform' }),
+      useCache: !opts.force,
+      versionCheck: mobileAppVersion => {
+        //TODO to be activated when mobile app version 0.58.9 is published
+        /* if (!semver.gte(mobileAppVersion, '0.58.9')) {
+          throw new Error('This version of CLI only supports platforms containing mobile app 0.58.9 or higher');
+        } */
+      }
+    });
   }
 
   await pullExtensions(opts.appId, path.join(appDir, 'extensions'));

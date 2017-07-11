@@ -87,7 +87,7 @@ export async function fixPlatform(platformDir, appId) {
       await replace({
         files: appBuilderPath,
         from: "const apkPath = path.join('android', 'app', 'build', 'outputs', 'apk');",
-        to: "const apkPath = path.join('c:/', 'tmp', 'ShoutemApp', 'app', 'outputs', 'apk');"
+        to: `const apkPath = path.join('c:/', '${appId}', 'tmp', 'ShoutemApp', 'app', 'outputs', 'apk');`
       });
     } catch (err) {
       console.log('WARN: Could not adapt client for c:\\tmp build directory');
@@ -105,10 +105,14 @@ export async function fixPlatform(platformDir, appId) {
   }
 }
 
-export async function downloadApp(appId, destinationDir, options) {
+export async function downloadApp(appId, destinationDir, options = {}) {
   analytics.setAppId(appId);
 
+  const versionCheck = options.versionCheck || (() => {});
+
   const { mobileAppVersion } = await appManager.getApplicationPlatform(appId);
+  await versionCheck(mobileAppVersion);
+
   await pullPlatform(mobileAppVersion, destinationDir, options);
 
   if (!await pathExists(destinationDir)) {
