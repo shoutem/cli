@@ -6,7 +6,6 @@ const getHomeDir = require('../home-dir');
 
 const cliHome = getHomeDir();
 
-//TODO to be activated when mobile app version 0.58.9 is published
 const removeGlobalNpmLinks = [
   'npm remove -g shoutem.about',
   'npm remove -g shoutem.analytics',
@@ -45,7 +44,9 @@ const removeGlobalNpmLinks = [
   'npm remove -g shoutem.web-view',
   'npm remove -g shoutem.code-push',
   'npm remove -g shoutem.push-notifications',
-  'npm remove -g shoutem.notification-center'
+  'npm remove -g shoutem.notification-center',
+  'npm remove -g shoutem.firebase',
+  'npm remove -g shoutem.youtube',
 ];
 
 Promise.all([
@@ -68,5 +69,5 @@ Promise.all([
   rimraf(path.join(cliHome, 'qa')),
   rimraf(path.join(cliHome, 'dev')),
   rimraf(path.join(cliHome, 'local'))
-]/*.concat(removeGlobalNpmLinks.map(exec))*/)
+].concat(removeGlobalNpmLinks.map(exec)))
   .catch(console.error);
