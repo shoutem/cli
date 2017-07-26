@@ -15,7 +15,8 @@ import { pathExists, readJson } from 'fs-extra';
 async function isPlatformDirectory(dir) {
   const { name } = await readJsonFile(path.join(dir, 'package.json')) || {};
 
-  return name === '@shoutem/mobile-app';
+  // platform package was renamed with Platform release v1.1.10
+  return name === '@shoutem/mobile-app' || name === '@shoutem/platform';
 }
 
 export async function getPlatformRootDir(dir = process.cwd()) {
