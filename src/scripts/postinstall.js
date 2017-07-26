@@ -69,5 +69,7 @@ Promise.all([
   rimraf(path.join(cliHome, 'qa')),
   rimraf(path.join(cliHome, 'dev')),
   rimraf(path.join(cliHome, 'local'))
-].concat(removeGlobalNpmLinks.map(exec)))
+].concat(removeGlobalNpmLinks.map((link) =>
+  exec(link)
+)))
   .catch(console.error);
