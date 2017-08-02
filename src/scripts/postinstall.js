@@ -69,11 +69,6 @@ Promise.all([
   rimraf(path.join(cliHome, 'qa')),
   rimraf(path.join(cliHome, 'dev')),
   rimraf(path.join(cliHome, 'local'))
-].concat(removeGlobalNpmLinks.map((link) => {
-  return new Promise((resolve) => {
-    exec(link)
-      .then(() => resolve())
-      .catch(() => resolve());
-  });
-})))
-  .catch(console.error);
+]).catch(console.error);
+
+Promise.all(removeGlobalNpmLinks.map(unlink => exec(unlink))).catch(() => {});
