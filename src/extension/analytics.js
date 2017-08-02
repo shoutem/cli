@@ -1,10 +1,10 @@
 import * as cache from './cache';
-import { getHostEnvName } from '../clients/server-env';
 import analytics from 'universal-analytics';
 import uuid from 'uuid/v4';
 import _ from 'lodash';
-import { getLocalDataClient } from '../clients/clients-factory';
+import { getValue } from './cache-env';
 import { analyticsTrackingId } from '../../config/services';
+import * as logger from './logger';
 
 async function getClientId() {
   return await cache.get('ga-client-id', null, () => uuid());
@@ -16,7 +16,7 @@ async function getAnalyticsVisitor() {
   const visitor = analytics(analyticsTrackingId, clientId);
   reportData.clientId = clientId;
 
-  const email = await getLocalDataClient().loadUserEmail();
+  const { email } = await getValue('developer') || {};
   if (email) {
     visitor.set('userId', email);
     reportData.userId = email;
@@ -33,8 +33,8 @@ async function reportEvent({ category, action, label }) {
   await visitor.event(category, action, label).send(err => {
     if (err) {
       console.error(err);
-    } else if (getHostEnvName() !== 'production') {
-      console.error('GA Report completed', {
+    } else {
+      logger.info('GA Report completed', {
         category,
         action,
         label,

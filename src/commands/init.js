@@ -1,15 +1,13 @@
 import _ from 'lodash';
 import inquirer from 'inquirer';
+import { pathExists } from 'fs-extra';
+import path from 'path';
 import { instantiateTemplatePath } from '../extension/template';
-import { ensureDeveloperIsRegistered } from './register';
+import { ensureUserIsLoggedIn } from '../commands/login';
 import msg from '../user_messages';
-import { ExtensionManagerClient } from '../clients/extension-manager';
-import { ensureUserIsLoggedIn } from './login'
+import { getPlatforms } from '../clients/extension-manager';
 import * as utils from '../extension/data';
 
-export function cwd() {
-  return process.cwd();
-}
 
 function generateNoPatchSemver(version) {
   const [a, b] = version.split('.');
@@ -17,16 +15,8 @@ function generateNoPatchSemver(version) {
 }
 
 export async function promptExtensionInit(extName) {
-  /* eslint no-confusing-arrow: 0 */
-  /* eslint no-param-reassign: 0 */
   const name = _.kebabCase(extName);
   const title = _.upperFirst(extName.toLowerCase());
-
-  const apiToken = await ensureUserIsLoggedIn();
-  const extClient = new ExtensionManagerClient(apiToken);
-  const platforms = (await extClient.getPlatforms()).filter(({ attributes: { published } }) => published);
-  const platformVersions = platforms.map(p => p.attributes.version);
-
   const version = '0.0.1';
 
   const questions = [{
@@ -48,11 +38,15 @@ export async function promptExtensionInit(extName) {
   console.log(msg.init.requestInfo());
   const answer = await inquirer.prompt(questions);
 
+  const platformVersions = (await getPlatforms())
+    .filter(({ published }) => published)
+    .map(({ version }) => version);
+
   return { name, ...answer, platform: generateNoPatchSemver(_.first(platformVersions)) };
 }
 
 export async function initExtension(extName) {
-  const developer = await ensureDeveloperIsRegistered();
+  const developer = await ensureUserIsLoggedIn();
   const extJson = await promptExtensionInit(extName);
 
   utils.getExtensionCanonicalName(developer.name, extJson.name, extJson.version);
@@ -63,7 +57,12 @@ export async function initExtension(extName) {
     description: extJson.description
   };
 
-  await instantiateTemplatePath('init', cwd(), {
+  const dirname = `${developer.name}.${extJson.name}`;
+  if (await pathExists(path.join(process.cwd(), dirname))) {
+    throw new Error(`Folder ${dirname} already exists. Rename the folder.`);
+  }
+
+  await instantiateTemplatePath('init', process.cwd(), {
     devName: developer.name,
     extJson,
     extJsonString: JSON.stringify(extJson, null, 2),

@@ -2,10 +2,10 @@ import services from '../../config/services';
 import {
   createNewApp,
   ensureApp,
-  installExtensionById,
   installLocalExtension,
 } from '../commands/install';
 import msg from '../user_messages';
+import { ensureUserIsLoggedIn } from '../commands/login';
 import { handleError } from '../extension/error-handler';
 
 export const description = 'Install the current extension to an application.';
@@ -16,19 +16,20 @@ export const builder = yargs => {
     .options({
       app: {
         alias: 'a',
-          description: 'app id to install current extension to',
-          requiresArg: true
+        description: 'app id to install current extension to',
+        requiresArg: true
       },
       new: {
         alias: 'n',
-          description: 'install to a new app with given name',
-          type: 'string'
+        description: 'install to a new app with given name',
+        type: 'string'
       }})
     .usage(`usage: shoutem ${command} [options]\n\n${description}`);
 };
 
 export async function handler(options) {
   try {
+    await ensureUserIsLoggedIn();
     const appCreationRequested = options.new || options.new === '';
 
     let appId;

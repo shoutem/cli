@@ -1,11 +1,11 @@
 import msg from '../user_messages';
-import { getDeveloper } from '../commands/register';
+import { getValue } from '../extension/cache-env';
 
 export const command = 'whoami';
 export const description = 'Username of the current user.';
 export async function handler() {
   try {
-    const dev = await getDeveloper();
+    const dev = await getValue('developer');
     if (dev) {
       console.log(msg.login.complete(dev));
     } else {

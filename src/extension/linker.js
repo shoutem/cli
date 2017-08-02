@@ -1,15 +1,11 @@
 import path from 'path';
 import Promise from 'bluebird';
 import _ from 'lodash';
-import { mobileEnvPath } from '../clients/cli-paths';
-import { pathExists, readJsonFile, writeJsonFile } from './data';
-
-async function getLinkedPath() {
-  return path.join(await mobileEnvPath(), 'linked-directories.json');
-}
+import { pathExists } from 'fs-extra';
+import * as cache from './cache';
 
 export async function getLinkedDirectories() {
-  const allDirectories = await readJsonFile(await getLinkedPath()) || [];
+  const allDirectories = await cache.getValue('linked-extensions') || [];
   const existingDirectories = await Promise.filter(allDirectories, pathExists);
 
   if (!_.isEqual(allDirectories, existingDirectories)) {
@@ -20,7 +16,7 @@ export async function getLinkedDirectories() {
 }
 
 export async function setLinkedDirectories(dirs) {
-  await writeJsonFile(dirs, await getLinkedPath());
+  await cache.setValue('linked-extensions', dirs);
 }
 
 export async function linkExtension(extensionDir) {

@@ -1,27 +1,68 @@
-import _ from 'lodash';
-import u from 'underscore';
-import request from 'request';
 import URI from 'urijs';
-import requestPromise from 'request-promise';
-import services from '../../config/services';
-import Promise from 'bluebird';
+import { extensionManager } from '../../config/services';
 import { listenStream } from '../extension/stream-listener';
 import * as jsonApi from './json-api-client';
+import FormData from 'form-data';
 
+const extensionManagerUri = new URI(extensionManager);
 
-export class ExtensionManagerError {
-  /*
-    Used whenever ExtensionManager misbehaves and returns errors not listed in
-    the API specification.
-  */
-  constructor(reqSettings, resStatus, resBody) {
-    this.message = 'Unexpected response from ExtensionManager';
-    this.request = reqSettings;
-    this.response = {
-      body: resBody,
-      statusCode: resStatus,
-    };
+export async function getDeveloper() {
+  const url = extensionManagerUri.clone().segment('/v1/devs/me');
+  return await jsonApi.get(url);
+}
+
+export async function createDeveloper(devName) {
+  const url = extensionManagerUri.clone().segment('/v1/devs');
+
+  return await jsonApi.post(url, {
+    data: {
+      type: 'shoutem.core.developers',
+      attributes: { name: devName },
+    },
+  });
+}
+
+export async function uploadExtension(canonicalName, tgzStream, progressHandler, size) {
+  // a temporary workaround, forces access token to refresh
+  await getDeveloper();
+
+  if (progressHandler) {
+    listenStream(tgzStream, progressHandler, size);
   }
+
+  const uri = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}`);
+  const form = new FormData();
+  form.append('extension', tgzStream, {
+    contentType: 'application/gzip'
+  });
+
+  const { id } = await jsonApi.put(uri, null, {
+    body: form,
+    headers: form.getHeaders()
+  });
+
+  return id;
+}
+
+export async function getExtensionId(canonicalName) {
+  const { id } = await getExtension(canonicalName);
+
+  return id;
+}
+
+export async function getExtension(canonicalName) {
+  const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}`);
+  return await jsonApi.get(url);
+}
+
+export async function publishExtension(canonicalName) {
+  const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}/publish`);
+  return await jsonApi.post(url);
+}
+
+export async function getPlatforms() {
+  const url = extensionManagerUri.clone().segment('/v1/platforms');
+  return await jsonApi.get(url);
 }
 
 export class DeveloperNameError {
@@ -30,252 +71,5 @@ export class DeveloperNameError {
   */
   constructor(devName) {
     this.message = `Name "${devName}" is already taken`;
-  }
-}
-
-
-export class ExtensionManagerClient {
-  /*
-    Client for ExtensionManager service.
-    https://github.com/shoutem/docs/tree/feature/api-for-em/api-specs/ExtensionManager
-  */
-  constructor(apiToken, extensionManagerUri = services.extensionManager) {
-    this.apiToken = apiToken;
-    this.serviceUri = new URI(extensionManagerUri);
-  }
-
-  prepareGetDeveloperRequest() {
-    return {
-      json: true,
-      method: 'GET',
-      uri: new URI(this.serviceUri).segment('/v1/devs/me').toString(),
-      headers: {
-        Accept: 'application/vnd.api+json',
-        Authorization: `Bearer ${this.apiToken}`,
-      },
-      simple: false,
-      resolveWithFullResponse: true,
-    };
-  }
-
-  /*
-    Get developer information based on his/her API token.
-  */
-  getDeveloper() {
-    const settings = this.prepareGetDeveloperRequest();
-
-    return requestPromise(settings)
-      .then(res => {
-        if (res.statusCode === 404) {
-          return null;
-        }
-
-        const dev = {
-          id: _.get(res.body, 'data.id'),
-          name: _.get(res.body, 'data.attributes.name'),
-        };
-
-        if (res.statusCode !== 200 || !dev.id || !dev.name) {
-          return Promise.reject(new ExtensionManagerError(settings, res.statusCode, res.body));
-        }
-
-        return dev;
-      });
-  }
-
-  prepareCreateDeveloperRequest(devName) {
-    return {
-      json: true,
-      method: 'POST',
-      uri: new URI(this.serviceUri).segment('/v1/devs').toString(),
-      headers: {
-        Accept: 'application/vnd.api+json',
-        Authorization: `Bearer ${this.apiToken}`,
-        'Content-Type': 'application/vnd.api+json',
-      },
-      body: {
-        data: {
-          type: 'shoutem.core.developers',
-          attributes: { name: devName },
-        },
-      },
-      simple: false,
-      resolveWithFullResponse: true,
-    };
-  }
-
-  /*
-    Create a new developer with given `devName`.
-  */
-  createDeveloper(devName) {
-    const settings = this.prepareCreateDeveloperRequest(devName);
-
-    return requestPromise(settings)
-      .then(res => {
-        if (res.statusCode === 409) {
-          return Promise.reject(new DeveloperNameError(devName));
-        }
-
-        const dev = {
-          id: _.get(res.body, 'data.id'),
-          name: _.get(res.body, 'data.attributes.name'),
-        };
-
-
-        if (!u.contains([201, 200], res.statusCode) || !dev.id || !dev.name) {
-          return Promise.reject(new ExtensionManagerError(settings, res.statusCode, res.body));
-        }
-
-        return dev;
-      });
-  }
-
-  prepareGetExtensionIdRequest(canonicalName) {
-    return {
-      json: true,
-      method: 'GET',
-      uri: new URI(this.serviceUri).segment(`/v1/extensions/${canonicalName}`).toString(),
-      headers: {
-        Accept: 'application/vnd.api+json',
-        Authorization: `Bearer ${this.apiToken}`,
-      },
-    };
-  }
-
-  getExtensionIdAsync(canonicalName) {
-    const getExtensionId = Promise.promisify((name, callback) => this.getExtensionId(name, callback));
-
-    return getExtensionId(canonicalName);
-  }
-
-  getExtensionId(canonicalName, callback) {
-    const settings = this.prepareGetExtensionIdRequest(canonicalName);
-
-    request(settings, (err, res, body) => {
-      if (err) return callback(err);
-
-      if (res.statusCode === 404) return callback(null, null);
-
-      if (res.statusCode === 200) {
-        const extensionId = _.get(body, 'data.id');
-        if (extensionId) return callback(null, extensionId);
-      }
-
-      return callback(new ExtensionManagerError(settings, res.statusCode, body));
-    });
-  }
-
-  prepareUploadExtensionZipRequest(canonicalName, zipStream) {
-    return {
-      json: false,
-      method: 'PUT',
-      uri: new URI(this.serviceUri).segment(`/v1/extensions/${canonicalName}`).toString(),
-      headers: {
-        Accept: 'application/vnd.api+json',
-        Authorization: `Bearer ${this.apiToken}`,
-        'Content-Type': 'multipart/form-data',
-      },
-      formData: {
-        extension: {
-          value: zipStream,
-          options: { contentType: null },
-        },
-      },
-      simple: false,
-      resolveWithFullResponse: true,
-    };
-  }
-
-  /*
-    Upload zipped extension.
-  */
-  uploadExtension(canonicalName, zipStream, progressHandler, size) {
-
-    if (progressHandler) {
-      listenStream(zipStream, progressHandler, size);
-    }
-
-    const settings = this.prepareUploadExtensionZipRequest(canonicalName, zipStream);
-
-    return requestPromise(settings)
-      .then(res => {
-        if (res.statusCode === 200 || res.statusCode === 201) {
-          return _.get(JSON.parse(res.body), 'data.id');
-        }
-        return Promise.reject(new ExtensionManagerError(settings, res.statusCode, res.body));
-      });
-  }
-
-  preparePublishExtensionRequest(canonicalName) {
-    return {
-      json: true,
-      method: 'POST',
-      uri: new URI(this.serviceUri).segment(`/v1/extensions/${canonicalName}/publish`).toString(),
-      headers: {
-        Accept: 'application/vnd.api+json',
-        Authorization: `Bearer ${this.apiToken}`,
-      },
-      simple: false,
-      resolveWithFullResponse: true,
-    };
-  }
-
-  prepareExtensionGetRequest(canonicalName) {
-    return {
-      json: true,
-      method: 'GET',
-      uri: new URI(this.serviceUri).segment(`/v1/extensions/${canonicalName}`).toString(),
-      headers: {
-        Accept: 'application/vnd.api+json',
-        Authorization: `Bearer ${this.apiToken}`,
-      },
-      simple: false,
-      resolveWithFullResponse: true,
-    };
-  }
-
-  /*
-    Publish extension with given `canonicalName`.
-  */
-  async publishExtension(canonicalName) {
-    const { statusCode, body } = await requestPromise(this.prepareExtensionGetRequest(canonicalName));
-    if (statusCode === 200 && body.data.attributes.published) {
-      throw new Error('Can\'t publish because current version is already published');
-    }
-
-    const settings = this.preparePublishExtensionRequest(canonicalName);
-
-    const res = await requestPromise(settings);
-    if (res.statusCode === 200 || res.statusCode === 201) {
-      return (res.body || {}).data;
-    } else {
-      throw new ExtensionManagerError(settings, res.statusCode, res.body);
-    }
-  }
-
-  async getPlatforms() {
-    const requestOptions = {
-      json: true,
-      method: 'GET',
-      uri: new URI(this.serviceUri).segment('/v1/platforms').toString(),
-      headers: {
-        Accept: 'application/vnd.api+json',
-        Authorization: `Bearer ${this.apiToken}`,
-      },
-      simple: false,
-      resolveWithFullResponse: true,
-    };
-
-    const res = await requestPromise(requestOptions);
-    if (res.statusCode !== 200 && res.statusCode !== 201) {
-      throw new ExtensionManagerError(requestOptions, res.statusCode, res.body);
-    }
-
-    return res.body.data;
-  }
-
-  async getExtension(extId) {
-    const uri = new URI(this.serviceUri).segment(`/v1/extensions/${extId}`);
-    return (await jsonApi.get(uri.toString(), this.apiToken)).data;
   }
 }

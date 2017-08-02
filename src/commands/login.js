@@ -1,15 +1,15 @@
 import inquirer from 'inquirer';
-import LocalDataClient from '../clients/local-data';
-import { AuthServiceClient } from '../clients/auth-service';
-import die from '../extension/die';
+import { authorizeRequests, getRefreshToken } from '../clients/auth-service';
+import { getDeveloper, createDeveloper } from '../clients/extension-manager';
 import msg from '../user_messages';
-import { ExtensionManagerClient } from '../clients/extension-manager';
 import urls from '../../config/services';
+import * as logger from '../extension/logger';
+import * as cache from '../extension/cache-env';
 
 function promptUserCredentials() {
   console.log(msg.login.credentialsPrompt(urls.appBuilder));
   const questions = [{
-    name: 'username',
+    name: 'email',
     message: 'Email',
   }, {
     name: 'password',
@@ -20,52 +20,55 @@ function promptUserCredentials() {
   return inquirer.prompt(questions);
 }
 
-export async function loginUser() {
-  /*
-    Asks user to enter credentials, verifies those credentials with authentication
-    service, and saves the received API token locally for further requests.
-  */
-  const authServiceClient = new AuthServiceClient();
-  const localDataClient = new LocalDataClient();
-
-  const creds  = await promptUserCredentials();
-  const { username, password } = creds;
-  const apiToken = await authServiceClient.loginUser(username, password);
-
-  return (await Promise.all([
-    localDataClient.saveApiToken(apiToken),
-    localDataClient.saveUserEmail(username)
-  ]))[0];
+function promptDeveloperName() {
+  /* eslint no-confusing-arrow: 0 */
+  console.log('Enter developer name.');
+  return inquirer.prompt({
+    name: 'devName',
+    message: 'Developer name',
+    validate: value => value ? true : 'Developer name cannot be blank.',
+  }).then(answer => answer.devName);
 }
 
-export async function ensureUserIsLoggedIn() {
-  /*
-    If user is logged in, `callback` receives his/her current API token. Otherwise,
-    user will be prompted to log in, and `callback` will receive a fresh token.
-
-    Any error in this process is a show-stopper: for many (all?) commands, it
-    makes no sense to continue if user cannot be authenticated.
-  */
-  const localDataClient = new LocalDataClient();
+/**
+ * Asks user to enter credentials, verifies those credentials with authentication
+ * service, and saves the received API token locally for further requests.
+ */
+export async function loginUser() {
+  const credentials = await promptUserCredentials();
+  const refreshToken = await getRefreshToken(credentials);
+  await authorizeRequests(refreshToken);
+  let developer = null;
 
   try {
-    const [apiToken, email] = await Promise.all([
-      localDataClient.loadApiToken(),
-      localDataClient.loadUserEmail()
-    ]);
-
-    if (apiToken && email) {
-      const extManager = new ExtensionManagerClient(apiToken);
-      try {
-        await extManager.getDeveloper();
-        return apiToken;
-      } catch (err) {
-        // ignored
-        // TODO refactor this WTF
-      }
-    }
-    return await loginUser();
+    developer = await getDeveloper();
   } catch (err) {
-    await die(err);
+    if (err.statusCode === 404) {
+      developer = await createDeveloper(await promptDeveloperName());
+    } else {
+      throw err;
+    }
+  }
+
+  console.log(msg.login.complete(developer));
+  logger.info('logged in as developer', developer);
+
+  return cache.setValue('developer', { ...developer, email: credentials.email });
+}
+
+/**
+ * Asks user for email and password if refreshToken is not already cached
+ * @param shouldThrow Should an error be thrown if user is not logged in or should user be asked for credentials
+ */
+export async function ensureUserIsLoggedIn(shouldThrow = false) {
+  const developer = await cache.getValue('developer');
+  if (developer) {
+    return developer;
+  }
+
+  if (shouldThrow) {
+    throw new Error('Not logged in, use `shoutem login` command to login');
+  } else {
+    return await loginUser();
   }
 }

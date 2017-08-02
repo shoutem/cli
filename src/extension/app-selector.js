@@ -1,12 +1,12 @@
-import { LegacyServiceClient } from '../clients/legacy-service';
-import { ensureUserIsLoggedIn } from '../commands/login';
+import { getLatestApps } from '../clients/legacy-service';
 import { spinify } from './spinner';
 import { prompt } from 'inquirer';
+import * as logger from './logger';
+import * as cache from './cache-env';
 
-export default async function(defaultAppId) {
-  const apiToken = await ensureUserIsLoggedIn();
-
-  const apps = await spinify(await new LegacyServiceClient(apiToken).getLatestAppsAsync(), 'Fetching applications');
+export default async function(apps = null) {
+  apps = apps || await spinify(getLatestApps(), 'Fetching applications');
+  logger.info('appSelector', apps);
 
   return (await prompt({
     type: 'list',
@@ -16,7 +16,6 @@ export default async function(defaultAppId) {
       name: `${app.name} (${app.id})`,
       value: app.id
     })),
-    default: defaultAppId,
     pageSize: 20
   })).appId;
 }

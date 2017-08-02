@@ -1,22 +1,19 @@
-import _ from 'lodash';
-import request from 'request-promise';
 import URI from 'urijs';
-
+import { post } from './json-api-client';
 import services from '../../config/services';
-
+import * as cache from '../extension/cache-env';
+import * as logger from '../extension/logger';
 
 export class AuthServiceError {
   /*
     Used whenever AuthService misbehaves and returns errors not listed in the
     API specification.
   */
-  constructor(reqSettings, resStatus, resBody) {
-    this.message = 'Unexpected response from AuthService';
-    this.request = reqSettings;
-    this.response = {
-      body: resBody,
-      statusCode: resStatus,
-    };
+  constructor(message, url, response, code) {
+    this.message = message;
+    this.url = url;
+    this.response = response;
+    this.code = code;
   }
 }
 
@@ -24,55 +21,134 @@ export class UnauthorizedError {
   /*
     Used when bad username or password is supplied.
   */
-  constructor() {
+  constructor(url, response, statusCode) {
     this.message = 'Username or password is not valid';
+    this.url = url;
+    this.response = response;
+    this.statusCode = statusCode;
   }
 }
 
+const tokensUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
 
-export class AuthServiceClient {
-  /*
-    Client for authenication service.
-    https://github.com/shoutem/docs/tree/feature/api-for-em/api-specs/AuthService
-  */
-  constructor(authServiceUri = services.authService) {
-    this.serviceUri = new URI(authServiceUri);
-  }
+function getBasicAuthHeaderValue(email, password) {
+  return 'Basic ' + new Buffer(`${email}:${password}`).toString('base64');
+}
 
-  prepareLoginUserRequest(username, password) {
-    const encoded = new Buffer(`${username}:${password}`).toString('base64');
-    return {
-      json: true,
-      method: 'POST',
-      uri: new URI(this.serviceUri).segment('/v1/login').toString(),
+export async function createRefreshToken(email, password) {
+  try {
+    const response = await post(tokensUrl, null, {
       headers: {
-        Accept: 'application/vnd.api+json',
-        Authorization: `Basic ${encoded}`,
-      },
-      resolveWithFullResponse: true,
-      simple: false,
-    };
+        Authorization: getBasicAuthHeaderValue(email, password)
+      }
+    });
+    const { token } = response;
+    return token;
+
+  } catch (err) {
+    if (err.statusCode === 401) {
+      throw new UnauthorizedError(err.url, err.response, err.statusCode);
+    }
+    throw err;
+  }
+}
+
+export async function createAppAccessToken(appId, refreshToken) {
+  const body = {
+    data: {
+      type: 'shoutem.auth.tokens',
+      attributes: {
+        tokenType: 'access-token',
+        subjectType: 'application',
+        subjectId: appId.toString()
+      }
+    }
+  };
+
+  const { token } = await post(tokensUrl, body, {
+    headers: {
+      Authorization: `Bearer ${refreshToken}`
+    }
+  });
+
+  return token;
+}
+
+export async function getRefreshToken({ email, password } = {}) {
+  if (email && password) {
+    const refreshToken = await cache.setValue('refresh-token', await createRefreshToken(email, password));
+    await cache.setValue('access-token', null);
+    return refreshToken;
   }
 
-  /*
-    Passes `username` and `password` to authentication service for validation.
-    If credentials are valid, `callback` will receive an API token.
-  */
-  loginUser(username, password) {
-    const settings = this.prepareLoginUserRequest(username, password);
-    return request(settings)
-      .then(response => {
-        const body = response.body;
-        if (response.statusCode === 401) {
-          return Promise.reject(new UnauthorizedError());
-        }
+  return await cache.getValue('refresh-token');
+}
 
-        const apiToken = _.get(body, 'meta.authHeaderToken');
-        if (response.statusCode !== 200 || !apiToken) {
-          return Promise.reject(new AuthServiceError(settings, 200, body));
-        }
+export async function clearTokens() {
+  await cache.setValue('access-token', null);
+  await cache.setValue('refresh-token', null);
+}
 
-        return apiToken;
-      });
+const authorizationConfig = {
+  createAccessTokenRequest(refreshToken) {
+    logger.info('createAccessTokenRequest', refreshToken);
+    return new Request(tokensUrl, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${refreshToken}`,
+        Accept: 'application/vnd.api+json',
+        'Content-Type': 'application/vnd.api+json'
+      },
+      body: JSON.stringify({
+        data: {
+          type: 'shoutem.auth.tokens',
+          attributes: {
+            tokenType: 'access-token'
+          }
+        }
+      })
+    });
+  },
+  async parseAccessToken(response) {
+    if (response.ok) {
+      const { data: { attributes: { token } } } = await response.json();
+      await cache.setValue('access-token', token);
+      return token;
+    }
+    logger.info('parseAccessToken', response);
+    throw new AuthServiceError('Could not get access token', tokensUrl, response, 'ACCESS_TOKEN_FAILURE');
+  },
+  shouldIntercept(request) {
+    return !request.headers.get('Authorization') && new URI(request.url).host() !== 'github.com';
+  },
+  shouldInvalidateAccessToken() {
+    return false;
+  },
+  authorizeRequest(request, accessToken) {
+    request.headers.set('Authorization', `Bearer ${accessToken}`);
+    logger.info('authorizeRequest', request.headers);
+    return request;
+  },
+  isResponseUnauthorized({ status }) {
+    return status === 401 || status === 403;
+  },
+  shouldWaitForTokenRenewal: true
+};
+
+export async function authorizeRequests(refreshToken) {
+  if (!refreshToken) {
+    return;
+  }
+  try {
+    const intercept = require('@shoutem/fetch-token-intercept');
+    intercept.configure(authorizationConfig);
+    intercept.authorize(refreshToken, await cache.getValue('access-token'));
+    return true;
+  } catch (err) {
+    logger.info(err);
+    if (err.statusCode !== 401) {
+      throw err;
+    }
+    return false;
   }
 }

@@ -1,9 +1,9 @@
-import { ensureDeveloperIsRegistered } from '../commands/register';
+import { ensureUserIsLoggedIn } from '../commands/login';
 import confirm from '../extension/confirmer';
 import { getHostEnvName } from '../clients/server-env';
 
 export default async function(msg) {
-  const dev = await ensureDeveloperIsRegistered();
+  const dev = await ensureUserIsLoggedIn();
 
   if (getHostEnvName() !== 'production' || dev.name !== 'shoutem') {
     return true;

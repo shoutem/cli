@@ -2,11 +2,11 @@ import _ from 'lodash';
 import inquirer from 'inquirer';
 import request from 'request-promise';
 import { instantiateTemplatePath } from '../extension/template';
-import { getExtensionRootDir } from '../extension/data';
+import { ensureInExtensionDir } from '../extension/data';
 
 const themeUrls = {
   theme: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/app/themes/Rubicon.js',
-  variables: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/server/themeVariables.json'
+  variables: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/server/primeThemeVariables.json'
 };
 
 
@@ -36,7 +36,7 @@ async function getThemeVariablesContent(themeName) {
 export async function createTheme(themeName) {
   const { title, description } = await promptThemeDetails(_.upperFirst(_.camelCase(themeName)));
 
-  return await instantiateTemplatePath('theme', getExtensionRootDir(), {
+  return await instantiateTemplatePath('theme', ensureInExtensionDir(), {
     title,
     themeName,
     description,

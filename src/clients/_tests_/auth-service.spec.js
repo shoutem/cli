@@ -1,94 +1,34 @@
-import nock from 'nock';
 import { assert } from 'chai';
+import * as authService from '../auth-service';
 
-import { AuthServiceError, UnauthorizedError, AuthServiceClient } from '../auth-service';
+describe('Auth service client integration tests', () => {
 
+  describe('Create a refresh token', () => {
 
-describe('AuthServiceClient', () => {
-  describe('prepareLoginUserRequest', () => {
-    const authServiceUri = 'http://auth.service.com';
-    const client = new AuthServiceClient(authServiceUri);
-
-    it('prepares request for user login', () => {
-      const settings = client.prepareLoginUserRequest('user', 'pass');
-      const encoded = new Buffer('user:pass').toString('base64');
-      assert.deepEqual(settings, {
-        json: true,
-        method: 'POST',
-        uri: 'http://auth.service.com/v1/login',
-        headers: {
-          Accept: 'application/vnd.api+json',
-          Authorization: `Basic ${encoded}`,
-        },
-      });
-    });
-  });
-
-  describe('loginUser', () => {
-    const authServiceUri = 'http://auth.service.com';
-    const client = new AuthServiceClient(authServiceUri);
-
-    it('returns an error on unspecified response', done => {
-      nock(authServiceUri).post('/v1/login').reply(678, {});
-
-      client.loginUser('user', 'pass', (err, token) => {
-        try {
-          assert(err instanceof AuthServiceError);
-          assert.strictEqual(err.response.statusCode, 678);
-          assert.isUndefined(token);
-          done();
-        } catch (exc) {
-          done(exc);
-        }
-      });
+    it('should create a refresh token', async () => {
+      const token = await authService.createRefreshToken('cli-test@shoutem.com', 'password');
+      console.log(token);
+      assert.isOk(token, 'a token was returned');
+      assert.isAtLeast(token.length, 10, 'a token is too short');
     });
 
-    it('returns an error if response has no API token', done => {
-      nock(authServiceUri).post('/v1/login').reply(200, { meta: null });
-
-      client.loginUser('user', 'pass', (err, token) => {
-        try {
-          assert(err instanceof AuthServiceError);
-          assert.strictEqual(err.response.body.meta, null);
-          assert.isUndefined(token);
-          done();
-        } catch (exc) {
-          done(exc);
-        }
-      });
+    it('should report invalid credentials', async () => {
+      try {
+        await authService.createRefreshToken('cli-test@shoutem.com', 'invalid-password');
+      } catch (err) {
+        assert.strictEqual(err.statusCode, 401, 'api should respond with 401');
+        return;
+      }
+      throw new Error('401 error should have been reported by the shoutem api when invalid password is used');
     });
 
-    it('returns an error for bad credentials', done => {
-      nock(authServiceUri).post('/v1/login').reply(401);
-
-      client.loginUser('user', 'pass', (err, token) => {
-        try {
-          assert(err instanceof UnauthorizedError);
-          assert.isUndefined(token);
-          done();
-        } catch (exc) {
-          done(exc);
-        }
-      });
+    it('should create an app token', async () => {
+      const refreshToken = await authService.getRefreshToken({ email: 'cli-test@shoutem.com', password: 'password' });
+      const appToken = await authService.createAppAccessToken(3777, refreshToken);
+      console.log(appToken);
+      assert.isOk(appToken, 'a token was returned');
+      assert.isAtLeast(appToken.length, 10, 'a token is too short');
     });
 
-    it('returns an API token on successful login', done => {
-      nock(authServiceUri).post('/v1/login')
-      .reply(200, {
-        meta: {
-          authHeaderToken: 'A1BD639C97AE',
-        },
-      });
-
-      client.loginUser('user', 'pass', (err, token) => {
-        if (err) return done(err);
-        try {
-          assert.strictEqual(token, 'A1BD639C97AE');
-          return done();
-        } catch (exc) {
-          return done(exc);
-        }
-      });
-    });
-  });
+  })
 });

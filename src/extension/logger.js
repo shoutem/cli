@@ -1,11 +1,11 @@
-import _ from 'underscore';
+import _ from 'lodash';
 
-export async function info(msg, object) {
+export function info(msg, object) {
   if (isVerbose()) {
     console.log(msg, object);
   }
 }
 
-export async function isVerbose() {
-  return _.contains(process.argv, '--verbose');
+export function isVerbose() {
+  return _.includes(process.argv, '--verbose');
 }

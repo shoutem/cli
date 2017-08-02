@@ -1,16 +1,18 @@
 import fs from 'fs';
 import path from 'path';
 import mzfs from 'mz/fs';
-import { ExtensionManagerClient } from '../clients/extension-manager';
+import * as extensionManager from '../clients/extension-manager';
 import { getHostEnvName } from '../clients/server-env';
+import { getExtensionCanonicalName } from '../clients/local-extensions';
 import { ensureInExtensionDir } from '../extension/data';
-import { ensureDeveloperIsRegistered } from './register';
+import { ensureUserIsLoggedIn } from './login';
 import * as utils from '../extension/data';
 import shoutemPack from '../extension/packer';
 import msg from '../user_messages';
 import _ from 'lodash';
 import { createProgressHandler } from '../extension/progress-bar';
 import { startSpinner } from '../extension/spinner';
+import extLint from '../extension/extlint';
 
 async function setPackageNameVersion(path, name, version) {
   const data = await utils.readJsonFile(path);
@@ -36,8 +38,16 @@ function setExtNameVersionInPackageJson(extName, version, root = utils.getExtens
 }
 
 export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
-  const dev = await ensureDeveloperIsRegistered();
-
+  if (!opts.nocheck) {
+    console.log('Checking the extension code for syntax errors...');
+    try {
+      await extLint(extensionDir);
+    } catch (err) {
+      err.message = 'Syntax errors detected, aborting push! Use `shoutem push --nocheck` to override';
+      throw err;
+    }
+  }
+  const dev = await ensureUserIsLoggedIn();
   const extJson = await utils.loadExtensionJsonAsync(extensionDir);
   await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version, extensionDir);
   const packResult = await shoutemPack(extensionDir, { packToTempDir: true, nobuild: opts.nobuild });
@@ -45,15 +55,14 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
   const { size } = await mzfs.stat(packResult.package);
   const stream = fs.createReadStream(packResult.package);
 
-  const id = utils.getExtensionCanonicalName(dev.name, extJson.name, extJson.version);
-  const extensionManager = new ExtensionManagerClient(dev.apiToken);
+  const id = await getExtensionCanonicalName(extensionDir);
 
   console.log(msg.push.uploadingInfo(extJson, getHostEnvName()));
   let spinner = null;
   const extensionId = await extensionManager.uploadExtension(
     id,
     stream,
-    createProgressHandler('Upload progress', size, () => spinner = startSpinner('Processing upload... %s')),
+    createProgressHandler({ msg: 'Upload progress', total: size, onFinished: () => spinner = startSpinner('Processing upload... %s') }),
     size
   );
 

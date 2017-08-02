@@ -3,23 +3,17 @@ import fs from 'mz/fs';
 import path from 'path';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';
-import fs2 from 'fs-extra';
 import targz from 'tar.gz';
 import { buildNodeProject } from './builder';
 import { readJsonFile, writeJsonFile } from './data';
 import { startSpinner } from '../extension/spinner';
-const copy = Promise.promisify(fs2.copy);
-const mv = Promise.promisify(require('mv'));
 import move from 'glob-move';
-import { pathExists } from '../extension/data';
+import { pathExists, copy } from 'fs-extra';
 import decompress from 'decompress';
+const mv = Promise.promisify(require('mv'));
 
 function hasPackageJson(dir) {
-  const packageJsonPath = path.join(dir, 'package.json');
-  return fs
-    .access(packageJsonPath, fs.F_OK)
-    .then(() => true)
-    .catch(() => false);
+  return pathExists(path.join(dir, 'package.json'));
 }
 
 async function npmPack(dir, destinationDir) {
@@ -39,7 +33,7 @@ async function npmPack(dir, destinationDir) {
 
   await mv(packagePath, resultFilename);
 
-  if (originalFileContent != null) {
+  if (originalFileContent !== null) {
     await fs.writeFile(packageJsonPath, originalFileContent, 'utf8');
   }
 }
@@ -64,16 +58,10 @@ export async function shoutemUnpack(tgzFile, destinationDir) {
 }
 
 function hasExtensionsJson(dir) {
-  const extensionJsonPath = path.join(dir, 'extension.json');
-  return fs
-    .access(extensionJsonPath, fs.F_OK)
-    .then(() => true)
-    .catch(() => false);
+  return pathExists(path.join(dir, 'extension.json'));
 }
 
 export default async function shoutemPack(dir, options) {
-  const spinner = startSpinner('Packing extension... %s');
-
   const packedDirectories = ['app', 'server'].map(d => path.join(dir, d));
 
   if (!await hasExtensionsJson(dir)) {
@@ -93,6 +81,7 @@ export default async function shoutemPack(dir, options) {
     await buildNodeProject(path.join(dir, 'app'));
   }
 
+  const spinner = startSpinner('Packing extension... %s');
   for (const dir of dirsToPack) {
     await npmPack(dir, packageDir);
   }

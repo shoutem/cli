@@ -8,7 +8,6 @@ export async function createShortcut(shortcutName) {
     throw new Error(msg.shortcut.add.alreadyExists(shortcutName));
   }
 
-  console.log('Enter shortcut information.');
   const shortcutData = await shortcut.promptShortcutInfo(shortcutName);
 
   shortcut.addShortcut(extJson, shortcutData);
