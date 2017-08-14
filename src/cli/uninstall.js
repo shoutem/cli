@@ -30,7 +30,7 @@ export async function handler(args) {
       throw new Error(msg.uninstall.missingExtension());
     }
 
-    const installations = (await getExtInstallations(appId)).data;
+    const installations = (await getExtInstallations(appId));
     const installation = installations.filter(inst => inst.extension === extensionId)[0];
 
     if (!installation) {

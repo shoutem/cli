@@ -36,7 +36,14 @@ export async function execute(method, url, opts = {}) {
 
   logger.info(`${method} ${url}`, req);
   const response = await fetch(req);
-  const json = await response.json();
+  const textResponse = await response.text();
+
+  if (!textResponse) {
+    return null;
+  }
+
+  const json = JSON.parse(textResponse);
+
   if (response.ok) {
     try {
       return await deserializer.deserialize(json);
