@@ -20,7 +20,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@shoutem/fetch-token-intercept": "^0.2.0",
+    "@shoutem/fetch-token-intercept": "^0.3.0",
     "async": "2.0.0-rc.3",
     "babel-eslint": "^6.0.4",
     "babel-plugin-transform-async-to-generator": "^6.22.0",
