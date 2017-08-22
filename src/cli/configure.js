@@ -10,7 +10,14 @@ export const builder = yargs => {
       release: {
         alias: 'r',
         description: '(re)configure the app with last published configuration from the shoutem server',
-        type: 'boolean'
+        type: 'boolean',
+        default: false
+      },
+      production: {
+        alias: 'p',
+        description: 'configure the app for production mode build',
+        type: 'boolean',
+        default: false
       }
     })
     .usage(`shoutem ${command} \n\n${description}`);
@@ -18,7 +25,11 @@ export const builder = yargs => {
 export async function handler(args) {
   await executeAndHandleError(async () => {
     const appDir = await getPlatformRootDir();
+
     const configureArgs = args.release ? ['--release'] : [];
+    if (args.production) {
+      configureArgs.push('--production');
+    }
 
     await npm.run(appDir, 'configure', configureArgs);
   });
