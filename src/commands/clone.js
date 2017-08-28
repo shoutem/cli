@@ -140,7 +140,7 @@ export async function clone(opts, destinationDir) {
   }
 
   if (appDir.indexOf(' ') >= 0) {
-    throw new Error('Due to a bug in the `npm`, app\'s path can\'t contain spaces');
+    throw new Error("Path to the directory you are cloning to can't contain spaces.");
   }
 
   await mkdirp(appDir);
