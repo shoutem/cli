@@ -11,6 +11,7 @@ import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
 import { pathExists, readJson } from 'fs-extra';
+import commandExists from '../extension/command-exists';
 
 async function isPlatformDirectory(dir) {
   const { name } = await readJsonFile(path.join(dir, 'package.json')) || {};
@@ -62,6 +63,10 @@ export async function getPlatformConfig(platformDir = null) {
 export async function configurePlatform(platformDir, mobileConfig) {
   await ensureYarnInstalled();
   await reactNative.ensureInstalled();
+  if (process.platform === 'darwin' && !await commandExists('pod')) {
+    throw new Error('Missing `pods` command. Please install cocoapods and run `shoutem configure` in the ' +
+      `${platformDir} directory`);
+  }
 
   const configPath = path.join(platformDir, 'config.json');
 
