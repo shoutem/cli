@@ -60,7 +60,11 @@ export async function getPlatformConfig(platformDir = null) {
   return await readJson(path.join(platformDir || await getPlatformRootDir(), 'config.json'));
 }
 
-export async function configurePlatform(platformDir, mobileConfig) {
+export async function setPlatformConfig(platformDir, mobileConfig) {
+  await writeJsonFile(mobileConfig, path.join(platformDir, 'config.json'));
+}
+
+export async function configurePlatform(platformDir) {
   await ensureYarnInstalled();
   await reactNative.ensureInstalled();
   if (process.platform === 'darwin' && !await commandExists('pod')) {
@@ -68,9 +72,10 @@ export async function configurePlatform(platformDir, mobileConfig) {
       `${platformDir} directory`);
   }
 
-  const configPath = path.join(platformDir, 'config.json');
+  if (!await getPlatformConfig(platformDir)) {
+    throw new Error('Missing config.json file');
+  }
 
-  await writeJsonFile(mobileConfig, configPath);
   await npm.install(path.join(platformDir, 'scripts'));
   await npm.run(platformDir, 'configure');
 }

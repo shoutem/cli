@@ -11,7 +11,10 @@ import { shoutemUnpack } from '../extension/packer';
 import { getApp } from '../clients/legacy-service';
 import { pathExists, copy } from 'fs-extra';
 import selectApp from '../extension/app-selector';
-import { downloadApp, fixPlatform, configurePlatform, createPlatformConfig } from '../extension/platform';
+import {
+  downloadApp, fixPlatform, configurePlatform, createPlatformConfig,
+  setPlatformConfig
+} from '../extension/platform';
 import { ensureUserIsLoggedIn } from './login';
 import { createProgressHandler } from '../extension/progress-bar';
 import { spinify } from '../extension/spinner';
@@ -166,10 +169,15 @@ export async function clone(opts, destinationDir) {
   await pullExtensions(opts.appId, path.join(appDir, 'extensions'));
 
   await fixPlatform(appDir, opts.appId);
-  if (!opts.noconfigure) {
-    const config = await createPlatformConfig(appDir, {
-      appId: opts.appId
-    });
+
+  const config = await createPlatformConfig(appDir, {
+    appId: opts.appId
+  });
+  await setPlatformConfig(appDir, config);
+
+  if (opts.noconfigure) {
+    console.log('Skipping configure step due to --noconfigure flag');
+  } else {
     await configurePlatform(appDir, config);
   }
 
