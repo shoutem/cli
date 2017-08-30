@@ -41,4 +41,5 @@ export const handler = ({ name, local }) => executeAndHandleError(async () => {
   await addToExtensionsJs(platformDir, extensionPath);
 
   console.log('\nSuccess!'.green.bold);
+  console.log('You can run `shoutem builder` to open the app in shoutem builder using default browser');
 });

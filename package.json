@@ -57,6 +57,7 @@
     "mv": "^2.1.1",
     "mz": "^2.4.0",
     "ngrok": "2.2.17",
+    "opn": "^5.1.0",
     "prettyjson": "^1.2.1",
     "progress": "^2.0.0",
     "qrcode-terminal": "^0.11.0",
