@@ -1,19 +1,19 @@
-// listen for sandbox initialization complete
-document.addEventListener('sandboxready', onSandboxReady, false);
+// listen for Shoutem initialization complete
+document.addEventListener('shoutemready', onShoutemReady, false);
 
-// handler for sandbox initialization finished
-function onSandboxReady(event) {
-  // config object containing buidler extension configuration, can be accessed via event
+// handler for Shoutem initialization finished
+function onShoutemReady(event) {
+  // config object containing builder extension configuration, can be accessed via event
   // or by shoutem.sandbox.config
-  const config = event.detail;
+  const config = event.detail.config;
 
   // Waiting for DOM to be ready to initialize shoutem.api and call app start function
   $(document).ready(function() {
-    shoutem.api.init(config);
-    appReady(config);
+    shoutem.api.init(config.context);
+    onPageReady(config);
   });
-}
+};
 
-// Put your settings page logic here, executes when sandbox and DOm are initalized
-function appReady(config) {
+// Put your settings page logic here, executes when sandbox and DOM are initalized
+function onPageReady(config) {
 }
