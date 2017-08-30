@@ -12,3 +12,4 @@ export async function ensureNodeVersion(minVersion = '7.2.0') {
     throw new Error(msg.node.outdated(minVersion));
   }
 }
+

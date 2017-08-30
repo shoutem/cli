@@ -1,5 +1,6 @@
 import url from 'url';
 import path from 'path';
+import _ from 'lodash';
 import replace from 'replace-in-file';
 import * as appManager from '../clients/app-manager';
 import * as authService from '../clients/auth-service';
@@ -10,7 +11,7 @@ import * as npm from './npm';
 import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
-import { pathExists, readJson } from 'fs-extra';
+import { pathExists, readJson, readFile, writeFile } from 'fs-extra';
 import commandExists from '../extension/command-exists';
 
 async function isPlatformDirectory(dir) {
@@ -134,4 +135,27 @@ export async function downloadApp(appId, destinationDir, options = {}) {
 async function pullPlatform(version, destination, options) {
   const url = `${cliUrls.mobileAppUrl}/archive/v${version}.tar.gz`;
   await decompressUri(url, destination, { ...options, strip: 1, useCache: options.useCache });
+}
+
+export async function addToExtensionsJs(platformDir, extensionPath) {
+  const { name } = await npm.getPackageJson(path.join(extensionPath, 'app'));
+
+  const extensionsJsPath = path.join(platformDir, 'extensions.js');
+
+  let extensionsJsData = await readFile(extensionsJsPath, 'utf8');
+
+  if (_.includes(extensionsJsData, `'${name}'`)) {
+    return;
+  }
+
+  extensionsJsData = extensionsJsData.replace('};', `'${name}': require('${name}'),`);
+  extensionsJsData += '  };\n';
+
+  await writeFile(extensionsJsPath, extensionsJsData);
+}
+
+export async function linkLocalExtension(platformDir, extensionPath) {
+  await npm.addLocalDependency(platformDir, path.join(extensionPath, 'app'));
+  await npm.linkLocalDependencies(platformDir);
+  await npm.install(platformDir);
 }
