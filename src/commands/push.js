@@ -48,7 +48,7 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
     }
   }
   const dev = await ensureUserIsLoggedIn();
-  const extJson = await utils.loadExtensionJsonAsync(extensionDir);
+  const extJson = await utils.loadExtensionJson(extensionDir);
   await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version, extensionDir);
   const packResult = await shoutemPack(extensionDir, { packToTempDir: true, nobuild: opts.nobuild });
 

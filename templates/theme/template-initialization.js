@@ -1,9 +1,9 @@
 import _ from 'lodash';
-import { loadExtensionJsonAsync, saveExtensionJsonAsync } from '../../src/extension/data';
+import { loadExtensionJson, saveExtensionJson } from '../../src/extension/data';
 import { generateExtensionJs } from '../../src/extension/ext-js-generator';
 
 module.exports = async function (localTemplatePath, extensionPath, { title, themeName, description }) {
-  const extJson = await loadExtensionJsonAsync(extensionPath) || {};
+  const extJson = await loadExtensionJson(extensionPath) || {};
 
   const themes = extJson.themes = extJson.themes || [];
   if (_.includes(themes.map(theme => theme.name), themeName)) {
@@ -23,7 +23,7 @@ module.exports = async function (localTemplatePath, extensionPath, { title, them
     path: `./server/themes/${themeName}Variables.json`,
   });
 
-  await saveExtensionJsonAsync(extJson);
+  await saveExtensionJson(extJson);
   await generateExtensionJs(extensionPath);
 
   return [

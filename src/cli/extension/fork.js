@@ -2,7 +2,7 @@ import { copy, pathExists } from 'fs-extra';
 import path from 'path';
 import {executeAndHandleError} from "../../extension/error-handler";
 import {configurePlatform, getPlatformConfig, getPlatformRootDir} from "../../extension/platform";
-import {loadExtensionJsonAsync} from "../../extension/data";
+import {loadExtensionJson} from "../../extension/data";
 import {getDeveloper} from "../../clients/extension-manager";
 import {installLocalExtension} from "../../commands/install";
 import {uploadExtension} from "../../commands/push";
@@ -24,7 +24,7 @@ export const handler = ({ canonicalName }) => executeAndHandleError(async () => 
     throw new Error(`Extension ${srcPath} does not exist`);
   }
 
-  const extName = (await loadExtensionJsonAsync(srcPath)).name;
+  const extName = (await loadExtensionJson(srcPath)).name;
   const devName = (await getDeveloper()).name;
 
   const destCanonicalName = `${devName}.${extName}`;

@@ -1,4 +1,4 @@
-import { ensureInExtensionDir, loadExtensionJsonAsync } from '../extension/data';
+import { ensureInExtensionDir, loadExtensionJson } from '../extension/data';
 import * as shortcut from '../extension/shortcut';
 import { ensureVariableName } from '../extension/cli-parsing';
 import msg from '../user_messages';
@@ -7,7 +7,7 @@ import { createShortcutForScreen } from './shortcut';
 
 export async function createScreen(screenName, shortcutName = null) {
   [screenName, shortcutName].map(ensureVariableName);
-  const extJson = await loadExtensionJsonAsync();
+  const extJson = await loadExtensionJson();
 
   const shortcutData = shortcutName ? await shortcut.promptShortcutInfo(shortcutName) : null;
 

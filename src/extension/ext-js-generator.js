@@ -1,4 +1,4 @@
-import { loadExtensionJsonAsync } from '../extension/data';
+import { loadExtensionJson } from '../extension/data';
 import { instantiateTemplatePath } from '../extension/template';
 
 /**
@@ -6,7 +6,7 @@ import { instantiateTemplatePath } from '../extension/template';
  * This file is used to export extension's themes and screens.
  */
 export async function generateExtensionJs(extensionPath) {
-  const extJson = await loadExtensionJsonAsync(extensionPath);
+  const extJson = await loadExtensionJson(extensionPath);
   const screensNamesList = (extJson.screens || [])
     .map(({ name }) => name);
 

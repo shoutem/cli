@@ -6,7 +6,7 @@ import { getExtensionCanonicalName } from '../clients/local-extensions';
 import msg from '../user_messages';
 
 export async function publishExtension(extDir) {
-  const extJson = await utils.loadExtensionJsonAsync(extDir);
+  const extJson = await utils.loadExtensionJson(extDir);
   console.log(msg.publish.publishInfo(extJson));
 
   const canonicalName = await getExtensionCanonicalName(extDir);

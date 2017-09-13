@@ -2,7 +2,6 @@ import fs from 'fs';
 import path from 'path';
 import mzfs from 'mz/fs';
 import * as analytics from './analytics';
-import Promise from 'bluebird';
 
 export function getExtensionCanonicalName(devName, extName, extVersion) {
   const canonicalName = `${devName}.${extName}-${extVersion}`;
@@ -67,7 +66,7 @@ export function ensureInExtensionDir() {
 }
 
 
-export function loadExtensionJson(callback) {
+export function loadExtensionJsonCallback(callback) {
   const root = ensureInExtensionDir();
 
   readJsonFile(path.join(root, 'extension.json'))
@@ -75,19 +74,21 @@ export function loadExtensionJson(callback) {
     .catch(err => callback(err));
 }
 
-export async function loadExtensionJsonAsync(rootPath = ensureInExtensionDir()) {
-  return await readJsonFile(path.join(rootPath, 'extension.json'));
-}
-
 /**
  * Persist extension.json file to extension root directory
  */
-export function saveExtensionJson(extJson, callback) {
+export function saveExtensionJsonCallback(extJson, callback) {
   const root = ensureInExtensionDir();
   fs.writeFile(path.join(root, 'extension.json'),
-               `${JSON.stringify(extJson, null, 2)}\n`,
-               'utf8',
-               err => callback(err, extJson));
+    `${JSON.stringify(extJson, null, 2)}\n`,
+    'utf8',
+    err => callback(err, extJson));
 }
 
-export const saveExtensionJsonAsync = Promise.promisify(saveExtensionJson);
+export async function loadExtensionJson(rootPath = ensureInExtensionDir()) {
+  return await readJsonFile(path.join(rootPath, 'extension.json'));
+}
+
+export async function saveExtensionJson(json, rootPath = ensureInExtensionDir()){
+  return await writeJsonFile(json, rootPath)
+}
