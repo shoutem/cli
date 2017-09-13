@@ -1,6 +1,6 @@
 import { spawn } from 'superspawn';
 import msg from '../user_messages';
-import commandExists from './/command-exists';
+import commandExists from './command-exists';
 import semver from 'semver';
 
 export async function ensureYarnInstalled(minVersion = '0.17.10') {

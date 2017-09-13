@@ -5,11 +5,12 @@ import Promise from 'bluebird';
 import tmp from 'tmp-promise';
 import targz from 'tar.gz';
 import { buildNodeProject } from './builder';
-import { readJsonFile, writeJsonFile } from './extension';
-import { startSpinner } from './/spinner';
+import { writeJsonFile } from './data';
+import { startSpinner } from './spinner';
 import move from 'glob-move';
 import { pathExists, copy } from 'fs-extra';
 import decompress from 'decompress';
+import {readJsonFile} from "./data";
 const mv = Promise.promisify(require('mv'));
 
 function hasPackageJson(dir) {

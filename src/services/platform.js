@@ -6,13 +6,14 @@ import * as appManager from '../clients/app-manager';
 import * as authService from '../clients/auth-service';
 import decompressUri from './decompress';
 import cliUrls from '../../config/services';
-import { writeJsonFile, readJsonFile } from './extension';
+import { writeJsonFile} from './data';
 import * as npm from './npm';
 import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
 import { pathExists, readJson, readFile, writeFile } from 'fs-extra';
-import commandExists from './/command-exists';
+import commandExists from './command-exists';
+import {readJsonFile} from "./data";
 
 async function isPlatformDirectory(dir) {
   const { name } = await readJsonFile(path.join(dir, 'package.json')) || {};

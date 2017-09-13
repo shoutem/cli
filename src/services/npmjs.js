@@ -1,6 +1,6 @@
 import request from 'request-promise-native';
 import semver from 'semver';
-import * as cache from './/cache';
+import * as cache from './cache';
 
 export async function getRepoData(npmUrl) {
   return await request({ uri: npmUrl, json: true });

@@ -1,4 +1,4 @@
-import { readJsonFile } from './extension';
+import { readJsonFile } from './data';
 import path from 'path';
 import * as yarn from './yarn'
 

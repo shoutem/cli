@@ -1,6 +1,6 @@
 import path from 'path';
 import mkdirp from 'mkdirp-promise'
-import { readJsonFile, writeJsonFile } from './/data';
+import { readJsonFile, writeJsonFile } from './data';
 import { getLocalStoragePath } from '../clients/cli-paths';
 
 async function getCacheFilePath(key) {

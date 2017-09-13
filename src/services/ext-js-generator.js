@@ -1,5 +1,5 @@
-import { loadExtensionJson } from './/data';
-import { instantiateTemplatePath } from './/template';
+import { loadExtensionJson } from './extension';
+import { instantiateTemplatePath } from './template';
 
 /**
  * Generate app/extension.js file within the extension.

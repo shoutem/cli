@@ -2,20 +2,20 @@ import fs from 'fs';
 import path from 'path';
 import mzfs from 'mz/fs';
 import * as extensionManager from '../clients/extension-manager';
-import { getHostEnvName } from '../clients/server-env';
-import { getExtensionCanonicalName } from '../clients/local-extensions';
-import { ensureInExtensionDir } from '../services/extension';
-import { ensureUserIsLoggedIn } from './login';
+import {getHostEnvName} from '../clients/server-env';
+import {getExtensionCanonicalName} from '../clients/local-extensions';
 import * as utils from '../services/extension';
+import {ensureUserIsLoggedIn} from './login';
 import shoutemPack from '../services/packer';
 import msg from '../user_messages';
 import _ from 'lodash';
-import { createProgressHandler } from '../services/progress-bar';
-import { startSpinner } from '../services/spinner';
+import {createProgressHandler} from '../services/progress-bar';
+import {startSpinner} from '../services/spinner';
 import extLint from '../services/extlint';
+import {readJsonFile, writeJsonFile} from "../services/data";
 
 async function setPackageNameVersion(path, name, version) {
-  const data = await utils.readJsonFile(path);
+  const data = await readJsonFile(path);
   if (data === null) {
     return null;
   }
@@ -23,7 +23,7 @@ async function setPackageNameVersion(path, name, version) {
   data.name = name;
   data.version = version;
 
-  await utils.writeJsonFile(data, path);
+  await writeJsonFile(data, path);
   return data;
 }
 
@@ -37,7 +37,7 @@ function setExtNameVersionInPackageJson(extName, version, root = utils.getExtens
   ]);
 }
 
-export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
+export async function uploadExtension(opts = {}, extensionDir = utils.ensureInExtensionDir()) {
   if (!opts.nocheck) {
     console.log('Checking the extension code for syntax errors...');
     try {
