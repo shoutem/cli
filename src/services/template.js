@@ -43,10 +43,13 @@ export async function instantiateTemplatePath(localTemplatePath, destinationPath
 
   await instantiateTemplatePathRec(localTemplatePath, destinationPath, context, opts);
 
-  const templateInitializationPath = path.join(templatesDirectory, localTemplatePath, 'template-initialization.js');
+  const templateInitializationPath = path.join(templatesDirectory, localTemplatePath, 'template-initialization');
+  let templateInit = () => {};
   try {
-    return await require(templateInitializationPath)(localTemplatePath, destinationPath, context);
+    templateInit = require(templateInitializationPath);
   } catch (error) {
-    throw error;
+    // ignored because template is allowed not to have an initialization file
   }
+
+  await templateInit(localTemplatePath, destinationPath, context);
 }

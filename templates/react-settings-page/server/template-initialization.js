@@ -1,8 +1,8 @@
-
 import {loadExtensionJson, saveExtensionJson} from "../../../src/services/extension";
 
 module.exports = async (templatePath, extensionPath, { pageClassName, shortcutName }) => {
   const extJson = await loadExtensionJson(extensionPath);
+
   extJson.pages = [
     ...(extJson.pages || []),
     {
@@ -11,5 +11,6 @@ module.exports = async (templatePath, extensionPath, { pageClassName, shortcutNa
       type: 'html'
     }
   ];
+
   await saveExtensionJson(extJson)
 };
