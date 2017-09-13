@@ -6,7 +6,7 @@ import { instantiateTemplatePath } from '../services/template';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import msg from '../user_messages';
 import { getPlatforms } from '../clients/extension-manager';
-import * as utils from '../services/data';
+import * as utils from '../services/extension';
 
 
 function generateNoPatchSemver(version) {

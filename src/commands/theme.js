@@ -2,7 +2,7 @@ import _ from 'lodash';
 import inquirer from 'inquirer';
 import request from 'request-promise';
 import { instantiateTemplatePath } from '../services/template';
-import { ensureInExtensionDir } from '../services/data';
+import { ensureInExtensionDir } from '../services/extension';
 
 const themeUrls = {
   theme: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/app/themes/Rubicon.js',

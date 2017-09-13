@@ -1,4 +1,4 @@
-import { ensureInExtensionDir } from '../services/data';
+import { ensureInExtensionDir } from '../services/extension';
 import { instantiateTemplatePath } from '../services/template';
 import * as yarn from '../services/yarn';
 

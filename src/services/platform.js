@@ -6,7 +6,7 @@ import * as appManager from '../clients/app-manager';
 import * as authService from '../clients/auth-service';
 import decompressUri from './decompress';
 import cliUrls from '../../config/services';
-import { writeJsonFile, readJsonFile } from './data';
+import { writeJsonFile, readJsonFile } from './extension';
 import * as npm from './npm';
 import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';

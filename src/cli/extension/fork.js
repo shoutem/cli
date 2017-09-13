@@ -2,7 +2,7 @@ import { copy, pathExists } from 'fs-extra';
 import path from 'path';
 import {executeAndHandleError} from "../../services/error-handler";
 import {configurePlatform, getPlatformConfig, getPlatformRootDir} from "../../services/platform";
-import {loadExtensionJson} from "../../services/data";
+import {loadExtensionJson} from "../../services/extension";
 import {getDeveloper} from "../../clients/extension-manager";
 import {installLocalExtension} from "../../commands/install";
 import {uploadExtension} from "../../commands/push";

@@ -9,7 +9,7 @@ import {
   loadExtensionJsonCallback,
   saveExtensionJsonCallback,
   ensureInExtensionDir,
-} from '../services/data';
+} from '../services/extension';
 import { load } from '../services/template';
 
 import msg from '../user_messages';

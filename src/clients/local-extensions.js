@@ -1,5 +1,5 @@
-import * as utils from '../services/data';
-import { ensureInExtensionDir } from '../services/data';
+import * as utils from '../services/extension';
+import { ensureInExtensionDir } from '../services/extension';
 import { ensureUserIsLoggedIn } from '../commands/login';
 
 export async function getExtensionCanonicalName(extensionRoot = ensureInExtensionDir()) {

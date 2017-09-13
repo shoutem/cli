@@ -5,7 +5,7 @@ import Promise from 'bluebird';
 import tmp from 'tmp-promise';
 import targz from 'tar.gz';
 import { buildNodeProject } from './builder';
-import { readJsonFile, writeJsonFile } from './data';
+import { readJsonFile, writeJsonFile } from './extension';
 import { startSpinner } from './/spinner';
 import move from 'glob-move';
 import { pathExists, copy } from 'fs-extra';

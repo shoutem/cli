@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import { loadExtensionJson, saveExtensionJson } from '../../src/services/data';
+import { loadExtensionJson, saveExtensionJson } from '../../src/services/extension';
 import { generateExtensionJs } from '../../src/services/ext-js-generator';
 
 module.exports = async function (localTemplatePath, extensionPath, { title, themeName, description }) {

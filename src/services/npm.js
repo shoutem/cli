@@ -2,7 +2,7 @@ import path from 'path';
 import Promise from 'bluebird';
 import { readJson } from 'fs-extra';
 import { spawn } from 'child-process-promise';
-import {writeJsonFile} from "./data";
+import {writeJsonFile} from "./extension";
 const linkLocal = Promise.promisify(require('linklocal'));
 
 export async function install(cwd = process.cwd()) {

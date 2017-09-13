@@ -1,6 +1,6 @@
-import { readJsonFile } from './data';
+import { readJsonFile } from './extension';
 import path from 'path';
-import * as yarn from './/yarn'
+import * as yarn from './yarn'
 
 export async function containsBuildTask(dir) {
   const pkgJson = await readJsonFile(path.join(dir, 'package.json'));

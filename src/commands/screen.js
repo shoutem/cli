@@ -1,4 +1,4 @@
-import { ensureInExtensionDir, loadExtensionJson } from '../services/data';
+import { ensureInExtensionDir, loadExtensionJson } from '../services/extension';
 import * as shortcut from '../services/shortcut';
 import { ensureVariableName } from '../services/cli-parsing';
 import msg from '../user_messages';
