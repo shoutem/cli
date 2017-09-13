@@ -36,12 +36,17 @@ export async function uploadExtension(canonicalName, tgzStream, progressHandler,
     contentType: 'application/gzip'
   });
 
-  const { id } = await jsonApi.put(uri, null, {
-    body: form,
-    headers: form.getHeaders()
-  });
+  try {
 
-  return id;
+    const {id} = await jsonApi.put(uri, null, {
+      body: form,
+      headers: form.getHeaders()
+    });
+
+    return id;
+  } catch (e) {
+    console.log(e);
+  }
 }
 
 export async function getExtensionId(canonicalName) {

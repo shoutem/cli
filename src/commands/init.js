@@ -45,7 +45,7 @@ export async function promptExtensionInit(extName) {
   return { name, ...answer, platform: generateNoPatchSemver(_.first(platformVersions)) };
 }
 
-export async function initExtension(extName) {
+export async function initExtension(extName, destDir = process.cwd()) {
   const developer = await ensureUserIsLoggedIn();
   const extJson = await promptExtensionInit(extName);
 
@@ -62,10 +62,12 @@ export async function initExtension(extName) {
     throw new Error(`Folder ${dirname} already exists. Rename the folder.`);
   }
 
-  await instantiateTemplatePath('init', process.cwd(), {
+  await instantiateTemplatePath('init', destDir, {
     devName: developer.name,
     extJson,
     extJsonString: JSON.stringify(extJson, null, 2),
     packageJsonString: JSON.stringify(packageJson, null, 2)
   });
+
+  return path.join(destDir, dirname);
 }

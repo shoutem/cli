@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -49,6 +49,7 @@
     "ip": "^1.1.5",
     "json-stringify-safe": "^5.0.1",
     "jsonapi-serializer": "^3.5.3",
+    "linklocal": "^2.8.1",
     "lodash": "4.11.2",
     "mkdirp": "^0.5.1",
     "mkdirp-promise": "^3.0.1",
@@ -56,6 +57,7 @@
     "mv": "^2.1.1",
     "mz": "^2.4.0",
     "ngrok": "2.2.17",
+    "opn": "^5.1.0",
     "prettyjson": "^1.2.1",
     "progress": "^2.0.0",
     "qrcode-terminal": "^0.11.0",
