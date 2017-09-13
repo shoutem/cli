@@ -1,8 +1,8 @@
-import mzfs from "mz/fs";
+import fs from "fs-extra";
 
 export async function readJsonFile(filePath) {
   try {
-    return JSON.parse(await mzfs.readFile(filePath, 'utf8'));
+    return JSON.parse(await fs.readFile(filePath, 'utf8'));
   } catch (err) {
     if (err.code === 'ENOENT') {
       return null;
@@ -14,6 +14,6 @@ export async function readJsonFile(filePath) {
 
 export async function writeJsonFile(json, filePath) {
   const str = `${JSON.stringify(json, null, 2)}\n`;
-  await mzfs.writeFile(filePath, str, 'utf8');
+  await fs.writeFile(filePath, str, 'utf8');
   return str;
 }

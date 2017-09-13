@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('mz/fs');
+const fs = require('fs-extra');
 const { generateExtensionJs } = require('../../src/services/ext-js-generator');
 
 module.exports = (localTemplatePath, destinationPath, { screenName }) => {

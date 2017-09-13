@@ -1,6 +1,5 @@
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
-import mzfs from 'mz/fs';
 import * as extensionManager from '../clients/extension-manager';
 import {getHostEnvName} from '../clients/server-env';
 import {getExtensionCanonicalName} from '../clients/local-extensions';
@@ -52,7 +51,7 @@ export async function uploadExtension(opts = {}, extensionDir = utils.ensureInEx
   await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version, extensionDir);
   const packResult = await shoutemPack(extensionDir, { packToTempDir: true, nobuild: opts.nobuild });
 
-  const { size } = await mzfs.stat(packResult.package);
+  const { size } = await fs.stat(packResult.package);
   const stream = fs.createReadStream(packResult.package);
 
   const id = await getExtensionCanonicalName(extensionDir);
@@ -70,7 +69,7 @@ export async function uploadExtension(opts = {}, extensionDir = utils.ensureInEx
     spinner.stop(true);
   }
 
-  await mzfs.unlink(packResult.package);
+  await fs.unlink(packResult.package);
 
   const notPacked = _.difference(packResult.allDirs, packResult.packedDirs);
   if (notPacked.length > 0) {

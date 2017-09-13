@@ -1,5 +1,5 @@
 const path = require('path');
-const fs = require('mz/fs');
+const fs = require('fs-extra');
 
 module.exports = (templatePath, extensionPath, templateVars) => {
   const extPath = path.join(extensionPath, 'extension.json');

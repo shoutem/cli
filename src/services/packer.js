@@ -1,5 +1,5 @@
-import { exec } from 'mz/child_process';
-import fs from 'mz/fs';
+import { exec } from 'child-process-promise';
+import fs from 'fs-extra';
 import path from 'path';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';

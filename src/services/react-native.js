@@ -1,7 +1,6 @@
 import Promise from 'bluebird';
 import { spawn } from 'child-process-promise';
 import msg from '../user_messages';
-import { exec, fork } from 'mz/child_process';
 import commandExists from './command-exists';
 import streamMatcher from './stream-matcher';
 
