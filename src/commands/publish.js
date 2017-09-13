@@ -1,7 +1,7 @@
 import * as extensionManager from '../clients/extension-manager';
-import * as utils from '../extension/data';
+import * as utils from '../services/data';
 import { uploadExtension } from '../commands/push';
-import { ensureInExtensionDir } from '../extension/data';
+import { ensureInExtensionDir } from '../services/data';
 import { getExtensionCanonicalName } from '../clients/local-extensions';
 import msg from '../user_messages';
 

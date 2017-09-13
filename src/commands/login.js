@@ -3,8 +3,8 @@ import { authorizeRequests, getRefreshToken } from '../clients/auth-service';
 import { getDeveloper, createDeveloper } from '../clients/extension-manager';
 import msg from '../user_messages';
 import urls from '../../config/services';
-import * as logger from '../extension/logger';
-import * as cache from '../extension/cache-env';
+import * as logger from '../services/logger';
+import * as cache from '../services/cache-env';
 
 function promptUserCredentials() {
   console.log(msg.login.credentialsPrompt(urls.appBuilder));

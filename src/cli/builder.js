@@ -1,7 +1,7 @@
 import opn from 'opn';
 import services from '../../config/services';
-import {getPlatformConfig} from "../extension/platform";
-import {executeAndHandleError} from "../extension/error-handler";
+import {getPlatformConfig} from "../services/platform";
+import {executeAndHandleError} from "../services/error-handler";
 
 export const description = 'Opens the app in the shoutem builder dashboard using default browser';
 export const command = 'builder [appId]';

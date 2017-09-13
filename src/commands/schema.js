@@ -9,8 +9,8 @@ import {
   loadExtensionJsonCallback,
   saveExtensionJsonCallback,
   ensureInExtensionDir,
-} from '../extension/data';
-import { load } from '../extension/template';
+} from '../services/data';
+import { load } from '../services/template';
 
 import msg from '../user_messages';
 

@@ -1,4 +1,4 @@
-import { handleError } from '../../extension/error-handler';
+import { handleError } from '../../services/error-handler';
 import { createScreen } from '../../commands/screen';
 
 export const description = 'Add a screen for applications running this extension';

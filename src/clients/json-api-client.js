@@ -1,5 +1,5 @@
 import { Deserializer } from 'jsonapi-serializer';
-import * as logger from '../extension/logger';
+import * as logger from '../services/logger';
 
 const deserializer = new Deserializer({
   keyForAttribute: 'camelCase'

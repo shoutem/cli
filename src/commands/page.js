@@ -1,6 +1,6 @@
-import { ensureInExtensionDir } from '../extension/data';
-import { instantiateTemplatePath } from '../extension/template';
-import * as yarn from '../extension/yarn';
+import { ensureInExtensionDir } from '../services/data';
+import { instantiateTemplatePath } from '../services/template';
+import * as yarn from '../services/yarn';
 
 export async function createPage(pageName) {
   await yarn.ensureYarnInstalled();

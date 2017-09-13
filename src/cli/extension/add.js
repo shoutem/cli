@@ -2,8 +2,8 @@ import path from 'path';
 import {
   addToExtensionsJs, configurePlatform, getPlatformConfig, getPlatformRootDir,
   linkLocalExtension
-} from "../../extension/platform";
-import {executeAndHandleError} from "../../extension/error-handler";
+} from "../../services/platform";
+import {executeAndHandleError} from "../../services/error-handler";
 import {initExtension} from "../../commands/init";
 import {publishExtension} from "../../commands/publish";
 import {uploadExtension} from "../../commands/push";

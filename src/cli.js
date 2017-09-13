@@ -8,8 +8,8 @@ import yargs from 'yargs';
 import { version } from '../package.json';
 import apiUrls from '../config/services';
 import autoUpdate from './commands/update-cli';
-import * as analytics from './extension/analytics';
-import { isAscii, containsSpace } from './extension/validation';
+import * as analytics from './services/analytics';
+import { isAscii, containsSpace } from './services/validation';
 import getHomeDir from './home-dir';
 import { authorizeRequests, getRefreshToken } from './clients/auth-service';
 

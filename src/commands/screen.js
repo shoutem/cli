@@ -1,8 +1,8 @@
-import { ensureInExtensionDir, loadExtensionJson } from '../extension/data';
-import * as shortcut from '../extension/shortcut';
-import { ensureVariableName } from '../extension/cli-parsing';
+import { ensureInExtensionDir, loadExtensionJson } from '../services/data';
+import * as shortcut from '../services/shortcut';
+import { ensureVariableName } from '../services/cli-parsing';
 import msg from '../user_messages';
-import { instantiateTemplatePath } from '../extension/template';
+import { instantiateTemplatePath } from '../services/template';
 import { createShortcutForScreen } from './shortcut';
 
 export async function createScreen(screenName, shortcutName = null) {

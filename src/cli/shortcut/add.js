@@ -1,7 +1,7 @@
 import msg from '../../user_messages';
 import { createShortcut } from '../../commands/shortcut';
-import { handleError } from '../../extension/error-handler';
-import { ensureVariableName } from '../../extension/cli-parsing';
+import { handleError } from '../../services/error-handler';
+import { ensureVariableName } from '../../services/cli-parsing';
 
 export const description = 'Add an application shortcut';
 export const command = 'add <name>';

@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import inquirer from 'inquirer';
 import request from 'request-promise';
-import { instantiateTemplatePath } from '../extension/template';
-import { ensureInExtensionDir } from '../extension/data';
+import { instantiateTemplatePath } from '../services/template';
+import { ensureInExtensionDir } from '../services/data';
 
 const themeUrls = {
   theme: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/app/themes/Rubicon.js',

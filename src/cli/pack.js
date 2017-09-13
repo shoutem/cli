@@ -1,6 +1,6 @@
-import shoutemPack from '../extension/packer';
-import { ensureInExtensionDir } from '../extension/data';
-import { handleError } from '../extension/error-handler';
+import shoutemPack from '../services/packer';
+import { ensureInExtensionDir } from '../services/data';
+import { handleError } from '../services/error-handler';
 
 export const description = 'Pack shoutem extensions for upload';
 export const command = 'pack';

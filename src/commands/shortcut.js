@@ -1,5 +1,5 @@
-import * as shortcut from '../extension/shortcut';
-import { loadExtensionJson, saveExtensionJson } from '../extension/data';
+import * as shortcut from '../services/shortcut';
+import { loadExtensionJson, saveExtensionJson } from '../services/data';
 import msg from '../user_messages';
 
 export async function createShortcut(shortcutName) {

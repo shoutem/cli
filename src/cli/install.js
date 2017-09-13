@@ -6,7 +6,7 @@ import {
 } from '../commands/install';
 import msg from '../user_messages';
 import { ensureUserIsLoggedIn } from '../commands/login';
-import { handleError } from '../extension/error-handler';
+import { handleError } from '../services/error-handler';
 
 export const description = 'Install the current extension to an application.';
 

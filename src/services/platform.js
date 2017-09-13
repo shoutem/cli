@@ -12,7 +12,7 @@ import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
 import { pathExists, readJson, readFile, writeFile } from 'fs-extra';
-import commandExists from '../extension/command-exists';
+import commandExists from './/command-exists';
 
 async function isPlatformDirectory(dir) {
   const { name } = await readJsonFile(path.join(dir, 'package.json')) || {};

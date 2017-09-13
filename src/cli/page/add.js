@@ -1,7 +1,7 @@
 import { createPage } from '../../commands/page';
 import msg from '../../user_messages';
-import { ensureVariableName } from '../../extension/cli-parsing';
-import { handleError } from '../../extension/error-handler';
+import { ensureVariableName } from '../../services/cli-parsing';
+import { handleError } from '../../services/error-handler';
 
 export const description = 'Add page to current extension';
 export const command = 'add <name>';

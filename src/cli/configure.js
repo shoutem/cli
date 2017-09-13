@@ -1,5 +1,5 @@
-import { executeAndHandleError } from '../extension/error-handler';
-import {configurePlatform, getPlatformConfig, getPlatformRootDir, setPlatformConfig} from '../extension/platform';
+import { executeAndHandleError } from '../services/error-handler';
+import {configurePlatform, getPlatformConfig, getPlatformRootDir, setPlatformConfig} from '../services/platform';
 
 export const description = 'Runs platform\'s configure script to sync with native changes to local extensions';
 export const command = 'configure';

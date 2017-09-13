@@ -4,15 +4,15 @@ import mzfs from 'mz/fs';
 import * as extensionManager from '../clients/extension-manager';
 import { getHostEnvName } from '../clients/server-env';
 import { getExtensionCanonicalName } from '../clients/local-extensions';
-import { ensureInExtensionDir } from '../extension/data';
+import { ensureInExtensionDir } from '../services/data';
 import { ensureUserIsLoggedIn } from './login';
-import * as utils from '../extension/data';
-import shoutemPack from '../extension/packer';
+import * as utils from '../services/data';
+import shoutemPack from '../services/packer';
 import msg from '../user_messages';
 import _ from 'lodash';
-import { createProgressHandler } from '../extension/progress-bar';
-import { startSpinner } from '../extension/spinner';
-import extLint from '../extension/extlint';
+import { createProgressHandler } from '../services/progress-bar';
+import { startSpinner } from '../services/spinner';
+import extLint from '../services/extlint';
 
 async function setPackageNameVersion(path, name, version) {
   const data = await utils.readJsonFile(path);

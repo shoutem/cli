@@ -1,8 +1,8 @@
 import { copy, pathExists } from 'fs-extra';
 import path from 'path';
-import {executeAndHandleError} from "../../extension/error-handler";
-import {configurePlatform, getPlatformConfig, getPlatformRootDir} from "../../extension/platform";
-import {loadExtensionJson} from "../../extension/data";
+import {executeAndHandleError} from "../../services/error-handler";
+import {configurePlatform, getPlatformConfig, getPlatformRootDir} from "../../services/platform";
+import {loadExtensionJson} from "../../services/data";
 import {getDeveloper} from "../../clients/extension-manager";
 import {installLocalExtension} from "../../commands/install";
 import {uploadExtension} from "../../commands/push";

@@ -1,5 +1,5 @@
 
-import {loadExtensionJson, saveExtensionJson} from "../../../src/extension/data";
+import {loadExtensionJson, saveExtensionJson} from "../../../src/services/data";
 
 module.exports = async (templatePath, extensionPath, { pageClassName, shortcutName }) => {
   const extJson = await loadExtensionJson(extensionPath);

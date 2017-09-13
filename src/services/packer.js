@@ -6,7 +6,7 @@ import tmp from 'tmp-promise';
 import targz from 'tar.gz';
 import { buildNodeProject } from './builder';
 import { readJsonFile, writeJsonFile } from './data';
-import { startSpinner } from '../extension/spinner';
+import { startSpinner } from './/spinner';
 import move from 'glob-move';
 import { pathExists, copy } from 'fs-extra';
 import decompress from 'decompress';

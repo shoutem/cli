@@ -1,5 +1,5 @@
 import { loginUser } from '../commands/login';
-import { executeAndHandleError } from '../extension/error-handler';
+import { executeAndHandleError } from '../services/error-handler';
 
 export const description = 'Log in and register as a Shoutem developer.';
 export const command = 'login';

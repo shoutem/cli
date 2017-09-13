@@ -1,6 +1,6 @@
 import _ from 'lodash';
-import { loadExtensionJson, saveExtensionJson } from '../../src/extension/data';
-import { generateExtensionJs } from '../../src/extension/ext-js-generator';
+import { loadExtensionJson, saveExtensionJson } from '../../src/services/data';
+import { generateExtensionJs } from '../../src/services/ext-js-generator';
 
 module.exports = async function (localTemplatePath, extensionPath, { title, themeName, description }) {
   const extJson = await loadExtensionJson(extensionPath) || {};

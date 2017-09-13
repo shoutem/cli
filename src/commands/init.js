@@ -2,11 +2,11 @@ import _ from 'lodash';
 import inquirer from 'inquirer';
 import { pathExists } from 'fs-extra';
 import path from 'path';
-import { instantiateTemplatePath } from '../extension/template';
+import { instantiateTemplatePath } from '../services/template';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import msg from '../user_messages';
 import { getPlatforms } from '../clients/extension-manager';
-import * as utils from '../extension/data';
+import * as utils from '../services/data';
 
 
 function generateNoPatchSemver(version) {

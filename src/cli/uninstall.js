@@ -2,7 +2,7 @@ import { uninstallExtension, getExtInstallations } from '../clients/app-manager'
 import * as localExtensions from '../clients/local-extensions';
 import { getExtensionId } from '../clients/extension-manager';
 import msg from '../user_messages';
-import { handleError } from '../extension/error-handler';
+import { handleError } from '../services/error-handler';
 
 export const description = `Uninstall current extension from an app.`;
 export const command = 'uninstall';

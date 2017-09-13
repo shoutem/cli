@@ -7,18 +7,18 @@ import semver from 'semver';
 import inquirer from 'inquirer';
 import { getExtension } from '../clients/extension-manager';
 import * as appManager from '../clients/app-manager';
-import { shoutemUnpack } from '../extension/packer';
+import { shoutemUnpack } from '../services/packer';
 import { getApp } from '../clients/legacy-service';
 import { pathExists, copy } from 'fs-extra';
-import selectApp from '../extension/app-selector';
+import selectApp from '../services/app-selector';
 import {
   downloadApp, fixPlatform, configurePlatform, createPlatformConfig,
   setPlatformConfig
-} from '../extension/platform';
+} from '../services/platform';
 import { ensureUserIsLoggedIn } from './login';
-import { createProgressHandler } from '../extension/progress-bar';
-import { spinify } from '../extension/spinner';
-import commandExists from '../extension/command-exists';
+import { createProgressHandler } from '../services/progress-bar';
+import { spinify } from '../services/spinner';
+import commandExists from '../services/command-exists';
 import 'colors';
 
 const downloadFile = Promise.promisify(require('download-file'));
