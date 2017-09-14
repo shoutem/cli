@@ -19,25 +19,48 @@ export const builder = {
   scope: {
     alias: 's',
     description: 'Where should the page be inserted (shortcut, extension).',
+    requiresArg: true,
+  },
+  shortcut: {
+    description: 'Name of the shortcut if settings page is to be connected with shortcut',
+    requiresArg: true,
+  },
+  title: {
+    description: 'Title of the settings page being created. Defaults to page name',
+    requiresArg: true,
   }
 };
 export const handler = args => executeAndHandleError(() => createPage(args));
 
-export async function createPage({ name: pageName, type }, extensionDir = ensureInExtensionDir()) {
+export async function createPage({ name: pageName, type, shortcut: shortcutName, scope, title }, extensionDir = ensureInExtensionDir()) {
   ensureVariableName(pageName);
   await yarn.ensureYarnInstalled();
 
   const pageDirectoryName = decamelize(pageName, '-');
   const pageClassName = pascalize(pageName);
+  title = title || decamelize(pageName, ' ');
+
+  if (shortcutName && !scope) {
+    scope = 'shortcut';
+  }
+
+  const templateVars = {
+    pageDirectoryName,
+    pageClassName,
+    pageName: pageClassName,
+    pageTitle: title,
+    scope,
+    shortcutName
+  };
 
   if (type === 'html') {
-    const { path } = await instantiateTemplatePath('html-settings-page', extensionDir, { pageName });
-    msg.page.add.complete({ path, pageName });
+    const { path } = await instantiateTemplatePath('html-settings-page', extensionDir, templateVars);
+    console.log(msg.page.add.complete({ path, pageName }));
   }
 
   if (type === 'react') {
+    await instantiateTemplatePath('react-settings-page', extensionDir, templateVars);
     await instantiateTemplatePath('react-settings-bin', extensionDir, {}, { overwrite: () => true });
-    await instantiateTemplatePath('react-settings-page', extensionDir, { pageDirectoryName, pageClassName });
     console.log(`React settings page added to pages/${pageDirectoryName}`);
   }
 

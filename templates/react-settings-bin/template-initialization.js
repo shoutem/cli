@@ -52,7 +52,7 @@ const pkgJsonTemplate = {
   }
 };
 
-module.exports = async (templatePath, extensionPath) => {
+export async function after(templatePath, extensionPath) {
   const serverPath = path.join(extensionPath, 'server');
 
   const originalJson = await getPackageJson(serverPath);
@@ -64,4 +64,4 @@ module.exports = async (templatePath, extensionPath) => {
 
   await savePackageJson(serverPath, updatedJson);
   await install(serverPath);
-};
+}

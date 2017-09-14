@@ -38,18 +38,23 @@ async function instantiateTemplatePathRec(localTemplatePath, destinationPath, co
   }
 }
 
+function importName(modulePath, name, defaultValue) {
+  try {
+    return require(modulePath)[name] || defaultValue;
+  } catch (err) {
+    return defaultValue;
+  }
+}
+
 export async function instantiateTemplatePath(localTemplatePath, destinationPath, context, opts = {}) {
   opts.overwrite = opts.overwrite || (() => false);
 
+  const initPath = path.join(templatesDirectory, localTemplatePath, 'template-initialization');
+
+  const before = importName(initPath, 'before', () => ({}));
+  const after = importName(initPath, 'after');
+
+  const expandedContext = await before(localTemplatePath, destinationPath, context) || {};
   await instantiateTemplatePathRec(localTemplatePath, destinationPath, context, opts);
-
-  const templateInitializationPath = path.join(templatesDirectory, localTemplatePath, 'template-initialization');
-  let templateInit = () => {};
-  try {
-    templateInit = require(templateInitializationPath);
-  } catch (error) {
-    // ignored because template is allowed not to have an initialization file
-  }
-
-  await templateInit(localTemplatePath, destinationPath, context);
+  return await after(localTemplatePath, destinationPath, { ...context, ...expandedContext });
 }

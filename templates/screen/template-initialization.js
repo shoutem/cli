@@ -2,7 +2,7 @@ const path = require('path');
 const fs = require('fs-extra');
 const { generateExtensionJs } = require('../../src/services/ext-js-generator');
 
-module.exports = (localTemplatePath, destinationPath, { screenName }) => {
+export function after(localTemplatePath, destinationPath, { screenName }) {
   const extPath = path.join(destinationPath, 'extension.json');
 
   return fs.readFile(extPath)
@@ -14,4 +14,4 @@ module.exports = (localTemplatePath, destinationPath, { screenName }) => {
     })
     .then(() => generateExtensionJs(destinationPath))
     .then(() => ({ path: `app/screens/${screenName}.js`}));
-};
+}

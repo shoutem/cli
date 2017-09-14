@@ -72,5 +72,5 @@ export async function loadExtensionJson(rootPath = ensureInExtensionDir()) {
 }
 
 export async function saveExtensionJson(json, rootPath = ensureInExtensionDir()){
-  return await writeJsonFile(json, rootPath)
+  return await writeJsonFile(json, path.join(rootPath, 'extension.json'));
 }

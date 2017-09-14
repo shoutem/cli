@@ -1,21 +1,24 @@
 // This file is managed by Shoutem CLI
 // You should not change it
-import pack from './package.json';
 
+{{#screensImports}}
 // screens imports
 {{{screensImports}}}
+{{{/screenImports}}}
 
+{{#themesImports}}
 // themes imports
 {{{themesImports}}}
+{{/themesImports}}
 
+{{#screensNames}}
 export const screens = {
 {{screensNames}}
 };
+{{/screensNames}}
 
+{{#themesNames}}
 export const themes = {
 {{themesNames}}
 };
-
-export function ext(resourceName) {
-  return resourceName ? `${pack.name}.${resourceName}` : pack.name;
-}
+{{/themesNames}}

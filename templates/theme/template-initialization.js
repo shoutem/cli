@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { loadExtensionJson, saveExtensionJson } from '../../src/services/extension';
 import { generateExtensionJs } from '../../src/services/ext-js-generator';
 
-module.exports = async function (localTemplatePath, extensionPath, { title, themeName, description }) {
+export async function after(localTemplatePath, extensionPath, { title, themeName, description }) {
   const extJson = await loadExtensionJson(extensionPath) || {};
 
   const themes = extJson.themes = extJson.themes || [];
@@ -30,4 +30,4 @@ module.exports = async function (localTemplatePath, extensionPath, { title, them
     `app/themes/${themeName}.js`,
     `server/themes/${themeName}Variables.js`
   ];
-};
+}
