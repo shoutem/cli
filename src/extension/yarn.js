@@ -3,15 +3,9 @@ import msg from '../user_messages';
 import commandExists from '../extension/command-exists';
 import semver from 'semver';
 
-export async function ensureYarnInstalled(minVersion = '0.17.10') {
+export async function ensureYarnInstalled() {
   if (!await commandExists('yarn')) {
     throw new Error(msg.yarn.missing());
-  }
-
-  const version = await spawn('yarn', ['-V']);
-
-  if (semver.gt(minVersion, version)) {
-    throw new Error(msg.yarn.outdated(minVersion));
   }
 }
 
