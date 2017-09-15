@@ -7,6 +7,14 @@ function isHtmlPage({ type, path }) {
 
 export async function before(templatePath, extensionPath, { pageName }) {
   const extJson = await loadExtensionJson(extensionPath);
+
+  if (!_.every(extJson.pages, isHtmlPage)) {
+    throw new Error("Html pages can't be mixed with non-html settings pages");
+  }
+
+  if (_.find(extJson.pages, { name: pageName })) {
+    throw new Error(`Page ${pageName} already exists`);
+  }
 }
 
 export async function after(templatePath, extensionPath, { pageName, pageTitle, shortcutName, scope }) {

@@ -52,7 +52,7 @@ export async function instantiateTemplatePath(localTemplatePath, destinationPath
   const initPath = path.join(templatesDirectory, localTemplatePath, 'template-initialization');
 
   const before = importName(initPath, 'before', () => ({}));
-  const after = importName(initPath, 'after');
+  const after = importName(initPath, 'after', () => {});
 
   const expandedContext = await before(localTemplatePath, destinationPath, context) || {};
   await instantiateTemplatePathRec(localTemplatePath, destinationPath, context, opts);

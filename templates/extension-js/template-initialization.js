@@ -9,15 +9,11 @@ function indentedNamesList(names) {
   return names.map(name => `  ${name}`).join(',\n');
 }
 
-function classFromPagePath(pagePath) {
-  return pagePath.split('?page=').pop();
-}
-
 /**
  * Generate app/extension.js file within the extension.
  * This file is used to export extension's themes and screens.
  */
-export async function before(templatePath, extensionPath, templateVars) {
+export async function before(templatePath, extensionPath) {
   const extJson = await loadExtensionJson(extensionPath);
 
   const screensNamesList = _.map(extJson.screens, 'name');
@@ -28,12 +24,11 @@ export async function before(templatePath, extensionPath, templateVars) {
   const themesImports = importStatements(themesNamesList, './themes');
   const themesNames = indentedNamesList(themesNamesList);
 
-  const pagesNamesList = _.map(extJson.pages, 'paths').map(classFromPagePath);
+  const pagesNamesList = _.map(extJson.pages, 'name');
   const pagesImports = importStatements(pagesNamesList, './pages/');
   const pagesNames = indentedNamesList(pagesNamesList);
 
   return {
-    ...templateVars,
     screensImports,
     screensNames,
     themesImports,

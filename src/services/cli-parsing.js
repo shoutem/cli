@@ -7,6 +7,11 @@ export function validateArgumentCount(args, maxAllowed) {
 }
 
 const varNameRegex = /^[a-zA-Z]\w*$/;
+
+export function isVariableName(str) {
+  return varNameRegex.test(str);
+}
+
 export function ensureVariableName(str) {
   if (!varNameRegex.test(str)){
     throw new Error(`${str} is not a valid name`);
