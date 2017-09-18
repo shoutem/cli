@@ -52,6 +52,7 @@
     "jsonapi-serializer": "^3.5.3",
     "linklocal": "^2.8.1",
     "lodash": "4.11.2",
+    "lodash-get-or-set": "^1.0.2",
     "mkdirp": "^0.5.1",
     "mkdirp-promise": "^3.0.1",
     "mustache": "2.2.1",

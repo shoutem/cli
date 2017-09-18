@@ -49,6 +49,14 @@ const pkgJsonTemplate = {
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0",
     "urijs": "^1.18.9"
+  },
+  "babel": {
+    "presets": [
+      ["es2015", { "modules": false }],
+      "react",
+      "stage-0"
+    ],
+    "plugins": ["transform-runtime"]
   }
 };
 

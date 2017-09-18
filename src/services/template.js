@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import fs from 'fs-extra';
 import path from 'path';
 import Mustache from 'mustache';
@@ -54,7 +55,7 @@ export async function instantiateTemplatePath(localTemplatePath, destinationPath
   const before = importName(initPath, 'before', () => ({}));
   const after = importName(initPath, 'after', () => {});
 
-  const expandedContext = await before(localTemplatePath, destinationPath, context) || {};
+  _.merge(context, await before(localTemplatePath, destinationPath, context));
   await instantiateTemplatePathRec(localTemplatePath, destinationPath, context, opts);
-  return await after(localTemplatePath, destinationPath, { ...context, ...expandedContext });
+  return await after(localTemplatePath, destinationPath, context);
 }

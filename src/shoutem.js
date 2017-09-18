@@ -29,4 +29,4 @@ require('babel-register')({
   only: ['config', 'src', 'templates']
 });
 
-require('./cli.js');
+require('./cli');

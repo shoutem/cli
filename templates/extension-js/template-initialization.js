@@ -25,7 +25,7 @@ export async function before(templatePath, extensionPath) {
   const themesNames = indentedNamesList(themesNamesList);
 
   const pagesNamesList = _.map(extJson.pages, 'name');
-  const pagesImports = importStatements(pagesNamesList, './pages/');
+  const pagesImports = importStatements(pagesNamesList, './pages');
   const pagesNames = indentedNamesList(pagesNamesList);
 
   return {

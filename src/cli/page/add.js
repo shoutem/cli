@@ -16,8 +16,7 @@ export const builder = {
   type: {
     alias: 't',
     requiresArg: true,
-    description: 'Type of settings page to create (react, html, blank).',
-    default: 'react'
+    description: 'Type of settings page to create (react, html, blank).'
   },
   scope: {
     alias: 's',
@@ -35,23 +34,25 @@ export const builder = {
 };
 
 const createQuestions = (args, shortcutNames) => [{
+  type: 'list',
+  name: 'type',
+  choices: ['react', 'html', 'blank'],
+  default: 'react',
+  message: 'Page type',
+  when: () => !args.type
+}, {
   type: 'input',
   name: 'name',
   message: 'Page name',
   validate: name => isVariableName(name) || 'Page name must be a valid js variable name',
-  when: () => !args.name
+  when: () => !args.name,
+  default: 'MyPage'
 }, {
   type: 'input',
   name: 'title',
   default: answers => decamelize(answers.name || args.name, ' '),
   message: 'Page title',
   when: () => !args.title
-}, {
-  type: 'list',
-  name: 'type',
-  choices: ['react', 'html', 'blank'],
-  default: 'react',
-  when: () => !args.type
 }, {
   type: 'list',
   name: 'scope',
@@ -67,13 +68,12 @@ const createQuestions = (args, shortcutNames) => [{
 }];
 
 export const handler = args => executeAndHandleError(async () => {
-  const pagesNames = _.map((await loadExtensionJson()).shortcuts, 'name');
-  await createPage({ ...args, ...await inq.prompt(createQuestions(args, pagesNames)) });
+  const shortcutNames = _.map((await loadExtensionJson()).shortcuts, 'name');
+  await createPage({ ...args, ...await inq.prompt(createQuestions(args, shortcutNames)) });
 });
 
 export async function createPage({ name: pageName, type, shortcut: shortcutName, scope, title }, extensionDir = ensureInExtensionDir()) {
   ensureVariableName(pageName);
-  await yarn.ensureYarnInstalled();
 
   const pageDirectoryName = decamelize(pageName, '-');
   const pageClassName = pascalize(pageName);
@@ -98,12 +98,14 @@ export async function createPage({ name: pageName, type, shortcut: shortcutName,
 
   if (type === 'react') {
     await instantiateTemplatePath('react-settings-page', extensionDir, templateVars);
-    await generateExtensionJs(extensionDir);
     await instantiateTemplatePath('react-settings-bin', extensionDir, {}, { overwrite: () => true });
     console.log(`React settings page added to pages/${pageDirectoryName}`);
   }
 
   if (type === 'blank') {
-    console.log('Added empty page');
+    await instantiateTemplatePath('blank-settings-page', extensionDir, templateVars);
+    console.log(`Blank settings page added to pages/${pageDirectoryName}`);
   }
+
+  await generateExtensionJs(extensionDir);
 }

@@ -4,7 +4,7 @@ import path from 'path';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';
 import targz from 'tar.gz';
-import { buildNodeProject } from './builder';
+import { buildNodeProject } from './node';
 import { writeJsonFile } from './data';
 import { startSpinner } from './spinner';
 import move from 'glob-move';

@@ -1,15 +1,36 @@
-import { spawn } from 'superspawn';
-import msg from '../user_messages';
-import semver from 'semver';
+import _ from 'lodash';
+import * as npm from "./npm";
 
-export async function ensureNodeVersion(minVersion = '7.2.0') {
-  let version = await spawn('node', ['-v']);
-  if (version.charAt(0) === 'v') {
-    version = version.slice(1);
+export async function containsBuildTask(dir) {
+  try {
+    const pkgJson = await npm.getPackageJson(dir);
+    return !!_.get(pkgJson, 'scripts.build');
+  } catch (err) {
+    return false;
+  }
+}
+
+export class BuildError {
+  /*
+   Used when bad username or password is supplied.
+   */
+  constructor(message) {
+    this.message = message;
+  }
+}
+
+export async function buildNodeProject(dir) {
+  if (!await containsBuildTask(dir)) {
+    return false;
   }
 
-  if (semver.gt(minVersion, version)) {
-    throw new Error(msg.node.outdated(minVersion));
+  try {
+    await npm.install(dir);
+    await npm.run(dir, 'build');
+  } catch (err) {
+    throw new BuildError(`${err.message || err}\nBuild failed for ${dir} directory.`);
   }
+
+  return true;
 }
 
