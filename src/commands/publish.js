@@ -1,12 +1,12 @@
 import * as extensionManager from '../clients/extension-manager';
-import * as utils from '../extension/data';
+import * as utils from '../services/extension';
 import { uploadExtension } from '../commands/push';
-import { ensureInExtensionDir } from '../extension/data';
+import { ensureInExtensionDir } from '../services/extension';
 import { getExtensionCanonicalName } from '../clients/local-extensions';
 import msg from '../user_messages';
 
 export async function publishExtension(extDir) {
-  const extJson = await utils.loadExtensionJsonAsync(extDir);
+  const extJson = await utils.loadExtensionJson(extDir);
   console.log(msg.publish.publishInfo(extJson));
 
   const canonicalName = await getExtensionCanonicalName(extDir);

@@ -1,5 +1,5 @@
 import show from '../commands/show.js';
-import { executeAndHandleError } from '../extension/error-handler';
+import { executeAndHandleError } from '../services/error-handler';
 
 export const command = 'show';
 export const description = 'Shows user status and list of linked extensions';

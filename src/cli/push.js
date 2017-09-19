@@ -1,8 +1,8 @@
 import { pushAll } from '../commands/push-all';
 import { uploadExtension } from '../commands/push';
 import msg from '../user_messages';
-import { handleError } from '../extension/error-handler';
-import multiglob from '../extension/multiglob';
+import { handleError } from '../services/error-handler';
+import multiglob from '../services/multiglob';
 import confirmPush from '../commands/confirm-admin-action';
 
 export const description = 'Upload local extension code and assets.';

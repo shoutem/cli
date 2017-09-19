@@ -1,8 +1,8 @@
 import msg from '../user_messages';
 import { publishExtension, pushAndPublish } from '../commands/publish';
 import { pushAll } from '../commands/push-all';
-import { handleError } from '../extension/error-handler';
-import multiglob from '../extension/multiglob';
+import { handleError } from '../services/error-handler';
+import multiglob from '../services/multiglob';
 import confirmPublish from '../commands/confirm-admin-action';
 
 export const description = 'Publish current extension version.';

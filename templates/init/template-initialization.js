@@ -1,9 +1,9 @@
 const path = require('path');
-const install = require('../../src/extension/npm').install;
-const generateExtensionJs = require('../../src/extension/ext-js-generator').generateExtensionJs;
+const install = require('../../src/services/npm').install;
+const generateExtensionJs = require('../../src/services/ext-js-generator').generateExtensionJs;
 require('colors');
 
-module.exports = (_, extPath, { devName, extJson }) => {
+export function after(_, extPath, { devName, extJson }) {
   extPath = path.join(extPath, `${devName}.${extJson.name}`);
 
   return generateExtensionJs(extPath)
@@ -17,4 +17,4 @@ module.exports = (_, extPath, { devName, extJson }) => {
       return install(path.join(extPath, 'app'));
     })
     .then(() => console.log('Packages installed.'));
-};
+}

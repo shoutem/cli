@@ -1,7 +1,7 @@
 import msg from '../../user_messages';
 import { createTheme } from '../../commands/theme';
-import { handleError } from '../../extension/error-handler';
-import { ensureVariableName } from '../../extension/cli-parsing';
+import { handleError } from '../../services/error-handler';
+import { ensureVariableName } from '../../services/cli-parsing';
 
 export const description = 'Add a theme to the current extension';
 export const command = 'add <name>';

@@ -1,8 +1,8 @@
-import { getLinkedDirectories } from '../extension/linker';
+import { getLinkedDirectories } from '../services/linker';
 import { getHostEnvName } from '../clients/server-env';
 import apisConfig from '../../config/services';
 import msg from '../user_messages';
-import { getValue } from '../extension/cache-env';
+import { getValue } from '../services/cache-env';
 import getHomeDir from '../home-dir';
 import prettyJson from 'prettyjson';
 

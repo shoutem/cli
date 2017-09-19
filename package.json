@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.9.8",
+  "version": "0.10.0-beta2",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
     "cli-spinner": "^0.2.6",
     "colors": "^1.1.2",
     "command-exists": "^1.0.2",
+    "decamelize": "^1.2.0",
     "decompress": "^4.0.0",
     "download-cached": "^1.0.8",
     "download-file": "latest",
@@ -51,11 +52,11 @@
     "jsonapi-serializer": "^3.5.3",
     "linklocal": "^2.8.1",
     "lodash": "4.11.2",
+    "lodash-get-or-set": "^1.0.2",
     "mkdirp": "^0.5.1",
     "mkdirp-promise": "^3.0.1",
     "mustache": "2.2.1",
     "mv": "^2.1.1",
-    "mz": "^2.4.0",
     "ngrok": "2.2.17",
     "opn": "^5.1.0",
     "prettyjson": "^1.2.1",
@@ -72,6 +73,7 @@
     "tar.gz": "1.0.2",
     "tmp-promise": "^1.0.2",
     "universal-analytics": "^0.4.13",
+    "uppercamelcase": "^3.0.0",
     "urijs": "1.18.0",
     "uuid": "^3.0.1",
     "yargonaut": "^1.1.2",
@@ -93,21 +95,5 @@
   },
   "engines": {
     "node": ">=7.0.0"
-  },
-  "babel": {
-    "presets": [
-      "node6"
-    ],
-    "plugins": [
-      "transform-object-rest-spread",
-      "transform-async-to-generator"
-    ],
-    "ignore": false,
-    "only": [
-      "config",
-      "src",
-      "templates"
-    ],
-    "sourceMaps": "both"
   }
 }

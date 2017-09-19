@@ -1,8 +1,8 @@
 import URI from 'urijs';
 import { post } from './json-api-client';
 import services from '../../config/services';
-import * as cache from '../extension/cache-env';
-import * as logger from '../extension/logger';
+import * as cache from '../services/cache-env';
+import * as logger from '../services/logger';
 
 export class AuthServiceError {
   /*

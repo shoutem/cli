@@ -1,5 +1,5 @@
 import msg from '../user_messages';
-import { getValue } from '../extension/cache-env';
+import { getValue } from '../services/cache-env';
 
 export const command = 'whoami';
 export const description = 'Username of the current user.';

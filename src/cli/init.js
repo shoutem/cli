@@ -1,8 +1,8 @@
 import msg from '../user_messages';
-import { isValidExtensionName } from '../extension/validation'
+import { isValidExtensionName } from '../services/validation'
 import { initExtension } from '../commands/init';
-import { handleError } from '../extension/error-handler';
-import { validateArgumentCount } from '../extension/cli-parsing';
+import { handleError } from '../services/error-handler';
+import { validateArgumentCount } from '../services/cli-parsing';
 
 export const command = 'init <name>';
 export const description = 'Create a scaffold of all files and folders required to build an extension.';

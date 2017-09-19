@@ -3,18 +3,22 @@ import { authorizeRequests, getRefreshToken } from '../clients/auth-service';
 import { getDeveloper, createDeveloper } from '../clients/extension-manager';
 import msg from '../user_messages';
 import urls from '../../config/services';
-import * as logger from '../extension/logger';
-import * as cache from '../extension/cache-env';
+import * as logger from '../services/logger';
+import * as cache from '../services/cache-env';
 
-function promptUserCredentials() {
-  console.log(msg.login.credentialsPrompt(urls.appBuilder));
+function promptUserCredentials(args) {
+  if (!args.email || !args.password) {
+    console.log(msg.login.credentialsPrompt(urls.appBuilder));
+  }
   const questions = [{
     name: 'email',
     message: 'Email',
+    when: () => !args.email,
   }, {
     name: 'password',
     message: 'Password',
     type: 'password',
+    when: () => !args.password,
   }];
 
   return inquirer.prompt(questions);
@@ -34,8 +38,8 @@ function promptDeveloperName() {
  * Asks user to enter credentials, verifies those credentials with authentication
  * service, and saves the received API token locally for further requests.
  */
-export async function loginUser() {
-  const credentials = await promptUserCredentials();
+export async function loginUser(args) {
+  const credentials = await promptUserCredentials(args);
   const refreshToken = await getRefreshToken(credentials);
   await authorizeRequests(refreshToken);
   let developer = null;

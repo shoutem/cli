@@ -2,7 +2,6 @@
 
 const semver = require('semver');
 const path = require('path');
-const os = require('os');
 const getHomeDir = require('./home-dir');
 require('colors');
 
@@ -29,4 +28,4 @@ require('babel-register')({
   only: ['config', 'src', 'templates']
 });
 
-require('./cli.js');
+require('./cli');
