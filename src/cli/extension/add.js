@@ -1,6 +1,8 @@
 import path from 'path';
 import {
-  addToExtensionsJs, configurePlatform, getPlatformConfig, getPlatformRootDir,
+  addToExtensionsJs,
+  getPlatformConfig, getPlatformExtensionsDir,
+  getPlatformRootDir,
   linkLocalExtension
 } from "../../services/platform";
 import {executeAndHandleError} from "../../services/error-handler";
@@ -26,7 +28,7 @@ export const builder = yargs => {
 
 export const handler = ({ name, local }) => executeAndHandleError(async () => {
   const platformDir = await getPlatformRootDir();
-  const extensionPath = await initExtension(name, path.join(platformDir, 'extensions'));
+  const extensionPath = await initExtension(name, await getPlatformExtensionsDir(platformDir));
 
   if (!local) {
     await uploadExtension({}, extensionPath);

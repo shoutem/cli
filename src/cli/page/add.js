@@ -38,12 +38,12 @@ const createQuestions = (args, shortcutNames) => [{
   name: 'type',
   choices: ['react', 'html', 'blank'],
   default: 'react',
-  message: 'Page type',
+  message: 'Page type:',
   when: () => !args.type
 }, {
   type: 'input',
   name: 'name',
-  message: 'Page name',
+  message: 'Page name:',
   validate: name => isVariableName(name) || 'Page name must be a valid js variable name',
   when: () => !args.name,
   default: 'MyPage'
@@ -51,18 +51,18 @@ const createQuestions = (args, shortcutNames) => [{
   type: 'input',
   name: 'title',
   default: answers => decamelize(answers.name || args.name, ' '),
-  message: 'Page title',
+  message: 'Page title:',
   when: () => !args.title
 }, {
   type: 'list',
   name: 'scope',
   choices: [...(shortcutNames.length ? ['shortcut'] : []), 'extension', 'none'],
-  message: 'Select whether the page should be connected as a shortcut settings page or an extension settings page',
+  message: 'Select whether the page should be connected as a shortcut settings page or an extension settings page:',
   when: () => !args.scope
 }, {
   type: 'list',
   name: 'shortcut',
-  message: 'Shortcut this page should be used for',
+  message: 'Shortcut this page should be used for:',
   when: answers => !args.shortcut && (args.scope || answers.scope) === 'shortcut',
   choices: shortcutNames
 }];

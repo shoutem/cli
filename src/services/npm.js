@@ -40,13 +40,13 @@ export async function addLocalDependency(npmProjectPath, npmModulePath) {
   const { name } = await getPackageJson(npmModulePath);
   const packageJson = await getPackageJson(npmProjectPath);
 
-  const dependancyValue = 'file:' + path.relative(npmProjectPath, npmModulePath);
+  const dependencyValue = 'file:' + path.relative(npmProjectPath, npmModulePath);
 
   await savePackageJson(npmProjectPath, {
     ...packageJson,
     dependencies: {
       ...packageJson.dependencies,
-      [name]: dependancyValue
+      [name]: dependencyValue
     }
   });
 }

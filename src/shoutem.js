@@ -2,7 +2,6 @@
 
 const semver = require('semver');
 const path = require('path');
-const os = require('os');
 const getHomeDir = require('./home-dir');
 require('colors');
 

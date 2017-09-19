@@ -22,40 +22,40 @@ export const builder = {
 const createQuestions = (args, shortcutsNames) => ([{
   type: 'input',
   name: 'name',
-  message: 'Screen name',
+  message: 'Screen name:',
   when: () => !args.name,
   validate: name => isVariableName(name) || 'Screen name must be a valid js variable name',
   default: 'MyScreen',
 }, {
   type: 'list',
   name: 'shortcutSelection',
-  message: 'Connect the screen with a new shortcut',
+  message: 'Connect the screen with a new shortcut:',
   when: () => !args.shortcut,
   choices: ['new shortcut', ...(shortcutsNames.length ? ['existing shortcut'] : []), 'without shortcut']
 }, {
   type: 'input',
   name: 'shortcut',
-  message: 'Name for the new shortcut',
+  message: 'Name for the new shortcut:',
   when: answers => answers.shortcutSelection === 'new shortcut',
   default: answers => (args.name || answers.name) + 'Shortcut',
   validate: name => isVariableName(name) || 'Shortcut name must be a valid js variable name',
 }, {
   type: 'input',
   name: 'shortcutTitle',
-  message: 'Shortcut title',
+  message: 'Shortcut title:',
   when: answers => answers.shortcutSelection === 'new shortcut',
   validate: title => !!title,
   default: answers => decamelize(answers.shortcut || args.shortcut, ' ')
 }, {
   type: 'input',
   name: 'shortcutDescription',
-  message: 'Shortcut description',
+  message: 'Shortcut description:',
   when: answers => answers.shortcutSelection === 'new shortcut',
   validate: desc => !!desc,
 }, {
   type: 'list',
   name: 'shortcut',
-  message: 'Select a shortcut',
+  message: 'Select a shortcut:',
   when: answers => answers.shortcutSelection === 'existing shortcut',
   choices: shortcutsNames
 }]);

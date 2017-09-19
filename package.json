@@ -95,21 +95,5 @@
   },
   "engines": {
     "node": ">=7.0.0"
-  },
-  "babel": {
-    "presets": [
-      "node6"
-    ],
-    "plugins": [
-      "transform-object-rest-spread",
-      "transform-async-to-generator"
-    ],
-    "ignore": false,
-    "only": [
-      "config",
-      "src",
-      "templates"
-    ],
-    "sourceMaps": "both"
   }
 }

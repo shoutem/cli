@@ -35,6 +35,10 @@ export async function getPlatformRootDir(dir = process.cwd()) {
   return await getPlatformRootDir(parentDir);
 }
 
+export async function getPlatformExtensionsDir(dir = null) {
+  return path.join(dir || await getPlatformRootDir(), 'extensions');
+}
+
 export async function createPlatformConfig(platformDir, opts) {
   const configTemplate = await readJson(path.join(platformDir, 'config.template.json'));
 
