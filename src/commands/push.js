@@ -1,40 +1,14 @@
 import fs from 'fs-extra';
-import path from 'path';
 import * as extensionManager from '../clients/extension-manager';
 import {getHostEnvName} from '../clients/server-env';
 import {getExtensionCanonicalName} from '../clients/local-extensions';
 import * as utils from '../services/extension';
-import {ensureUserIsLoggedIn} from './login';
 import shoutemPack from '../services/packer';
 import msg from '../user_messages';
 import _ from 'lodash';
 import {createProgressHandler} from '../services/progress-bar';
 import {startSpinner} from '../services/spinner';
 import extLint from '../services/extlint';
-import {readJsonFile, writeJsonFile} from "../services/data";
-
-async function setPackageNameVersion(path, name, version) {
-  const data = await readJsonFile(path);
-  if (data === null) {
-    return null;
-  }
-
-  data.name = name;
-  data.version = version;
-
-  await writeJsonFile(data, path);
-  return data;
-}
-
-function setExtNameVersionInPackageJson(extName, version, root = utils.getExtensionRootDir()) {
-  const appPath = path.join(root, 'app', 'package.json');
-  const serverPath = path.join(root, 'server', 'package.json');
-
-  return Promise.all([
-    setPackageNameVersion(serverPath, extName, version),
-    setPackageNameVersion(appPath, extName, version)
-  ]);
-}
 
 export async function uploadExtension(opts = {}, extensionDir = utils.ensureInExtensionDir()) {
   if (!opts.nocheck) {
@@ -46,9 +20,7 @@ export async function uploadExtension(opts = {}, extensionDir = utils.ensureInEx
       throw err;
     }
   }
-  const dev = await ensureUserIsLoggedIn();
   const extJson = await utils.loadExtensionJson(extensionDir);
-  await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version, extensionDir);
   const packResult = await shoutemPack(extensionDir, { packToTempDir: true, nobuild: opts.nobuild });
 
   const { size } = await fs.stat(packResult.package);
