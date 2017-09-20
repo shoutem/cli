@@ -28,7 +28,7 @@ async function npmPack(dir, destinationDir) {
   packageJson.version = `${packageJson.version}-build${timestamp}`;
 
   await writeJsonFile(packageJson, packageJsonPath);
-  const [stdout] = await exec('npm pack', { cwd: dir });
+  const { stdout } = await exec('npm pack', { cwd: dir });
   const packageFilename = stdout.replace(/\n$/, '');
   const packagePath = path.join(dir, packageFilename);
 

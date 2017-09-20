@@ -1,4 +1,4 @@
-import { spawn } from 'superspawn';
+import { spawn } from 'child-process-promise';
 import msg from '../user_messages';
 import commandExists from './command-exists';
 import semver from 'semver';
