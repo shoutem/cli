@@ -19,6 +19,7 @@ import { ensureUserIsLoggedIn } from './login';
 import { createProgressHandler } from '../services/progress-bar';
 import { spinify } from '../services/spinner';
 import commandExists from '../services/command-exists';
+import slugify from 'slugify';
 import 'colors';
 
 const downloadFile = Promise.promisify(require('download-file'));
@@ -122,7 +123,8 @@ export async function clone(opts, destinationDir) {
 
   const { name } = await getApp(opts.appId);
 
-  let directoryName = opts.dir || name.replace(/ /g, '_');
+  let directoryName = slugify(opts.dir || name, { remove: /[$*_+~.()'"!\-:@]/g });
+  console.log('cloning to', directoryName);
   let appDir = path.join(destinationDir, directoryName);
 
   if (opts.force) {
