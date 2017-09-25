@@ -1,6 +1,7 @@
 const path = require('path');
 const rimraf = require('rmfr');
 const getHomeDir = require('../home-dir');
+const spawn = require('child-process-promise').spawn;
 
 const cliHome = getHomeDir();
 
@@ -25,6 +26,9 @@ Promise.all([
   rimraf(path.join(cliHome, 'dev')),
   rimraf(path.join(cliHome, 'local'))
 ]).catch(console.error);
+
+spawn('shoutem', [], { script: true, stdio: 'inherit' })
+  .catch(console.error);
 
 // this should be enabled if old global npm linked dependencies start causing problems
 // for people that had an older version of shoutem client configured

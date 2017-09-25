@@ -21,11 +21,5 @@ if (semver.lt(process.versions.node, '6.0.0')) {
 const babelCachePath = path.join(homeDir, 'cache', 'babel-cache');
 process.env.BABEL_CACHE_PATH = process.env.BABEL_CACHE_PATH || babelCachePath;
 
-require('babel-register')({
-  presets: [semver.lt(process.versions.node, '7.0.0') ? 'node6' : 'node7'],
-  plugins: ['transform-object-rest-spread', 'transform-async-to-generator'],
-  ignore: false,
-  only: ['config', 'src', 'templates']
-});
-
+require('babel-register');
 require('./cli');
