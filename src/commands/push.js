@@ -2,7 +2,7 @@ import fs from 'fs-extra';
 import * as extensionManager from '../clients/extension-manager';
 import {getHostEnvName} from '../clients/server-env';
 import {getExtensionCanonicalName} from '../clients/local-extensions';
-import * as utils from '../services/extension';
+import { ensureInExtensionDir, loadExtensionJson } from '../services/extension';
 import shoutemPack from '../services/packer';
 import msg from '../user_messages';
 import _ from 'lodash';
@@ -10,7 +10,7 @@ import {createProgressHandler} from '../services/progress-bar';
 import {startSpinner} from '../services/spinner';
 import extLint from '../services/extlint';
 
-export async function uploadExtension(opts = {}, extensionDir = utils.ensureInExtensionDir()) {
+export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
   if (!opts.nocheck) {
     console.log('Checking the extension code for syntax errors...');
     try {
@@ -20,7 +20,7 @@ export async function uploadExtension(opts = {}, extensionDir = utils.ensureInEx
       throw err;
     }
   }
-  const extJson = await utils.loadExtensionJson(extensionDir);
+  const extJson = await loadExtensionJson(extensionDir);
   const packResult = await shoutemPack(extensionDir, { packToTempDir: true, nobuild: opts.nobuild });
 
   const { size } = await fs.stat(packResult.package);

@@ -6,7 +6,7 @@ import urls from '../../config/services';
 import * as logger from '../services/logger';
 import * as cache from '../services/cache-env';
 
-function promptUserCredentials(args) {
+function promptUserCredentials(args = {}) {
   if (!args.email || !args.password) {
     console.log(msg.login.credentialsPrompt(urls.appBuilder));
   }
