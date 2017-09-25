@@ -42,7 +42,7 @@ export function ensureInExtensionDir() {
   const root = getExtensionRootDir();
 
   if (!root) {
-    throw new Error('Not an extension directory.');
+    throw new Error('Not an extension directory. Move to extension directory and try again.');
   }
 
   return root;
