@@ -10,7 +10,7 @@ import {ensureInExtensionDir, loadExtensionJson} from '../../services/extension'
 import { instantiateTemplatePath } from '../../services/template';
 import {generateExtensionJs} from "../../services/ext-js-generator";
 
-export const description = 'Add page to current extension';
+export const description = 'Add a settings page to current extension';
 export const command = 'add [name]';
 export const builder = {
   type: {
@@ -20,7 +20,7 @@ export const builder = {
   },
   scope: {
     alias: 's',
-    description: 'Where should the page be inserted (shortcut, extension).',
+    description: 'Where should the settings page be inserted (shortcut, extension).',
     requiresArg: true,
   },
   shortcut: {
@@ -44,14 +44,14 @@ const createQuestions = (args, shortcutNames) => [{
   type: 'input',
   name: 'name',
   message: 'Page name:',
-  validate: name => isVariableName(name) || 'Page name must be a valid js variable name',
+  validate: name => isVariableName(name) || 'Settings page\'s name must be a valid js variable name',
   when: () => !args.name,
   default: 'MyPage'
 }, {
   type: 'input',
   name: 'title',
   default: answers => decamelize(answers.name || args.name, ' '),
-  message: 'Page title:',
+  message: 'Settings page title:',
   when: () => !args.title
 }, {
   type: 'list',
@@ -62,7 +62,7 @@ const createQuestions = (args, shortcutNames) => [{
 }, {
   type: 'list',
   name: 'shortcut',
-  message: 'Shortcut this page should be used for:',
+  message: 'Shortcut this settings page should be used for:',
   when: answers => !args.shortcut && (args.scope || answers.scope) === 'shortcut',
   choices: shortcutNames
 }];
