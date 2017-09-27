@@ -13,7 +13,7 @@ async function getNpmjsVersion(npmUrl, tag) {
 }
 
 export async function getVersion(npmUrl, tag) {
-  return await cache.get({ npmUrl, tag }, 3600 * 6, () => getNpmjsVersion(npmUrl, tag));
+  return await cache.get({ npmUrl, tag }, 3600 * 48, () => getNpmjsVersion(npmUrl, tag));
 }
 
 export async function isLatest(npmUrl, currentVersion) {

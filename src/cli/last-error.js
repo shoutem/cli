@@ -11,6 +11,7 @@ export async function handler() {
       keysColor: 'cyan',
       numberColor: 'white'
     }));
+    console.log(`\nIf you think this error is caused by bug in the shoutem command, you can report the issue here: ${"https://github.com/shoutem/cli/issues".bold}`.yellow);
   } else {
     console.log('No error'.green);
   }

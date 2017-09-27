@@ -60,14 +60,14 @@ export default {
   publish: {
     complete: extJson => `Version \`${extJson.version}\` of \`${extJson.name}\` extension was published!`,
     failed: detail => `Publish failed: ${detail}`,
-    publishInfo: extJson => `Publishing extension \`${extJson.name}\` version \`${extJson.version}\``
+    publishInfo: extJson => `Publishing ${extJson.name.blue.bold} version ${extJson.version.blue.bold}...`
   },
   push: {
     complete: () => 'Success!'.green.bold,
     missingPackageJson: list => `Warning: directories ${list} couldn't be pushed due to missing package.json.`,
     failureSuggestion: () => 'Warning: Check whether both server and app directory have a valid package.json file.',
     uploadingInfo: (extJson, env) =>
-      `Uploading \`${extJson.title}\` extension to ${env === 'production' ? 'Shoutem' : env}...`
+      `Uploading ${extJson.title.blue.bold} extension to ${env === 'production' ? 'Shoutem' : env}...`
   },
   schema: {
     add: {

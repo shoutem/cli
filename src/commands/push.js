@@ -12,9 +12,10 @@ import extLint from '../services/extlint';
 
 export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
   if (!opts.nocheck) {
-    console.log('Checking the extension code for syntax errors...');
+    process.stdout.write('Checking the extension code for syntax errors... ');
     try {
       await extLint(extensionDir);
+      console.log(`[${'OK'.green.bold}]`);
     } catch (err) {
       err.message = 'Syntax errors detected, aborting push! Use `shoutem push --nocheck` to override';
       throw err;
@@ -28,18 +29,18 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
 
   const id = await getExtensionCanonicalName(extensionDir);
 
-  console.log(msg.push.uploadingInfo(extJson, getHostEnvName()));
   let spinner = null;
   const extensionId = await extensionManager.uploadExtension(
     id,
     stream,
-    createProgressHandler({ msg: 'Upload progress', total: size, onFinished: () => spinner = startSpinner('Processing upload... %s') }),
+    createProgressHandler({ msg: 'Upload progress', total: size, onFinished: () => spinner = startSpinner('Processing upload...') }),
     size
   );
-
   if (spinner) {
     spinner.stop(true);
+    console.log(`Processing upload... [${'OK'.green.bold}]`);
   }
+  console.log(msg.push.uploadingInfo(extJson, getHostEnvName()) + ` [${'OK'.green.bold}]`);
 
   await fs.unlink(packResult.package);
 

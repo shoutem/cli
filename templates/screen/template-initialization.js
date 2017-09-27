@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import getOrSet from 'lodash-get-or-set';
 import {loadExtensionJson, saveExtensionJson} from "../../src/services/extension";
-import msg from "../../src/user_messages";
+import {addShortcutForTemplate} from "../../src/services/shortcut";
 
 export async function before(localTemplatePath, destinationPath, {
   screenName,
@@ -18,23 +18,7 @@ export async function before(localTemplatePath, destinationPath, {
   }
   screens.push({ name: screenName });
 
-  if (shortcutName) {
-    const shortcuts = getOrSet(extJson, 'shortcuts', []);
-    let shortcut = _.find(shortcuts, { name: shortcutName });
-    if (shortcut && shortcutSelection === 'new shortcut') {
-      throw new Error(msg.shortcut.add.alreadyExists(shortcutName));
-    }
-    if (!shortcut) {
-      shortcut = {
-        name: shortcutName,
-        title: shortcutTitle,
-        description: shortcutDescription,
-      };
-      shortcuts.push(shortcut);
-    }
-    shortcut.screen = `@.${screenName}`;
-  }
-
+  addShortcutForTemplate(extJson, { shortcutName, shortcutTitle, shortcutDescription, shortcutSelection, screenName });
   await saveExtensionJson(extJson);
 }
 

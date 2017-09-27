@@ -6,7 +6,7 @@ import tmp from 'tmp-promise';
 import targz from 'tar.gz';
 import { buildNodeProject } from './node';
 import { writeJsonFile } from './data';
-import { startSpinner } from './spinner';
+import {spinify} from './spinner';
 import move from 'glob-move';
 import { pathExists, copy } from 'fs-extra';
 import decompress from 'decompress';
@@ -82,23 +82,21 @@ export default async function shoutemPack(dir, options) {
     await buildNodeProject(path.join(dir, 'app'));
   }
 
-  const spinner = startSpinner('Packing extension... %s');
-  for (const dir of dirsToPack) {
-    await npmPack(dir, packageDir);
-  }
+  return await spinify(async () => {
+    for (const dir of dirsToPack) {
+      await npmPack(dir, packageDir);
+    }
+    const extensionJsonPathSrc = path.join(dir, 'extension.json');
+    const extensionJsonPathDest = path.join(packageDir, 'extension.json');
+    await copy(extensionJsonPathSrc, extensionJsonPathDest);
 
-  const extensionJsonPathSrc = path.join(dir, 'extension.json');
-  const extensionJsonPathDest = path.join(packageDir, 'extension.json');
-  await copy(extensionJsonPathSrc, extensionJsonPathDest);
+    const destinationDirectory = path.join(options.packToTempDir ? tmpDir : dir, 'extension.tgz');
+    await targz().compress(packageDir, destinationDirectory);
 
-  const destinationDirectory = path.join(options.packToTempDir ? tmpDir : dir, 'extension.tgz');
-  await targz().compress(packageDir, destinationDirectory);
-
-  spinner.stop(true);
-
-  return ({
-    packedDirs: dirsToPack,
-    allDirs: packedDirectories,
-    package: destinationDirectory,
-  });
+    return ({
+      packedDirs: dirsToPack,
+      allDirs: packedDirectories,
+      package: destinationDirectory,
+    });
+  }, 'Packing extension...', 'OK');
 }

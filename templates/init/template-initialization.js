@@ -1,13 +1,13 @@
-const path = require('path');
-const install = require('../../src/services/npm').install;
-const generateExtensionJs = require('../../src/services/ext-js-generator').generateExtensionJs;
-require('colors');
+import path from 'path';
+import { generateExtensionJs } from '../../src/services/ext-js-generator';
+import 'colors'
 
-export function after(_, extPath, { devName, extJson }) {
+export async function after(templatePath, extPath, { devName, extJson }) {
   extPath = path.join(extPath, `${devName}.${extJson.name}`);
 
-  return generateExtensionJs(extPath)
-    .then(() => {
+  return await generateExtensionJs(extPath);
+  // useless because initial app does not contain any dependencies
+    /*.then(() => {
       console.log('Initializing extension:'.green.bold);
       console.log('Installing packages for server...'.green.bold);
     })
@@ -16,5 +16,5 @@ export function after(_, extPath, { devName, extJson }) {
       console.log('Installing packages for app...'.green.bold);
       return install(path.join(extPath, 'app'));
     })
-    .then(() => console.log('Packages installed.'));
+    .then(() => console.log('Packages installed.')); */
 }

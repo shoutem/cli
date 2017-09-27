@@ -11,7 +11,6 @@ export function startSpinner(msg) {
 
   const spinner = new Spinner(msg);
   spinner.start();
-
   spinners.push(spinner);
 
   return spinner;
@@ -22,12 +21,21 @@ export function stopAll() {
   spinners = [];
 }
 
-export async function spinify(promise, msg) {
+export async function spinify(promise, msg, successMsg) {
   const spinner = startSpinner(msg);
 
   try {
-    return await promise;
-  } finally {
+    const result = await (typeof promise === 'function' ? promise() : promise);
     spinner.stop(true);
+    if (successMsg) {
+      console.log(`${msg} [${successMsg.green.bold}]`);
+    }
+    return result;
+  } catch (error) {
+    spinner.stop(true);
+    if (successMsg) {
+      console.log(`${msg} [${'ERROR'.red.bold}]`);
+    }
+    throw error;
   }
 }

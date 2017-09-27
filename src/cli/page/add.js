@@ -5,7 +5,6 @@ import inq from 'inquirer';
 import msg from '../../user_messages';
 import {ensureVariableName, isVariableName} from '../../services/cli-parsing';
 import { executeAndHandleError } from '../../services/error-handler';
-import * as yarn from '../../services/yarn';
 import {ensureInExtensionDir, loadExtensionJson} from '../../services/extension';
 import { instantiateTemplatePath } from '../../services/template';
 import {generateExtensionJs} from "../../services/ext-js-generator";
@@ -56,14 +55,34 @@ const createQuestions = (args, shortcutNames) => [{
 }, {
   type: 'list',
   name: 'scope',
-  choices: [...(shortcutNames.length ? ['shortcut'] : []), 'extension', 'none'],
-  message: 'Select whether the page should be connected as a shortcut settings page or an extension settings page:',
+  message: 'This page should be referenced by:',
+  choices: ['existing shortcut', 'new shortcut', 'extension', 'skip this step'],
   when: () => !args.scope
+}, {
+  type: 'input',
+  name: 'shortcut',
+  message: 'Name for the new shortcut:',
+  when: answers => answers.scope === 'new shortcut',
+  default: answers => (args.shortcut || answers.name) + 'Shortcut',
+  validate: name => isVariableName(name) || 'Shortcut name must be a valid js variable name',
+}, {
+  type: 'input',
+  name: 'shortcutTitle',
+  message: 'Shortcut title:',
+  when: answers => answers.shortcutSelection === 'new shortcut',
+  validate: title => !!title,
+  default: answers => decamelize(answers.shortcutName, ' ')
+}, {
+  type: 'input',
+  name: 'shortcutDescription',
+  message: 'Shortcut description:',
+  when: answers => answers.shortcutSelection === 'new shortcut',
+  validate: desc => !!desc,
 }, {
   type: 'list',
   name: 'shortcut',
   message: 'Shortcut this settings page should be used for:',
-  when: answers => !args.shortcut && (args.scope || answers.scope) === 'shortcut',
+  when: answers => !args.shortcut && (args.scope || answers.scope) === 'existing shortcut',
   choices: shortcutNames
 }];
 

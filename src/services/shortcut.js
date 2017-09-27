@@ -1,5 +1,7 @@
 import _ from 'lodash';
 import inquirer from 'inquirer';
+import getOrSet from 'lodash-get-or-set';
+import msg from '.././user_messages';
 
 export async function promptShortcutInfo(shortcutName) {
   console.log('Enter shortcut information:');
@@ -24,4 +26,33 @@ export function addShortcut(extJson, shortcut) {
   extJson.shortcuts = extJson.shortcuts || [];
   extJson.shortcuts.push(shortcut);
   return extJson;
+}
+
+export function addShortcutForTemplate(
+  extJson,
+  { shortcutName, shortcutTitle, shortcutDescription, shortcutSelection, screenName, pageName }) {
+  if (!shortcutName) {
+    return null;
+  }
+
+  const shortcuts = getOrSet(extJson, 'shortcuts', []);
+  let shortcut = _.find(shortcuts, { name: shortcutName });
+  if (shortcut && shortcutSelection === 'new shortcut') {
+    throw new Error(msg.shortcut.add.alreadyExists(shortcutName));
+  }
+  if (!shortcut) {
+    shortcut = {
+      name: shortcutName,
+      title: shortcutTitle,
+      description: shortcutDescription,
+    };
+    shortcuts.push(shortcut);
+  }
+  if (screenName) {
+    shortcut.screen = `@.${screenName}`;
+  }
+  if (pageName) {
+    shortcut.page = ``;
+  }
+  return shortcut;
 }

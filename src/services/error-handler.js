@@ -65,8 +65,7 @@ export async function handleError(err) {
       errorJson.message = (err || {}).message;
       await cache.setValue('last-error', errorJson);
       if (!reportInfoPrinted) {
-        console.error(`\nUse ${"`shoutem last-error`".bold} for more info`.yellow);
-        console.error(`If you think this error is caused by bug in the shoutem command, you can report the issue here: ${"https://github.com/shoutem/cli/issues".bold}`.yellow);
+        console.error(`\nUse ${'shoutem last-error'.bold.blue} for more info`.yellow);
         reportInfoPrinted = true;
       }
   } catch (err) {
