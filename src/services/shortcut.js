@@ -1,7 +1,10 @@
 import _ from 'lodash';
+import decamelize from 'decamelize';
+import inq from 'inquirer';
 import inquirer from 'inquirer';
 import getOrSet from 'lodash-get-or-set';
-import msg from '.././user_messages';
+import msg from '../user_messages';
+import {isVariableName} from "./cli-parsing";
 
 export async function promptShortcutInfo(shortcutName) {
   console.log('Enter shortcut information:');
@@ -55,4 +58,26 @@ export function addShortcutForTemplate(
     shortcut.page = ``;
   }
   return shortcut;
+}
+const createShortcutQuestions = ({ defaultName }) => [{
+  type: 'input',
+  name: 'name',
+  message: 'Name for the new shortcut:',
+  default: defaultName,
+  validate: name => isVariableName(name) || 'Shortcut name must be a valid js variable name',
+}, {
+  type: 'input',
+  name: 'title',
+  message: 'Shortcut title:',
+  validate: _.identity,
+  default: ({ name }) => decamelize(name, ' '),
+}, {
+  type: 'input',
+  name: 'description',
+  message: 'Shortcut description:',
+  validate: _.identity,
+}];
+
+export async function inquireNewShortcut({ defaultName }) {
+  return await inq.prompt({ defaultName });
 }

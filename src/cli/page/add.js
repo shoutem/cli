@@ -10,81 +10,44 @@ import { instantiateTemplatePath } from '../../services/template';
 import {generateExtensionJs} from "../../services/ext-js-generator";
 
 export const description = 'Add a settings page to current extension';
-export const command = 'add [name]';
-export const builder = {
-  type: {
-    alias: 't',
-    requiresArg: true,
-    description: 'Type of settings page to create (react, html, blank).'
-  },
-  scope: {
-    alias: 's',
-    description: 'Where should the settings page be inserted (shortcut, extension).',
-    requiresArg: true,
-  },
-  shortcut: {
-    description: 'Name of the shortcut if settings page is to be connected with shortcut',
-    requiresArg: true,
-  },
-  title: {
-    description: 'Title of the settings page being created. Defaults to page name',
-    requiresArg: true,
-  }
-};
+export const command = 'add';
 
-const createQuestions = (args, shortcutNames) => [{
-  type: 'list',
-  name: 'type',
-  choices: ['react', 'html', 'blank'],
-  default: 'react',
-  message: 'Page type:',
-  when: () => !args.type
-}, {
-  type: 'input',
-  name: 'name',
-  message: 'Page name:',
-  validate: name => isVariableName(name) || 'Settings page\'s name must be a valid js variable name',
-  when: () => !args.name,
-  default: 'MyPage'
-}, {
-  type: 'input',
-  name: 'title',
-  default: answers => decamelize(answers.name || args.name, ' '),
-  message: 'Settings page title:',
-  when: () => !args.title
-}, {
-  type: 'list',
-  name: 'scope',
-  message: 'This page should be referenced by:',
-  choices: ['existing shortcut', 'new shortcut', 'extension', 'skip this step'],
-  when: () => !args.scope
-}, {
-  type: 'input',
-  name: 'shortcut',
-  message: 'Name for the new shortcut:',
-  when: answers => answers.scope === 'new shortcut',
-  default: answers => (args.shortcut || answers.name) + 'Shortcut',
-  validate: name => isVariableName(name) || 'Shortcut name must be a valid js variable name',
-}, {
-  type: 'input',
-  name: 'shortcutTitle',
-  message: 'Shortcut title:',
-  when: answers => answers.shortcutSelection === 'new shortcut',
-  validate: title => !!title,
-  default: answers => decamelize(answers.shortcutName, ' ')
-}, {
-  type: 'input',
-  name: 'shortcutDescription',
-  message: 'Shortcut description:',
-  when: answers => answers.shortcutSelection === 'new shortcut',
-  validate: desc => !!desc,
-}, {
-  type: 'list',
-  name: 'shortcut',
-  message: 'Shortcut this settings page should be used for:',
-  when: answers => !args.shortcut && (args.scope || answers.scope) === 'existing shortcut',
-  choices: shortcutNames
-}];
+const createQuestions = (args, screenNames) => {
+  const scopeChoices = ['new screen', 'extension', 'skip this step'];
+  if (_.size(screenNames)) {
+    scopeChoices.unshift('existing screen');
+  }
+
+  return [{
+    type: 'list',
+    name: 'type',
+    choices: ['react', 'html', 'blank'],
+    default: 'react',
+    message: 'Page type:',
+  }, {
+    type: 'input',
+    name: 'name',
+    message: 'Page name:',
+    validate: name => isVariableName(name) || 'Settings page\'s name must be a valid js variable name',
+    default: 'MyPage',
+  }, {
+    type: 'input',
+    name: 'title',
+    default: answers => decamelize(answers.name || args.name, ' '),
+    message: 'Settings page title:',
+  }, {
+    type: 'list',
+    name: 'scope',
+    message: 'This page should be referenced by:',
+    choices: ['existing screen', 'new screen', 'extension', 'skip this step'],
+  }, {
+    type: 'list',
+    name: 'screenName',
+    message: 'Shortcut this settings page should be used for:',
+    when: ({scope}) => scope === 'existing shortcut',
+    choices: scopeChoices,
+  }];
+};
 
 export const handler = args => executeAndHandleError(async () => {
   const shortcutNames = _.map((await loadExtensionJson()).shortcuts, 'name');
