@@ -1,11 +1,10 @@
-import _ from 'lodash';
 import fs from 'fs-extra';
 import path from 'path';
 import Mustache from 'mustache';
 import { pathExists } from 'fs-extra';
 import mkdirp from 'mkdirp-promise';
 
-const templatesDirectory = path.join(__dirname, '..', '..', 'templates');
+const templatesDirectory = path.join(__dirname, '..', 'templates');
 
 export function load(pathWithSlashes, templateContext) {
   const p = path.join(templatesDirectory, ...pathWithSlashes.split('/'));
@@ -21,6 +20,7 @@ async function instantiateTemplatePathRec(localTemplatePath, destinationPath, co
 
   const templatePath = path.join(templatesDirectory, localTemplatePath);
   const templatePathState = await fs.lstat(templatePath);
+
   if (templatePathState.isDirectory()) {
     await mkdirp(destinationPath);
     const files = await fs.readdir(templatePath);
@@ -52,10 +52,10 @@ export async function instantiateTemplatePath(localTemplatePath, destinationPath
 
   const initPath = path.join(templatesDirectory, localTemplatePath, 'template-initialization');
 
-  const before = importName(initPath, 'before', () => ({}));
+  const before = importName(initPath, 'before', () => {});
   const after = importName(initPath, 'after', () => {});
 
-  _.merge(context, await before(localTemplatePath, destinationPath, context));
+  await before(context);
   await instantiateTemplatePathRec(localTemplatePath, destinationPath, context, opts);
-  return await after(localTemplatePath, destinationPath, context);
+  return await after(context);
 }

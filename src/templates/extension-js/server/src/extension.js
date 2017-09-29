@@ -9,6 +9,6 @@
 {{#pagesNames}}
 
 export const pages = {
-  {{pagesNames}}
+{{pagesNames}}
 };
 {{/pagesNames}}

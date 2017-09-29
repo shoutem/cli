@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import {loadExtensionJson} from "../../src/services/extension";
+import decamelize from 'decamelize';
 
-function importStatements(names, path) {
-  return names.map(name => `import ${name} from '${path}/${name}';`).join('\n');
+function importStatements(names, path, directoriesNames = names) {
+  return names.map((name, i) => `import ${name} from '${path}/${directoriesNames[i]}';`).join('\n');
 }
 
 function indentedNamesList(names) {
@@ -13,8 +13,8 @@ function indentedNamesList(names) {
  * Generate app/extension.js file within the extension.
  * This file is used to export extension's themes and screens.
  */
-export async function before(templatePath, extensionPath) {
-  const extJson = await loadExtensionJson(extensionPath);
+export async function before(context) {
+  const { extJson } = context;
 
   const screensNamesList = _.map(extJson.screens, 'name');
   const screensImports = importStatements(screensNamesList, './screens');
@@ -25,15 +25,19 @@ export async function before(templatePath, extensionPath) {
   const themesNames = indentedNamesList(themesNamesList);
 
   const pagesNamesList = _.map(extJson.pages, 'name');
-  const pagesImports = importStatements(pagesNamesList, './pages');
+  const pagesDirectoriesList = pagesNamesList.map(name => decamelize(name, '-'));
+  const pagesImports = importStatements(pagesNamesList, './pages', pagesDirectoriesList);
   const pagesNames = indentedNamesList(pagesNamesList);
 
-  return {
+  const extJsonString = JSON.stringify(extJson, null, 2);
+
+  _.merge(context, {
     screensImports,
     screensNames,
     themesImports,
     themesNames,
     pagesImports,
     pagesNames,
-  };
+    extJsonString,
+  });
 }

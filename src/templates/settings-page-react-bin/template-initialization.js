@@ -1,6 +1,5 @@
 import _ from 'lodash';
-import path from 'path';
-import {getPackageJson, install, savePackageJson} from '../../src/services/npm';
+import * as npm from "../../services/npm";
 
 const pkgJsonTemplate = {
   "scripts": {
@@ -60,16 +59,10 @@ const pkgJsonTemplate = {
   }
 };
 
-export async function after(templatePath, extensionPath) {
-  const serverPath = path.join(extensionPath, 'server');
+export async function before({ serverJson }) {
+  _.merge(serverJson, pkgJsonTemplate);
+}
 
-  const originalJson = await getPackageJson(serverPath);
-  const updatedJson = _.merge({}, originalJson, pkgJsonTemplate);
-
-  if (_.isEqual(originalJson, updatedJson)) {
-    return null;
-  }
-
-  await savePackageJson(serverPath, updatedJson);
-  await install(serverPath);
+export async function after({ extensionPath }) {
+  return async () => await npm.install(extensionPath);
 }

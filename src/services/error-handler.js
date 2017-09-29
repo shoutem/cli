@@ -65,7 +65,7 @@ export async function handleError(err) {
       errorJson.message = (err || {}).message;
       await cache.setValue('last-error', errorJson);
       if (!reportInfoPrinted) {
-        console.error(`\nUse ${'shoutem last-error'.bold.blue} for more info`.yellow);
+        console.error(`\nUse ${'shoutem last-error'.cyan} for more info`);
         reportInfoPrinted = true;
       }
   } catch (err) {

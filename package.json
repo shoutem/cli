@@ -103,14 +103,6 @@
     ],
     "plugins": [
       "transform-object-rest-spread"
-    ],
-    "only": [
-      "config",
-      "src",
-      "templates"
     ]
-  },
-  "engines": {
-    "node": ">=6.0.0"
   }
 }

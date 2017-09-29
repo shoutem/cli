@@ -7,6 +7,7 @@ import { ensureUserIsLoggedIn } from '../commands/login';
 import msg from '../user_messages';
 import { getPlatforms } from '../clients/extension-manager';
 import * as utils from '../services/extension';
+import {instantiateExtensionTemplate} from "../services/extension-template";
 
 
 function generateNoPatchSemver(version) {
@@ -62,11 +63,12 @@ export async function initExtension(extName, destDir = process.cwd()) {
     throw new Error(`Folder ${dirname} already exists. Rename the folder.`);
   }
 
-  await instantiateTemplatePath('init', destDir, {
+  await instantiateExtensionTemplate('init', {
     devName: developer.name,
     extJson,
     extJsonString: JSON.stringify(extJson, null, 2),
-    packageJsonString: JSON.stringify(packageJson, null, 2)
+    packageJsonString: JSON.stringify(packageJson, null, 2),
+    extensionPath: destDir,
   });
 
   return path.join(destDir, dirname);

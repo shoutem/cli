@@ -137,4 +137,4 @@ function mapDispatchToProps(dispatch, ownProps) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(HelloShortcutPage);
+export default connect(mapStateToProps, mapDispatchToProps)({{pageClassName}});

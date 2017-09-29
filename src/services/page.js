@@ -1,70 +1,96 @@
 import _ from 'lodash';
+import decamelize from "decamelize";
+import { prompt } from "inquirer";
 import {isVariableName} from "./cli-parsing";
-const decamelize = require("decamelize");
-const inquirer = require("inquirer");
-import getOrSet from 'lodash-get-or-set';
-import {askScreenCreationQuestions} from "./screen";
+import { askScreenCreationQuestions } from "./screen";
 
-export const createPageQuestions = ({ screens } = {}) => {
-  const scopeChoices = [{
-    name: 'new screen',
-    value: 'new',
+function validatePageName(name, existingPages) {
+  if (!isVariableName(name)) {
+    return 'Settings page\'s name must be a valid js variable name';
+  }
+  if (_.find(existingPages, { name })) {
+    return `${name} already exists`;
+  }
+  return true;
+}
+
+function createPageCreationQuestions({ pages, parentName }) {
+  return [{
+    type: 'list',
+    name: 'type',
+    choices: ['react', 'html', 'blank'],
+    default: 'react',
+    message: 'Settings page type:',
   }, {
-    name: 'extension',
+    type: 'input',
+    name: 'name',
+    message: 'Settings page name:',
+    validate: name => validatePageName(name, pages),
+    default: parentName ? `${parentName}Page` : 'MyPage',
+  }, {
+    type: 'input',
+    name: 'title',
+    default: ({ name }) => decamelize(name, ' '),
+    message: 'Settings page title:',
+  }];
+}
+
+function createPageScopeQuestions({ screens, name: extensionName }) {
+  const scopeChoices = [{
+    name: 'a screen I want to create right now',
+    value: 'newScreen',
+  }, {
+    name: `the entire '${extensionName}' extension`,
     value: 'extension',
   }, {
     name: 'decide later',
     value: 'skip',
   }, {
-    name: 'existing screen',
-    value: 'existing',
+    name: 'an existing screen',
+    value: 'existingScreen',
   }];
-
-  const screensNames = _.map(screens, 'name');
-  if (!_.size(screensNames)) {
+  if (!_.size(screens)) {
     scopeChoices.pop();
   }
 
   return [{
     type: 'list',
     name: 'type',
-    choices: ['react', 'html', 'blank'],
-    default: 'react',
-    message: 'Page type:',
-  }, {
-    type: 'input',
-    name: 'name',
-    message: 'Page name:',
-    validate: name => isVariableName(name) || 'Settings page\'s name must be a valid js variable name',
-    default: 'MyPage',
-  }, {
-    type: 'input',
-    name: 'title',
-    default: ({ name }) => decamelize(name, ' '),
-    message: 'Settings page title:',
-  }, {
-    type: 'list',
-    name: 'scope',
     message: 'This settings page controls settings for:',
     choices: scopeChoices,
-  }, {
-    type: 'list',
-    name: 'existingScreen',
-    message: 'This page should be used by:',
-    when: ({ scope }) => scope === 'existing',
-    choices: screensNames,
   }];
-};
-
-export async function askPageCreationQuestions(opts) {
-  const pageData = await inquirer.prompt(createPageQuestions(opts));
-  if (!pageData.existingScreen) {
-    pageData.newScreen = await askScreenCreationQuestions({ skipPages: true });
-  }
-  return pageData;
 }
 
-export function addPageToExtJson(extJson, page) {
-  const pages = getOrSet(extJson, 'pages', []);
-  const page = _.find(pages, { name: page.name });
+function createScreenSelectionQuestions({ screens }) {
+  return {
+    type: 'list',
+    name: 'existingScreenName',
+    message: 'Select existing screen:',
+    choices: _.map(screens, 'name'),
+  };
+}
+
+export async function askPageCreationQuestions({ skipScope, ...opts }) {
+  const page = await prompt(createPageCreationQuestions(opts));
+  const parentName = page.name;
+
+  if (skipScope) {
+    return page;
+  }
+
+  const scope = await prompt(createPageScopeQuestions(opts));
+
+  if (scope.type === 'existingScreen') {
+    _.merge(page, await prompt(createScreenSelectionQuestions(opts)));
+  }
+
+  if (scope.type === 'newScreen') {
+    page.newScreen = await askScreenCreationQuestions({ opts, skipPage: true, parentName });
+  }
+
+  if (scope.type === 'extension') {
+    page.extensionScope = true;
+  }
+
+  return page;
 }

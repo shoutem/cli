@@ -1,14 +1,12 @@
 import _ from 'lodash';
 import decamelize from 'decamelize';
-import inq from 'inquirer';
-import inquirer from 'inquirer';
+import { prompt } from 'inquirer';
 import getOrSet from 'lodash-get-or-set';
-import msg from '../user_messages';
 import {isVariableName} from "./cli-parsing";
 
 export async function promptShortcutInfo(shortcutName) {
   console.log('Enter shortcut information:');
-  const { title }  = await inquirer.prompt({
+  const { title }  = await prompt({
     message: 'Title',
     name: 'title',
     type: 'input',
@@ -19,7 +17,6 @@ export async function promptShortcutInfo(shortcutName) {
   return { title, name: shortcutName };
 }
 
-//throw new Error(msg.shortcut.add.alreadyExists(shortcutName));
 export function containsShortcut(extJson, shortcutName) {
   const names = (extJson.shortcuts || []).map(s => s.name);
   return _.includes(names, shortcutName);
@@ -31,53 +28,70 @@ export function addShortcut(extJson, shortcut) {
   return extJson;
 }
 
-export function addShortcutForTemplate(
-  extJson,
-  { shortcutName, shortcutTitle, shortcutDescription, shortcutSelection, screenName, pageName }) {
-  if (!shortcutName) {
-    return null;
+function validateShortcutName(name, existingShortcuts) {
+  if (!isVariableName(name)) {
+    return 'Shortcut\'s name must be a valid js variable name';
   }
-
-  const shortcuts = getOrSet(extJson, 'shortcuts', []);
-  let shortcut = _.find(shortcuts, { name: shortcutName });
-  if (shortcut && shortcutSelection === 'new shortcut') {
-    throw new Error(msg.shortcut.add.alreadyExists(shortcutName));
+  if (_.find(existingShortcuts, { name })) {
+    return `${name} already exists`;
   }
-  if (!shortcut) {
-    shortcut = {
-      name: shortcutName,
-      title: shortcutTitle,
-      description: shortcutDescription,
-    };
-    shortcuts.push(shortcut);
-  }
-  if (screenName) {
-    shortcut.screen = `@.${screenName}`;
-  }
-  if (pageName) {
-    shortcut.page = ``;
-  }
-  return shortcut;
+  return true;
 }
-const createShortcutQuestions = ({ defaultName }) => [{
-  type: 'input',
-  name: 'name',
-  message: 'Name for the new shortcut:',
-  default: defaultName,
-  validate: name => isVariableName(name) || 'Shortcut name must be a valid js variable name',
-}, {
-  type: 'input',
-  name: 'title',
-  message: 'Shortcut title:',
-  validate: _.identity,
-  default: ({ name }) => decamelize(name, ' '),
-}, {
-  type: 'input',
-  name: 'description',
-  message: 'Shortcut description:',
-  validate: _.identity,
-}];
 
-export async function inquireNewShortcut({ defaultName }) {
-  return await inq.prompt({ defaultName });
+function createShortcutCreationQuestions({ shortcuts, parentName, message }) {
+  const when = ({ shouldCreateShortcut }) => shouldCreateShortcut;
+
+  return [{
+    type: 'confirm',
+    name: 'shouldCreateShortcut',
+    message: message || 'Do you want to create a shortcut?',
+  }, {
+    type: 'input',
+    name: 'name',
+    message: 'Name for the new shortcut:',
+    default: () => parentName || 'MyShortcut',
+    validate: name => validateShortcutName(name, shortcuts),
+    when,
+  }, {
+    type: 'input',
+    name: 'title',
+    message: 'Shortcut title:',
+    validate: x => !!x,
+    default: ({ name }) => decamelize(name, ' '),
+    when,
+  }, {
+    type: 'input',
+    name: 'description',
+    message: 'Shortcut description:',
+    validate: x => !!x,
+    default: ({ name }) => `A shortcut for ${name}`,
+    when,
+  }];
+}
+
+export async function askShortcutCreationQuestions(opts) {
+  return await prompt(createShortcutCreationQuestions(opts));
+}
+
+export function addShortcutForScreen(extJson, screen, shortcut) {
+  getOrSet(extJson, 'shortcuts', [])
+    .push({
+      name: shortcut.name,
+      title: shortcut.title,
+      description: shortcut.title,
+      screen: `@.${screen.name}`
+    });
+}
+
+export function linkSettingsPageWithExistingScreen(extJson, page, screenName) {
+  let shortcut = _.find(extJson.shortcuts, { screen: `@.${screenName}` });
+  if (!shortcut) {
+    throw new Error(`Shortcut for screen ${screenName} does not exist so it cannot be linked with settings pages. ` +
+      `Please create a shortcut using 'shoutem shortcut add' first!`)
+  }
+
+  getOrSet(shortcut, 'adminPages', []).push({
+    name: `@.${page.name}`,
+    title: page.title || decamelize(page.name, ' '),
+  });
 }
