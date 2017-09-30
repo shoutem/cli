@@ -1,7 +1,7 @@
 import React, { PropTypes, Component, Children } from 'react';
 import { connect } from 'react-redux';
 import sandbox from '@shoutem/extension-sandbox';
-import ext from '../../src/const';
+import { ext } from '../../src/const';
 
 export class SyncStateEngineProvider extends Component {
   constructor(props) {
