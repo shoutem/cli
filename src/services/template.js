@@ -1,3 +1,4 @@
+import Promise from 'bluebird';
 import fs from 'fs-extra';
 import path from 'path';
 import Mustache from 'mustache';
@@ -12,6 +13,11 @@ export function load(pathWithSlashes, templateContext) {
   return Mustache.render(template, templateContext);
 }
 
+async function computeDiff(filePath, newContent) {
+  const oldContent = await fs.readFile(filePath);
+  
+}
+
 async function instantiateTemplatePathRec(localTemplatePath, destinationPath, context, opts) {
   if (localTemplatePath.endsWith('template-initialization.js')) {
     return null;
@@ -24,11 +30,11 @@ async function instantiateTemplatePathRec(localTemplatePath, destinationPath, co
   if (templatePathState.isDirectory()) {
     await mkdirp(destinationPath);
     const files = await fs.readdir(templatePath);
-    await Promise.all(files.map(file => {
+    await Promise.map(files, file => {
       const src = path.join(localTemplatePath, file);
       const dest = path.join(destinationPath, file);
       return instantiateTemplatePathRec(src, dest, context, opts);
-    }));
+    });
   } else if (templatePathState.isFile()) {
     if (!opts.overwrite(destinationPath) && await pathExists(destinationPath)) {
       throw new Error(`File ${destinationPath} already exists.`);

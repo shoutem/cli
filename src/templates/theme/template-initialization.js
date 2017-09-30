@@ -1,12 +1,9 @@
 import _ from 'lodash';
-import { loadExtensionJson, saveExtensionJson } from '../../src/services/extension';
-import { generateExtensionJs } from '../../src/services/ext-js-generator';
+import getOrSet from 'lodash-get-or-set';
 
-export async function after(localTemplatePath, extensionPath, { title, themeName, description }) {
-  const extJson = await loadExtensionJson(extensionPath) || {};
-
-  const themes = extJson.themes = extJson.themes || [];
-  if (_.includes(themes.map(theme => theme.name), themeName)) {
+export async function after({ title, themeName, description, extJson }) {
+  const themes = getOrSet(extJson, 'themes', []);
+  if (_.find(themes, { name: themeName })) {
     throw new Error(`Theme \`${themeName}\` already exists. Pick another name.`);
   }
   themes.push({
@@ -17,14 +14,11 @@ export async function after(localTemplatePath, extensionPath, { title, themeName
     variables: `@.${themeName}Variables`,
   });
 
-  const themeVariables = extJson.themeVariables = extJson.themeVariables || [];
-  themeVariables.push({
-    name: `${themeName}Variables`,
-    path: `./server/themes/${themeName}Variables.json`,
-  });
-
-  await saveExtensionJson(extJson);
-  await generateExtensionJs(extensionPath);
+  getOrSet(extJson, 'themeVariables', [])
+    .push({
+      name: `${themeName}Variables`,
+      path: `./server/themes/${themeName}Variables.json`,
+    });
 
   return [
     `app/themes/${themeName}.js`,
