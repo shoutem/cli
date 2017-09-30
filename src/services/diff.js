@@ -2,7 +2,7 @@ import _ from 'lodash';
 import path from 'path';
 import { diffLines } from 'diff';
 import fs from 'fs-extra';
-import mkdirp from 'mkdirp';
+import mkdirp from 'mkdirp-promise';
 import confirm from './confirmer';
 
 export async function applyDiffLog(diffLog) {
@@ -25,9 +25,6 @@ export async function offerChanges({ diffLog, postRunActions }) {
       }
       return { diff: diffLines(oldContent, fileContent), type: 'modify', filePath };
     } catch (e) {
-      if (e.code !== 'ENOENT') {
-        throw e;
-      }
       return { type: 'add', filePath };
     }
   }));
@@ -60,10 +57,10 @@ export async function offerChanges({ diffLog, postRunActions }) {
     });
   });
 
-  if (await confirm('Do you want to apply these changes?')) {
-    await applyDiffLog(diffLog);
-    await Promise.all(_.map(postRunActions, action => action()));
-    return;
+  if (!await confirm('Do you want to apply these changes?')) {
+    throw new Error('Changes canceled');
   }
-  throw new Error('Changes canceled');
+
+  await applyDiffLog(diffLog);
+  await Promise.all(_.map(postRunActions, action => action()));
 }

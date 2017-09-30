@@ -1,4 +1,3 @@
-import _ from 'lodash';
 import getOrSet from 'lodash-get-or-set';
 import Promise from 'bluebird';
 import fs from 'fs-extra';
@@ -15,7 +14,7 @@ export function load(pathWithSlashes, templateContext) {
 }
 
 async function instantiateTemplatePathRec(localTemplatePath, destinationPath, context, opts) {
-  if (localTemplatePath.endsWith('template-initialization.js')) {
+  if (localTemplatePath.endsWith('template-init.js')) {
     return null;
   }
   destinationPath = Mustache.render(destinationPath, context);
@@ -48,22 +47,11 @@ function importName(modulePath, name, defaultValue) {
   }
 }
 
-export async function diffLogToDiff(diffLog) {
-  await Promise.all(_.map(diffLog, async (newValue, filePath) => {
-    try {
-      fs.readFile(filePath)
-    } catch (e) {
-
-    }
-  }));
-}
-
 export async function instantiateTemplatePath(localTemplatePath, destinationPath, context, opts = {}) {
   opts.overwrite = opts.overwrite || (() => false);
-  const apply = getOrSet(opts, 'apply', false);
   const postRunActions = getOrSet(context, 'postRunActions', []);
 
-  const initPath = path.join(templatesDirectory, localTemplatePath, 'template-initialization');
+  const initPath = path.join(templatesDirectory, localTemplatePath, 'template-init');
 
   const before = importName(initPath, 'before', () => {});
   const after = importName(initPath, 'after', () => {});

@@ -30,24 +30,26 @@ export const builder = yargs => {
 
 const postRunMessage =
 `
-  ${'shoutem screen add'.blue.bold}
+  ${'shoutem screen add'.cyan}
     add a new screen
 
-  ${'shoutem schema add'.blue.bold}
+  ${'shoutem schema add <schemaName>'.cyan}
     add a new data schema
 
-  ${'shoutem theme add'.blue.bold}
+  ${'shoutem theme add <themeName>'.cyan}
     add a new theme
 
-  ${'shoutem page add'.blue.bold} 
+  ${'shoutem page add'.cyan} 
     add a new settings page 
 `;
 
-export const handler = ({ name, local }) => executeAndHandleError(async () => {
-  const platformDir = await getPlatformRootDir();
-  const extensionPath = await initExtension(name, await getPlatformExtensionsDir(platformDir));
+export const handler = args => executeAndHandleError(addExtension);
 
-  if (!local) {
+export async function addExtension({ name, local, externalDestination }) {
+  const platformDir = externalDestination || await getPlatformRootDir();
+  const extensionPath = await initExtension(name, externalDestination || await getPlatformExtensionsDir(platformDir));
+
+  if (!local && !externalDestination) {
     await uploadExtension({}, extensionPath);
     await publishExtension(extensionPath);
 
@@ -55,14 +57,16 @@ export const handler = ({ name, local }) => executeAndHandleError(async () => {
     await spinify(installLocalExtension(appId, extensionPath), 'Installing it in your app...', 'OK');
   }
 
-  console.log('\nRunning npm install script:');
-  await linkLocalExtension(platformDir, extensionPath);
-  await addToExtensionsJs(platformDir, extensionPath);
-  console.log(`npm install [${'OK'.bold.green}]`);
+  if (!externalDestination) {
+    console.log('\nRunning npm install script:');
+    await linkLocalExtension(platformDir, extensionPath);
+    await addToExtensionsJs(platformDir, extensionPath);
+    console.log(`npm install [${'OK'.bold.green}]`);
+  }
 
   const cdCommand = 'cd ' + path.relative(process.cwd(), extensionPath);
   console.log('\nCongratulations, your new extension is ready!'.green.bold);
-  console.log(`You might try doing ${cdCommand.blue.bold} where you can:`);
+  console.log(`You might try doing ${cdCommand.cyan} where you can:`);
   console.log(postRunMessage);
   console.log('Happy coding!');
-});
+}

@@ -14,7 +14,6 @@ export const handler = args => executeAndHandleError(async () => {
 
 export async function createPage(opts, extensionPath) {
   const changes = await instantiateExtensionTemplate('settings-page', { ...opts, extensionPath });
-  console.log(changes.postRunActions);
   await offerChanges(changes);
   console.log('Page added!'.green.bold);
 }

@@ -22,10 +22,19 @@ export function containsShortcut(extJson, shortcutName) {
   return _.includes(names, shortcutName);
 }
 
-export function addShortcut(extJson, shortcut) {
-  extJson.shortcuts = extJson.shortcuts || [];
-  extJson.shortcuts.push(shortcut);
-  return extJson;
+export function addShortcut(extJson, { name, title, description, screenName, pagesNames }) {
+  const shortcut = { name, title, description };
+  if (screenName) {
+    shortcut.screen = `@.${screenName}`;
+  }
+  if (_.size(pagesNames)) {
+    shortcut.adminPages = pagesNames.map(name => ({
+      page: `@.${name}`,
+      title: decamelize(name, ' '),
+    }));
+  }
+
+  getOrSet(extJson, 'shortcuts', []).push(shortcut);
 }
 
 function validateShortcutName(name, existingShortcuts) {
@@ -38,13 +47,16 @@ function validateShortcutName(name, existingShortcuts) {
   return true;
 }
 
-function createShortcutCreationQuestions({ shortcuts, parentName, message }) {
-  const when = ({ shouldCreateShortcut }) => shouldCreateShortcut;
+function createShortcutCreationQuestions({ shortcuts, parentName, pages, screens }) {
+  const when = ({ shouldCreateShortcut }) => shouldCreateShortcut || !parentName;
+  const screensNames = _.map(screens, 'name');
+  const pagesNames = _.map(pages, 'name');
 
   return [{
     type: 'confirm',
     name: 'shouldCreateShortcut',
-    message: message || 'Do you want to create a shortcut?',
+    message: 'Create a shortcut (so that screen can be added through the Builder)?',
+    when: () => parentName,
   }, {
     type: 'input',
     name: 'name',
@@ -64,8 +76,20 @@ function createShortcutCreationQuestions({ shortcuts, parentName, message }) {
     name: 'description',
     message: 'Shortcut description:',
     validate: x => !!x,
-    default: ({ name }) => `A shortcut for ${name}`,
+    default: () => parentName ? `A shortcut for ${parentName}` : null,
     when,
+  }, {
+    type: 'checkbox',
+    name: 'pagesNames',
+    message: 'Which settings pages would you like to connect with this shortcut?',
+    when: () => !parentName && screensNames.length,
+    choices: screensNames,
+  }, {
+    type: 'list',
+    name: 'screenName',
+    message: 'Which screen would you like to connect with this shortcut?',
+    when: () => !parentName && pagesNames.length,
+    choices: [{ name: 'Skip this step', value: null }, ...pagesNames],
   }];
 }
 
@@ -78,7 +102,7 @@ export function addShortcutForScreen(extJson, screen, shortcut) {
     .push({
       name: shortcut.name,
       title: shortcut.title,
-      description: shortcut.title,
+      description: shortcut.description,
       screen: `@.${screen.name}`
     });
 }

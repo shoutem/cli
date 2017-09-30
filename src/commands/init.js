@@ -8,6 +8,7 @@ import { getPlatforms } from '../clients/extension-manager';
 import * as utils from '../services/extension';
 import {instantiateExtensionTemplate} from "../services/extension-template";
 import {offerChanges} from "../services/diff";
+import {stringify} from "../services/data";
 
 
 function generateNoPatchSemver(version) {
@@ -52,22 +53,22 @@ export async function initExtension(extName, extensionPath = process.cwd()) {
 
   utils.getExtensionCanonicalName(developer.name, extJson.name, extJson.version);
 
-  const packageJson = {
-    name: `${developer.name}.${extJson.name}`,
-    version: extJson.version,
-    description: extJson.description
-  };
-
   const dirname = `${developer.name}.${extJson.name}`;
   if (await pathExists(path.join(process.cwd(), dirname))) {
-    throw new Error(`Folder ${dirname} already exists. Rename the folder.`);
+    throw new Error(`Folder ${dirname} already exists.`);
   }
+
+  const packageJsonString = stringify({
+    name: `${developer.name}.${extJson.name}`,
+    version: extJson.version,
+    description: extJson.description,
+  });
 
   await offerChanges(await instantiateExtensionTemplate('init', {
     extensionPath,
     devName: developer.name,
     extJson,
-    packageJsonString: JSON.stringify(packageJson, null, 2),
+    packageJsonString,
   }));
 
   return path.join(extensionPath, dirname);
