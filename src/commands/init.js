@@ -2,12 +2,12 @@ import _ from 'lodash';
 import inquirer from 'inquirer';
 import { pathExists } from 'fs-extra';
 import path from 'path';
-import { instantiateTemplatePath } from '../services/template';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import msg from '../user_messages';
 import { getPlatforms } from '../clients/extension-manager';
 import * as utils from '../services/extension';
 import {instantiateExtensionTemplate} from "../services/extension-template";
+import {offerChanges} from "../services/diff";
 
 
 function generateNoPatchSemver(version) {
@@ -46,7 +46,7 @@ export async function promptExtensionInit(extName) {
   return { name, ...answer, platform: generateNoPatchSemver(_.first(platformVersions)) };
 }
 
-export async function initExtension(extName, destDir = process.cwd()) {
+export async function initExtension(extName, extensionPath = process.cwd()) {
   const developer = await ensureUserIsLoggedIn();
   const extJson = await promptExtensionInit(extName);
 
@@ -63,13 +63,12 @@ export async function initExtension(extName, destDir = process.cwd()) {
     throw new Error(`Folder ${dirname} already exists. Rename the folder.`);
   }
 
-  await instantiateExtensionTemplate('init', {
+  await offerChanges(await instantiateExtensionTemplate('init', {
+    extensionPath,
     devName: developer.name,
     extJson,
-    extJsonString: JSON.stringify(extJson, null, 2),
     packageJsonString: JSON.stringify(packageJson, null, 2),
-    extensionPath: destDir,
-  });
+  }));
 
-  return path.join(destDir, dirname);
+  return path.join(extensionPath, dirname);
 }

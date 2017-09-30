@@ -24,14 +24,12 @@ export async function after(context) {
 
   const { type } = context;
   if (type === 'react') {
-    return await instantiateExtensionTemplate('settings-page-react', context);
-  }
-
-  if (type === 'html') {
-    return await instantiateExtensionTemplate('settings-page-html', context);
-  }
-
-  if (type === 'blank') {
-    return await instantiateExtensionTemplate('settings-page-blank', context);
+    await instantiateExtensionTemplate('settings-page-react', context)
+  } else if (type === 'html') {
+    await instantiateExtensionTemplate('settings-page-html', context);
+  } else if (type === 'blank') {
+    await instantiateExtensionTemplate('settings-page-blank', context);
+  } else {
+    throw new Error(`Invalid page type ${type}`);
   }
 }

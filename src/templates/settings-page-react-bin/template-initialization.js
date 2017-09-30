@@ -1,5 +1,8 @@
 import _ from 'lodash';
-import * as npm from "../../services/npm";
+import path from 'path';
+import getOrSet from 'lodash-get-or-set';
+import {stringify} from "../../services/data";
+import {getPackageJson, install} from "../../services/npm";
 
 const pkgJsonTemplate = {
   "scripts": {
@@ -59,10 +62,19 @@ const pkgJsonTemplate = {
   }
 };
 
-export async function before({ serverJson }) {
-  _.merge(serverJson, pkgJsonTemplate);
+export async function before(context) {
+  const { extensionPath } = context;
+  const serverPath = path.join(extensionPath, 'server');
+  context.serverJsonString = stringify(_.merge(await getPackageJson(serverPath), pkgJsonTemplate));
 }
 
-export async function after({ extensionPath }) {
-  return async () => await npm.install(extensionPath);
+export async function after(context) {
+  const { extensionPath } = context;
+
+  getOrSet(context, 'postRunActions', [])
+    .push(async () => {
+      console.log('Running npm install on the server dir...');
+      await install(path.join(extensionPath, 'server'));
+      console.log(`npm install... [${'OK'.green.bold}]`)
+    });
 }

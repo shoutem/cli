@@ -13,7 +13,11 @@ export async function readJsonFile(filePath) {
 }
 
 export async function writeJsonFile(json, filePath) {
-  const str = `${JSON.stringify(json, null, 2)}\n`;
+  const str = stringify(json);
   await fs.writeFile(filePath, str, 'utf8');
   return str;
+}
+
+export function stringify(json) {
+  return `${JSON.stringify(json, null, 2)}\n`;
 }

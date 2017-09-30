@@ -73,7 +73,7 @@ export async function askScreenCreationQuestions({ skipPage, ...opts }) {
     }
   }
 
-  const message = "Create a shortcut for this screen? Choose 'yes' and accept defaults if unsure";
+  const message = "Shortcut is required for a screen to appear in the app. Create one now?";
   const { shouldCreateShortcut, ...shortcut } = await askShortcutCreationQuestions({ ...opts, parentName, message });
   if (shouldCreateShortcut) {
     screen.newShortcut = shortcut;

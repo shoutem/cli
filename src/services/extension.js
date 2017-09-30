@@ -67,10 +67,14 @@ export function saveExtensionJsonCallback(extJson, callback) {
     err => callback(err, extJson));
 }
 
+export function extensionJsonPath(rootPath) {
+  return path.join(rootPath, 'extension.json');
+}
+
 export async function loadExtensionJson(rootPath = ensureInExtensionDir()) {
-  return await readJsonFile(path.join(rootPath, 'extension.json'));
+  return await readJsonFile(extensionJsonPath(rootPath));
 }
 
 export async function saveExtensionJson(json, rootPath = ensureInExtensionDir()){
-  return await writeJsonFile(json, path.join(rootPath, 'extension.json'));
+  return await writeJsonFile(json, extensionJsonPath(rootPath));
 }

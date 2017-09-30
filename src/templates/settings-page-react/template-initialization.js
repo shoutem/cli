@@ -29,5 +29,5 @@ export async function before(context) {
 }
 
 export async function after(context) {
-  return await instantiateExtensionTemplate('settings-page-react-bin', context, { overwrite: () => true });
+  await instantiateExtensionTemplate('settings-page-react-bin', context);
 }

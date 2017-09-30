@@ -33,6 +33,7 @@
     "command-exists": "1.0.2",
     "decamelize": "^1.2.0",
     "decompress": "4.0.0",
+    "diff": "^3.3.1",
     "download-cached": "1.0.8",
     "download-file": "latest",
     "eslint": "2.9.0",

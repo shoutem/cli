@@ -10,10 +10,6 @@ export async function instantiateExtensionTemplate(localTemplatePath, context, o
     throw new Error(`Missing extension path for extension-template ${localTemplatePath}`);
   }
 
-  const ret = await template.instantiateTemplatePath(localTemplatePath, context.extensionPath, context, opts);
-  if (!context.skipExtensionJs) {
-    await template.instantiateTemplatePath('extension-js', context.extensionPath, context, { overwrite: () => true });
-  }
-
-  return ret;
+  await template.instantiateTemplatePath(localTemplatePath, context.extensionPath, context, opts);
+  return await template.instantiateTemplatePath('extension-js', context.extensionPath, context, opts);
 }

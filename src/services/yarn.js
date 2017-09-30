@@ -1,7 +1,6 @@
 import { spawn } from 'child-process-promise';
 import msg from '../user_messages';
 import commandExists from './command-exists';
-import semver from 'semver';
 
 export async function ensureYarnInstalled() {
   if (!await commandExists('yarn')) {
@@ -11,7 +10,7 @@ export async function ensureYarnInstalled() {
 
 export async function install(cwd = process.cwd()) {
   await ensureYarnInstalled();
-  await spawn('yarn', ['install'], {cwd, stdio: 'inherit'});
+  await spawn('yarn', ['install'], { cwd, stdio: 'inherit' });
 }
 
 export async function run(cwd, task, taskArgs = null, stdio = 'inherit') {
