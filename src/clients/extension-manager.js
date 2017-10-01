@@ -36,17 +36,12 @@ export async function uploadExtension(canonicalName, tgzStream, progressHandler,
     contentType: 'application/gzip'
   });
 
-  try {
+  const { id } = await jsonApi.put(uri, null, {
+    body: form,
+    headers: form.getHeaders()
+  });
 
-    const {id} = await jsonApi.put(uri, null, {
-      body: form,
-      headers: form.getHeaders()
-    });
-
-    return id;
-  } catch (e) {
-    console.log(e);
-  }
+  return id;
 }
 
 export async function getExtensionId(canonicalName) {
@@ -70,11 +65,3 @@ export async function getPlatforms() {
   return await jsonApi.get(url);
 }
 
-export class DeveloperNameError {
-  /*
-    Used when developer tries to register with a name which is not unique.
-  */
-  constructor(devName) {
-    this.message = `Name "${devName}" is already taken`;
-  }
-}

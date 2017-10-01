@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.10.0-beta7",
+  "version": "0.10.0-beta8",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -104,6 +104,11 @@
     ],
     "plugins": [
       "transform-object-rest-spread"
+    ],
+    "ignore": false,
+    "only": [
+      "config",
+      "src"
     ]
   }
 }

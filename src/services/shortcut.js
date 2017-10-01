@@ -115,7 +115,7 @@ export function linkSettingsPageWithExistingScreen(extJson, page, screenName) {
   }
 
   getOrSet(shortcut, 'adminPages', []).push({
-    name: `@.${page.name}`,
+    page: `@.${page.name}`,
     title: page.title || decamelize(page.name, ' '),
   });
 }
