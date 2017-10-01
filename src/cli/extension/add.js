@@ -43,7 +43,7 @@ const postRunMessage =
     add a new settings page 
 `;
 
-export const handler = args => executeAndHandleError(addExtension);
+export const handler = args => executeAndHandleError(() => addExtension(args));
 
 export async function addExtension({ name, local, externalDestination }) {
   const platformDir = externalDestination || await getPlatformRootDir();
