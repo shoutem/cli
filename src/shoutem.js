@@ -3,6 +3,7 @@
 const semver = require('semver');
 const path = require('path');
 const getHomeDir = require('./home-dir');
+const packageJson = require('../package.json');
 require('colors');
 
 const homeDir = getHomeDir();
@@ -21,5 +22,5 @@ if (semver.lt(process.versions.node, '6.0.0')) {
 const babelCachePath = path.join(homeDir, 'cache', 'babel-cache');
 process.env.BABEL_CACHE_PATH = process.env.BABEL_CACHE_PATH || babelCachePath;
 
-require('babel-register');
+require('babel-register')(packageJson.babel);
 require('./cli');

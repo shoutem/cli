@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.10.0-beta9",
+  "version": "0.10.0-beta12",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -14,7 +14,6 @@
     "lint": "eslint ./",
     "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\"",
     "shoutem": "node src/shoutem.js",
-    "postinstall": "node src/scripts/postinstall.js",
     "prepublish": "dos2unix src/shoutem.js",
     "beta": "npm publish --access public --tag beta"
   },
