@@ -15,7 +15,8 @@
     "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\"",
     "shoutem": "node src/shoutem.js",
     "postinstall": "node src/scripts/postinstall.js",
-    "prepublish": "dos2unix src/shoutem.js"
+    "prepublish": "dos2unix src/shoutem.js",
+    "beta": "npm publish --access public --tag beta"
   },
   "author": "",
   "license": "ISC",
