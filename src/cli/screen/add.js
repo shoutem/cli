@@ -5,11 +5,11 @@ import {instantiateExtensionTemplate} from "../../services/extension-template";
 import {offerChanges} from "../../services/diff";
 
 export const description = 'Add a screen for applications running this extension';
-export const command = 'add';
+export const command = 'add [name]';
 
-export const handler = () => executeAndHandleError(async () => {
+export const handler = args => executeAndHandleError(async () => {
   const extJson = await loadExtensionJson();
-  const answers = await askScreenCreationQuestions({ ...extJson, skipPage: true });
+  const answers = await askScreenCreationQuestions({ ...extJson, defaultName: args.name });
   await createScreen(answers, ensureInExtensionDir());
 });
 

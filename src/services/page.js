@@ -14,7 +14,7 @@ function validatePageName(name, existingPages) {
   return true;
 }
 
-function createPageCreationQuestions({ pages, parentName }) {
+function createPageCreationQuestions({ pages, parentName, defaultName = 'MyPage' }) {
   return [{
     type: 'list',
     name: 'type',
@@ -26,7 +26,7 @@ function createPageCreationQuestions({ pages, parentName }) {
     name: 'name',
     message: 'Settings page name:',
     validate: name => validatePageName(name, pages),
-    default: parentName ? `${parentName}Page` : 'MyPage',
+    default: parentName ? `${parentName}Page` : defaultName,
   }, {
     type: 'input',
     name: 'title',
@@ -36,28 +36,24 @@ function createPageCreationQuestions({ pages, parentName }) {
 }
 
 function createPageScopeQuestions({ screens, name: extensionName }) {
-  const scopeChoices = [{
-    name: 'a screen I want to create right now',
-    value: 'newScreen',
-  }, {
-    name: `the entire '${extensionName}' extension`,
-    value: 'extension',
-  }, {
-    name: 'decide later',
-    value: 'skip',
-  }, {
-    name: 'an existing screen',
-    value: 'existingScreen',
-  }];
-  if (!_.size(screens)) {
-    scopeChoices.pop();
-  }
-
   return [{
     type: 'list',
     name: 'type',
     message: 'This settings page controls settings for:',
-    choices: scopeChoices,
+    choices: [{
+      name: 'an existing screen',
+      value: 'existingScreen',
+      when: _.size(screens),
+    }, {
+      name: 'a new screen (creates a screen)',
+      value: 'newScreen',
+    }, {
+      name: `the '${extensionName}' extension`,
+      value: 'extension',
+    }, {
+      name: 'skip',
+      value: 'skip',
+    }],
   }];
 }
 
@@ -85,7 +81,7 @@ export async function askPageCreationQuestions({ skipScope, ...opts }) {
   }
 
   if (scope.type === 'newScreen') {
-    page.newScreen = await askScreenCreationQuestions({ opts, skipPage: true, parentName });
+    page.newScreen = await askScreenCreationQuestions({ opts, parentName });
   }
 
   if (scope.type === 'extension') {

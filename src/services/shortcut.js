@@ -4,24 +4,6 @@ import { prompt } from 'inquirer';
 import getOrSet from 'lodash-get-or-set';
 import {isVariableName} from "./cli-parsing";
 
-export async function promptShortcutInfo(shortcutName) {
-  console.log('Enter shortcut information:');
-  const { title }  = await prompt({
-    message: 'Title',
-    name: 'title',
-    type: 'input',
-    default: _.upperFirst(shortcutName),
-    validate: input => input.length > 0
-  });
-  console.log();
-  return { title, name: shortcutName };
-}
-
-export function containsShortcut(extJson, shortcutName) {
-  const names = (extJson.shortcuts || []).map(s => s.name);
-  return _.includes(names, shortcutName);
-}
-
 export function addShortcut(extJson, { name, title, description, screenName, pagesNames }) {
   const shortcut = { name, title, description };
   if (screenName) {
@@ -47,7 +29,7 @@ function validateShortcutName(name, existingShortcuts) {
   return true;
 }
 
-function createShortcutCreationQuestions({ shortcuts, parentName, pages, screens }) {
+function createShortcutCreationQuestions({ shortcuts, parentName, pages, screens, defaultName = 'MyShortcut' }) {
   const when = ({ shouldCreateShortcut }) => shouldCreateShortcut || !parentName;
   const screensNames = _.map(screens, 'name');
   const pagesNames = _.map(pages, 'name');
@@ -61,7 +43,7 @@ function createShortcutCreationQuestions({ shortcuts, parentName, pages, screens
     type: 'input',
     name: 'name',
     message: 'Name for the new shortcut:',
-    default: () => parentName || 'MyShortcut',
+    default: () => parentName || defaultName,
     validate: name => validateShortcutName(name, shortcuts),
     when,
   }, {
@@ -82,14 +64,14 @@ function createShortcutCreationQuestions({ shortcuts, parentName, pages, screens
     type: 'checkbox',
     name: 'pagesNames',
     message: 'Which settings pages would you like to connect with this shortcut?',
-    when: () => !parentName && screensNames.length,
-    choices: screensNames,
+    when: () => !parentName && pagesNames.length,
+    choices: pagesNames,
   }, {
     type: 'list',
     name: 'screenName',
     message: 'Which screen would you like to connect with this shortcut?',
-    when: () => !parentName && pagesNames.length,
-    choices: [{ name: 'Skip this step', value: null }, ...pagesNames],
+    when: () => !parentName && screensNames.length,
+    choices: [{ name: 'skip', value: null }, ...screensNames],
   }];
 }
 

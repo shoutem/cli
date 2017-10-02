@@ -68,5 +68,6 @@ export async function addExtension({ name, local, externalDestination }) {
   console.log('\nCongratulations, your new extension is ready!'.green.bold);
   console.log(`You might try doing ${cdCommand.cyan} where you can:`);
   console.log(postRunMessage);
+  console.log('Success!'.green.bold);
   console.log('Happy coding!');
 }
