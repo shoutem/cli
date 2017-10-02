@@ -42,7 +42,7 @@ function createShortcutCreationQuestions({ shortcuts, parentName, pages, screens
   }, {
     type: 'input',
     name: 'name',
-    message: 'Name for the new shortcut:',
+    message: 'Shortcut name:',
     default: () => parentName || defaultName,
     validate: name => validateShortcutName(name, shortcuts),
     when,
