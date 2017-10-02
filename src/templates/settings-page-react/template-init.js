@@ -18,7 +18,7 @@ export async function before(context) {
   }
 
   if (!_.every(pages, isReactPage)) {
-    throw new Error("React pages can't be mixed with non-react settings pages");
+    throw new Error("React pages can't be mixed with non-react settings pages in the same extension");
   }
 
   pages.push({ name, type: 'react-page' });

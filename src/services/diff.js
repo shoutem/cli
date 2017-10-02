@@ -57,10 +57,6 @@ export async function offerChanges({ diffLog, postRunActions }) {
     });
   });
 
-  if (!await confirm('Do you want to apply these changes?')) {
-    throw new Error('Changes canceled');
-  }
-
   await applyDiffLog(diffLog);
   await Promise.all(_.map(postRunActions, action => action()));
 }

@@ -9,7 +9,7 @@ export async function before({ extJson, name }) {
   const pages = getOrSet(extJson, 'pages', []);
 
   if (!_.every(pages, isHtmlPage)) {
-    throw new Error("Html pages can't be mixed with non-html settings pages");
+    throw new Error("Html pages can't be mixed with non-html settings pages in the same extension");
   }
 
   if (_.find(pages, { name })) {
