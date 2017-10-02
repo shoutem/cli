@@ -1,8 +1,6 @@
-require('babel-register');
+require('babel-register')(require('../../package.json').babel);
 require('fetch-everywhere');
-
 const readline = require('readline');
-const semver = require('semver');
 
 const rl = readline.createInterface({
   input: process.stdin,
