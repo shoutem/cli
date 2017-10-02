@@ -4,7 +4,7 @@ import decamelize from "decamelize";
 import pascalize from 'uppercamelcase';
 import {instantiateExtensionTemplate} from "../../services/extension-template";
 
-function isReactPage({ type, path }) {
+export function isReactPage({ type, path }) {
   return type === 'react-page' || _.includes(path, 'server/build');
 }
 

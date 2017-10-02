@@ -5,7 +5,8 @@ function isHtmlPage({ type, path }) {
    return type === 'html' && !_.includes(path, 'server/build');
 }
 
-export async function before({ extJson, name }) {
+export async function before(context) {
+  const { extJson, name } = context;
   const pages = getOrSet(extJson, 'pages', []);
 
   if (!_.every(pages, isHtmlPage)) {
@@ -15,6 +16,8 @@ export async function before({ extJson, name }) {
   if (_.find(pages, { name })) {
     throw new Error(`Page ${name} already exists`);
   }
+
+  context.pageName = name;
 
   pages.push({
     name: name,
