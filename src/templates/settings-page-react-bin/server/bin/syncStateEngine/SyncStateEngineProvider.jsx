@@ -1,4 +1,5 @@
 import React, { PropTypes, Component, Children } from 'react';
+import _ from 'lodash';
 import { connect } from 'react-redux';
 import sandbox from '@shoutem/extension-sandbox';
 import { ext } from '../../src/const';

@@ -29,5 +29,10 @@ export async function before(context) {
 }
 
 export async function after(context) {
+  if (context.extensionScope) {
+    await instantiateExtensionTemplate('settings-page-react-extension', context);
+  } else {
+    await instantiateExtensionTemplate('settings-page-react-shortcut', context);
+  }
   await instantiateExtensionTemplate('settings-page-react-bin', context);
 }

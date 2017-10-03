@@ -66,13 +66,9 @@ function createScreenSelectionQuestions({ screens }) {
   };
 }
 
-export async function askPageCreationQuestions({ skipScope, ...opts }) {
+export async function askPageCreationQuestions(opts) {
   const page = await prompt(createPageCreationQuestions(opts));
   const parentName = page.name;
-
-  if (skipScope) {
-    return page;
-  }
 
   const scope = await prompt(createPageScopeQuestions(opts));
 
