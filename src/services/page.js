@@ -18,7 +18,7 @@ function createPageCreationQuestions({ pages, parentName, defaultName = 'MyPage'
   return [{
     type: 'list',
     name: 'type',
-    choices: ['react', 'html', 'blank'],
+    choices: ['react', 'html'],
     default: 'react',
     message: 'Settings page type:',
   }, {
