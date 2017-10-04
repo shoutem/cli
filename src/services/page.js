@@ -40,20 +40,23 @@ function createPageScopeQuestions({ screens, name: extensionName }) {
     type: 'list',
     name: 'type',
     message: 'This settings page controls settings for:',
-    choices: [{
+    choices: _.filter([{
       name: 'an existing screen',
       value: 'existingScreen',
-      when: _.size(screens),
+      include: _.size(screens),
     }, {
       name: 'a new screen (creates a screen)',
       value: 'newScreen',
+      include: true,
     }, {
       name: `the '${extensionName}' extension`,
       value: 'extension',
+      include: true,
     }, {
       name: 'skip',
       value: 'skip',
-    }],
+      include: true,
+    }], 'include'),
   }];
 }
 

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import inquirer from 'inquirer';
+import decamelize from 'decamelize';
 import { pathExists } from 'fs-extra';
 import path from 'path';
 import { ensureUserIsLoggedIn } from '../commands/login';
@@ -18,7 +19,7 @@ function generateNoPatchSemver(version) {
 
 export async function promptExtensionInit(extName) {
   const name = _.kebabCase(extName);
-  const title = _.upperFirst(extName.toLowerCase());
+  const title = decamelize(extName, ' ');
   const version = '0.0.1';
 
   const questions = [{
