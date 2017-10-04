@@ -29,10 +29,10 @@ function validateShortcutName(name, existingShortcuts) {
   return true;
 }
 
-function createShortcutCreationQuestions({ shortcuts, parentName, pages, screens, defaultName = 'MyShortcut' }) {
+function createShortcutCreationQuestions({ shortcuts, parentName, screens, defaultName = 'MyShortcut' }) {
   const when = ({ shouldCreateShortcut }) => shouldCreateShortcut || !parentName;
-  const screensNames = _.map(screens, 'name');
-  const pagesNames = _.map(pages, 'name');
+  const shortcutsWithoutScreen = _.filter(screens, ({ name }) => !_.find(shortcuts, { screen: `@.${name}` }));
+  const screensNames = _.map(shortcutsWithoutScreen, 'name');
 
   return [{
     type: 'confirm',
@@ -57,15 +57,8 @@ function createShortcutCreationQuestions({ shortcuts, parentName, pages, screens
     type: 'input',
     name: 'description',
     message: 'Shortcut description:',
-    validate: x => !!x,
     default: () => parentName ? `A shortcut for ${parentName}` : null,
     when,
-  }, {
-    type: 'checkbox',
-    name: 'pagesNames',
-    message: 'Which settings pages would you like to connect with this shortcut?',
-    when: () => !parentName && pagesNames.length,
-    choices: pagesNames,
   }, {
     type: 'list',
     name: 'screenName',
