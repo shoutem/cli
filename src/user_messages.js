@@ -58,9 +58,9 @@ export default {
     }
   },
   publish: {
-    complete: extJson => `Version \`${extJson.version}\` of \`${extJson.name}\` extension was published!`,
+    complete: extJson => `Version ${extJson.version.cyan} of ${extJson.name.cyan} extension was published!`,
     failed: detail => `Publish failed: ${detail}`,
-    publishInfo: extJson => `Publishing ${extJson.name.blue.bold} version ${extJson.version.blue.bold}...`
+    publishInfo: extJson => `Publishing ${extJson.name.cyan} version ${extJson.version.cyan}...`
   },
   push: {
     complete: () => 'Success!'.green.bold,

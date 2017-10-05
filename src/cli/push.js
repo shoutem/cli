@@ -36,6 +36,7 @@ export const handler = args => executeAndHandleError(async () => {
     console.log('Push aborted'.bold.yellow);
     return null;
   }
+  console.log('WARNING: shoutem push command is deprecated. Use shoutem publish instead'.yellow.bold);
   if (!args.paths.length) {
     await uploadExtension(args);
     console.log(msg.push.complete());

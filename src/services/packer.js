@@ -78,8 +78,8 @@ export default async function shoutemPack(dir, options) {
   if (options.nobuild) {
     console.error('Skipping build step due to --nobuild flag.');
   } else {
-    await buildNodeProject(path.join(dir, 'server'));
-    await buildNodeProject(path.join(dir, 'app'));
+    await spinify(buildNodeProject(path.join(dir, 'server')), 'Building the server part...', 'OK');
+    await spinify(buildNodeProject(path.join(dir, 'app')), 'Building the app part...', 'OK');
   }
 
   return await spinify(async () => {

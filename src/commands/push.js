@@ -1,14 +1,23 @@
 import fs from 'fs-extra';
 import * as extensionManager from '../clients/extension-manager';
 import {getHostEnvName} from '../clients/server-env';
-import {getExtensionCanonicalName} from '../clients/local-extensions';
-import { ensureInExtensionDir, loadExtensionJson } from '../services/extension';
+import * as local from '../clients/local-extensions';
+import {
+  ensureInExtensionDir,
+  getExtensionCanonicalName,
+  loadExtensionJson,
+  saveExtensionJson
+} from '../services/extension';
 import shoutemPack from '../services/packer';
 import msg from '../user_messages';
 import _ from 'lodash';
 import {createProgressHandler} from '../services/progress-bar';
-import {startSpinner} from '../services/spinner';
+import {spinify, startSpinner} from '../services/spinner';
 import extLint from '../services/extlint';
+import {ensureUserIsLoggedIn} from "./login";
+import {canPublish} from "../clients/extension-manager";
+import { prompt } from 'inquirer';
+import semver from 'semver';
 
 export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
   if (!opts.nocheck) {
@@ -22,12 +31,17 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
     }
   }
   const extJson = await loadExtensionJson(extensionDir);
+  if (opts.publish) {
+    await promptPublishableCanonicalName(extJson);
+    await saveExtensionJson(extJson, extensionDir);
+  }
+
   const packResult = await shoutemPack(extensionDir, { packToTempDir: true, nobuild: opts.nobuild });
 
   const { size } = await fs.stat(packResult.package);
   const stream = fs.createReadStream(packResult.package);
 
-  const id = await getExtensionCanonicalName(extensionDir);
+  const id = await local.getExtensionCanonicalName(extensionDir);
 
   let spinner = null;
   const extensionId = await extensionManager.uploadExtension(
@@ -50,4 +64,23 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
   }
 
   return { extensionId, packResult, extJson };
+}
+
+export async function promptPublishableCanonicalName(extJson) {
+  const dev = await ensureUserIsLoggedIn();
+  while (true) {
+    const { name, version } = extJson;
+    const canonical = getExtensionCanonicalName(dev.name, name, version);
+    const canExtensionBePublished = await spinify(canPublish(canonical), `Checking if version ${version} can be published`);
+    if (canExtensionBePublished) {
+      return;
+    }
+    const { newVersion } = await prompt({
+      name: 'newVersion',
+      default: semver.inc(version, 'patch'),
+      message: `Version ${version} is already published. Specify another version:`,
+      validate: v => !!semver.valid(v),
+    });
+    extJson.version = newVersion;
+  }
 }

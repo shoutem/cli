@@ -14,7 +14,7 @@ export async function publishExtension(extDir) {
 
 export async function pushAndPublish(args) {
   if (!args.nopush) {
-    await uploadExtension(args);
+    await uploadExtension({ ...args, publish: true });
   }
   const extPath = ensureInExtensionDir();
   return await publishExtension(extPath);

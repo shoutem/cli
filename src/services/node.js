@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import * as npm from "./npm";
+import { exec } from 'child-process-promise'
 
 export async function containsBuildTask(dir) {
   try {
@@ -10,27 +11,19 @@ export async function containsBuildTask(dir) {
   }
 }
 
-export class BuildError {
-  /*
-   Used when bad username or password is supplied.
-   */
-  constructor(message) {
-    this.message = message;
-  }
-}
-
 export async function buildNodeProject(dir) {
   if (!await containsBuildTask(dir)) {
     return false;
   }
 
   try {
-    await npm.install(dir);
-    await npm.run(dir, 'build');
+    await exec('npm install', { cwd: dir, FORCE_COLOR: true });
+    await exec('npm run build', { cwd: dir, FORCE_COLOR: true });
   } catch (err) {
-    throw new BuildError(`${err.message || err}\nBuild failed for ${dir} directory.`);
+    console.log(err.stdout);
+    console.error(err.stderr);
+    err.message = `${err.message + '\n'}Build failed for ${dir} directory.`;
+    throw err;
   }
-
   return true;
 }
-

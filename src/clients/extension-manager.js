@@ -65,3 +65,14 @@ export async function getPlatforms() {
   return await jsonApi.get(url);
 }
 
+export async function canPublish(canonical) {
+  try {
+    const { tag } = await getExtension(canonical);
+    return tag === 'develop';
+  } catch (e) {
+    if (e.statusCode === 404) {
+      return true;
+    }
+    throw e;
+  }
+}

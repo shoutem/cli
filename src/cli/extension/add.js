@@ -50,7 +50,7 @@ export async function addExtension({ name, local, externalDestination }) {
   const extensionPath = await initExtension(name, externalDestination || await getPlatformExtensionsDir(platformDir));
 
   if (!local && !externalDestination) {
-    await uploadExtension({}, extensionPath);
+    await uploadExtension({ publish: true }, extensionPath);
     await publishExtension(extensionPath);
 
     const { appId } = await getPlatformConfig(platformDir);

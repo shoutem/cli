@@ -15,5 +15,5 @@ export const handler = args => executeAndHandleError(async () => {
 
 export async function createScreen(opts, extensionPath) {
   await offerChanges(await instantiateExtensionTemplate('screen', { ...opts, extensionPath }));
-  console.log('Success!'.green.bold);
+  console.log('Success'.green.bold);
 }
