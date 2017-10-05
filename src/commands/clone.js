@@ -160,6 +160,7 @@ export async function clone(opts, destinationDir) {
     await downloadApp(opts.appId, appDir, {
       progress: createProgressHandler({ msg: 'Downloading shoutem platform' }),
       useCache: !opts.force,
+
       versionCheck: mobileAppVersion => {
         if (!semver.gte(mobileAppVersion, '0.58.9')) {
           throw new Error('This version of CLI only supports platforms containing mobile app 0.58.9 or higher');

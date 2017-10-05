@@ -7,6 +7,7 @@ export const builder = yargs => {
   return yargs
     .options({
       platform: {
+
         alias: 'p',
         description: 'use external mobile app (ignores platform settings)',
         requiresArg: true

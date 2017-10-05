@@ -12,7 +12,7 @@ export async function publishExtension(extDir) {
   return await spinify(extensionManager.publishExtension(canonicalName), msg.publish.publishInfo(extJson), 'OK');
 }
 
-export async function pushAndPublish(args) {
+export async function pushAndPublish(args = {}) {
   if (!args.nopush) {
     await uploadExtension({ ...args, publish: true });
   }
