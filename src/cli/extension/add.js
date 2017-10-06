@@ -12,6 +12,7 @@ import {uploadExtension} from "../../commands/push";
 import {installLocalExtension} from "../../commands/install";
 import 'colors';
 import {spinify} from "../../services/spinner";
+import {publishExtension} from "../../commands/publish";
 
 export const description = 'Create a new extension for the current app';
 export const command = 'add <name>';
@@ -50,6 +51,7 @@ export async function addExtension({ name, local, externalDestination }) {
 
   if (!local && !externalDestination) {
     await uploadExtension({ publish: true }, extensionPath);
+    await publishExtension(extensionPath);
 
     const { appId } = await getPlatformConfig(platformDir);
     await spinify(installLocalExtension(appId, extensionPath), 'Installing it in your app...', 'OK');

@@ -32,7 +32,7 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
   }
   const extJson = await loadExtensionJson(extensionDir);
   if (opts.publish) {
-    await promptPublishableCanonicalName(extJson);
+    await promptPublishableVersion(extJson);
     await saveExtensionJson(extJson, extensionDir);
   }
 
@@ -66,7 +66,7 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
   return { extensionId, packResult, extJson };
 }
 
-export async function promptPublishableCanonicalName(extJson) {
+export async function promptPublishableVersion(extJson) {
   const dev = await ensureUserIsLoggedIn();
   while (true) {
     const { name, version } = extJson;
