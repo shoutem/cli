@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import _ from 'lodash';
 import {
   Button,
   ButtonToolbar,
@@ -8,19 +9,13 @@ import {
   HelpBlock,
 } from 'react-bootstrap';
 import { LoaderContainer } from '@shoutem/react-web-ui';
-import {
-  fetchShortcut,
-  updateShortcutSettings,
-  getShortcut,
-} from '@shoutem/redux-api-sdk';
-import { shouldRefresh } from '@shoutem/redux-io';
+import { updateShortcutSettings } from '@shoutem/redux-api-sdk';
 import { connect } from 'react-redux';
 import './style.scss';
 
 class {{pageClassName}} extends Component {
   static propTypes = {
     shortcut: PropTypes.object,
-    fetchShortcut: PropTypes.func,
     updateShortcutSettings: PropTypes.func,
   };
 
@@ -31,8 +26,6 @@ class {{pageClassName}} extends Component {
     this.handleSave = this.handleSave.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
 
-    props.fetchShortcut();
-
     this.state = {
       error: null,
       greeting: _.get(props.shortcut, 'settings.greeting'),
@@ -42,7 +35,6 @@ class {{pageClassName}} extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    const { shortcut } = this.props;
     const { shortcut: nextShortcut } = nextProps;
     const { greeting } = this.state;
 
@@ -50,10 +42,6 @@ class {{pageClassName}} extends Component {
       this.setState({
         greeting: _.get(nextShortcut, 'settings.greeting'),
       });
-    }
-
-    if (shortcut !== nextShortcut && shouldRefresh(nextShortcut)) {
-      this.props.fetchShortcut();
     }
   }
 
@@ -78,8 +66,8 @@ class {{pageClassName}} extends Component {
       .then(() => (
         this.setState({ hasChanges: false, inProgress: false })
       )).catch((err) => {
-        this.setState({ error: err, inProgress: false });
-      });
+      this.setState({ error: err, inProgress: false });
+    });
   }
 
   render() {
@@ -99,7 +87,7 @@ class {{pageClassName}} extends Component {
             />
           </FormGroup>
           {error &&
-            <HelpBlock className="text-error">{error}</HelpBlock>
+          <HelpBlock className="text-error">{error}</HelpBlock>
           }
         </form>
         <ButtonToolbar>
@@ -118,23 +106,12 @@ class {{pageClassName}} extends Component {
   }
 }
 
-function mapStateToProps(state, ownProps) {
-  const { shortcutId } = ownProps;
-
+function mapDispatchToProps(dispatch) {
   return {
-    shortcut: getShortcut(state, shortcutId),
-  };
-}
-
-function mapDispatchToProps(dispatch, ownProps) {
-  const { shortcutId } = ownProps;
-
-  return {
-    fetchShortcut: () => dispatch(fetchShortcut(shortcutId)),
     updateShortcutSettings: (shortcut, settings) => (
       dispatch(updateShortcutSettings(shortcut, settings))
     ),
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)({{pageClassName}});
+export default connect(null, mapDispatchToProps)({{pageClassName}});

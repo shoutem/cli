@@ -22,7 +22,7 @@ async function isPlatformDirectory(dir) {
   return name === '@shoutem/mobile-app' || name === '@shoutem/platform';
 }
 
-export async function getPlatformRootDir(dir = process.cwd()) {
+export async function getPlatformRootDir(dir = process.cwd(), { shouldThrow = true } = {}) {
   if (await isPlatformDirectory(dir)) {
     return dir;
   }
@@ -30,9 +30,13 @@ export async function getPlatformRootDir(dir = process.cwd()) {
   const parentDir = path.join(dir, '..');
 
   if (parentDir === dir) {
-    throw new Error('Not a platform directory');
+    if (shouldThrow) {
+      throw new Error('Not a platform directory');
+    } else {
+      return null;
+    }
   }
-  return await getPlatformRootDir(parentDir);
+  return await getPlatformRootDir(parentDir, { shouldThrow });
 }
 
 export async function getPlatformExtensionsDir(dir = null) {

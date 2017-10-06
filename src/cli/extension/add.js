@@ -51,7 +51,6 @@ export async function addExtension({ name, local, externalDestination }) {
 
   if (!local && !externalDestination) {
     await uploadExtension({ publish: true }, extensionPath);
-    await publishExtension(extensionPath);
 
     const { appId } = await getPlatformConfig(platformDir);
     await spinify(installLocalExtension(appId, extensionPath), 'Installing it in your app...', 'OK');

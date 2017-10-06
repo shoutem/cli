@@ -72,6 +72,17 @@ export function put(url, jsonBody = null, opts) {
   return execute('put', url, opts);
 }
 
+export function patch(url, jsonBody = null, opts) {
+  if (jsonBody) {
+    return execute('patch', url, {
+      ...opts,
+      body: JSON.stringify(jsonBody)
+    });
+  }
+
+  return execute('patch', url, opts);
+}
+
 export function del(uri) {
   return execute('delete', uri);
 }
