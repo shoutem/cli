@@ -8,7 +8,6 @@ import {
 } from "../../services/platform";
 import {executeAndHandleError} from "../../services/error-handler";
 import {initExtension} from "../../commands/init";
-import {publishExtension} from "../../commands/publish";
 import {uploadExtension} from "../../commands/push";
 import {installLocalExtension} from "../../commands/install";
 import 'colors';
