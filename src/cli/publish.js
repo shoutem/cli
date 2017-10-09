@@ -27,6 +27,8 @@ export async function handler(args) {
     return null;
   }
 
+  //console.log('WARNING: shoutem publish command is deprecated. Use shoutem extension publish instead'.yellow.bold);
+
   try {
     if (args.paths.length === 0) {
       await pushAndPublish(args);
