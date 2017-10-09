@@ -30,7 +30,7 @@ function createPageCreationQuestions({ pages, parentName, defaultName = 'MyPage'
   }, {
     type: 'input',
     name: 'title',
-    default: ({ name }) => decamelize(name, ' '),
+    default: ({ name }) => _.upperFirst(decamelize(name, ' ')),
     message: 'Settings page title:',
   }];
 }

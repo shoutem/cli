@@ -21,9 +21,9 @@ export async function pushAndPublish(args = {}) {
   }
   const extPath = ensureInExtensionDir();
   const { name } = await loadExtensionJson();
-  const { id: extensionId } = await publishExtension(extPath);
+  const { id: extensionId, version } = await publishExtension(extPath);
 
   if (await getPlatformRootDir(extPath, { shouldThrow: false })) {
-    await offerInstallationUpdate(extensionId, name);
+    await offerInstallationUpdate(extensionId, name, version);
   }
 }

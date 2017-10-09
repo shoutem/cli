@@ -51,7 +51,7 @@ function createShortcutCreationQuestions({ shortcuts, parentName, screens, defau
     name: 'title',
     message: 'Shortcut title:',
     validate: x => !!x,
-    default: ({ name }) => decamelize(name, ' '),
+    default: ({ name }) => _.upperFirst(decamelize(name, ' ')),
     when,
   }, {
     type: 'input',

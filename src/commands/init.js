@@ -19,7 +19,7 @@ function generateNoPatchSemver(version) {
 
 export async function promptExtensionInit(extName) {
   const name = _.kebabCase(extName);
-  const title = decamelize(extName, ' ');
+  const title = _.upperFirst(decamelize(extName, ' '));
   const version = '0.0.1';
 
   const questions = [{

@@ -7,6 +7,7 @@ import {uploadExtension} from "../../commands/push";
 import {publishExtension} from "../../commands/publish";
 import {updateExtension, getInstallation, installExtension} from "../../clients/app-manager";
 import confirmer from "../../services/confirmer";
+import {getExtension} from "../../clients/extension-manager";
 
 export const description = 'Publish an extension from the app in the working directory';
 export const command = 'publish <name>';
@@ -24,19 +25,21 @@ export const handler = ({ name }) => executeAndHandleError(async () => {
   }
 
   await uploadExtension({ publish: true }, extensionPath);
-  const { id: extensionId } = await publishExtension(extensionPath);
-  await offerInstallationUpdate(extensionId, name);
+  const { id: extensionId, version } = await publishExtension(extensionPath);
+  await offerInstallationUpdate(extensionId, name, version);
   console.log('Success'.green.bold);
 });
 
-export async function offerInstallationUpdate(extensionId, extensionName) {
+export async function offerInstallationUpdate(extensionId, extensionName, newVersion) {
   const { appId } = await getPlatformConfig();
   const dev = await ensureUserIsLoggedIn();
   const canonical = `${dev.name}.${extensionName}`;
 
   try {
-    const { id: installationId } = await getInstallation(appId, canonical);
-    const msg = `Do you want to update app ${appId} to the latest version of ${canonical} extension?`;
+    const { id: installationId, extension: oldExtensionId } = await getInstallation(appId, canonical);
+    const { version: oldVersion } = await getExtension(oldExtensionId);
+    const versionMsg = `${canonical}@${oldVersion} => @${newVersion}`;
+    const msg = `Update the version used in the current app (${versionMsg})?`;
     if (await confirmer(msg)) {
       await updateExtension(appId, installationId, extensionId);
     }

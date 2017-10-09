@@ -14,7 +14,7 @@ async function promptThemeDetails(themeName) {
   const questions = [{
     message: 'Title',
     name: 'title',
-    default: themeName,
+    default: _.upperFirst(themeName),
     type: 'input',
   }, {
     message: 'Description',
