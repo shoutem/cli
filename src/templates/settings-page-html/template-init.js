@@ -1,12 +1,14 @@
 import _ from 'lodash';
 import getOrSet from 'lodash-get-or-set';
+import {instantiateExtensionTemplate} from "../../services/extension-template";
+import decamelize from 'decamelize';
 
 function isHtmlPage({ type, path }) {
    return type === 'html' && !_.includes(path, 'server/build');
 }
 
 export async function before(context) {
-  const { extJson, name } = context;
+  const { extJson, name, extensionScope } = context;
   const pages = getOrSet(extJson, 'pages', []);
 
   if (!_.every(pages, isHtmlPage)) {
@@ -17,11 +19,19 @@ export async function before(context) {
     throw new Error(`Page ${name} already exists`);
   }
 
-  context.pageName = name;
+  const pageName = name;
+  const pageDirectoryName = decamelize(name, '-');
+  _.merge(context, { pageName, pageDirectoryName });
 
   pages.push({
-    name: name,
-    path: `server/pages/${name}/index.html`,
+    name: pageName,
+    path: `server/pages/${pageDirectoryName}/index.html`,
     type: 'html'
   });
+
+  if (extensionScope) {
+    await instantiateExtensionTemplate('settings-page-html-extension', context)
+  } else {
+    await instantiateExtensionTemplate('settings-page-html-shortcut', context);
+  }
 }
