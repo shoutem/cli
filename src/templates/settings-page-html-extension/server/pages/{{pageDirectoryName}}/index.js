@@ -29,7 +29,7 @@ function onPageReady(config) {
     const company = $('#companyName').val();
 
     // updates extension settings by patching with current settings
-    shoutem.api.extensions.updateSettings({ company }, { extensionInstallationId: ownExtensionName })
+    shoutem.api.extensions.updateSettings({ company })
       .catch(errorHandler);
 
     return false;
@@ -46,6 +46,6 @@ function onPageReady(config) {
   $('button[type="submit"]').click(handleSubmit);
 
   // shoutem.api returns promise with fetched settings
-  shoutem.api.extensions.getSettings({ extensionInstallationId: ownExtensionName })
+  shoutem.api.extensions.getSettings()
     .then(initForm, errorHandler);
 }
