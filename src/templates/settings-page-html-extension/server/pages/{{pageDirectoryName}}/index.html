@@ -8,15 +8,22 @@
 </head>
 <body>
 
-<p>
-    Hello World!
-</p>
+<form id="hello-form" action="#">
+  <h3>Enter company name</h3>
+  <div class="form-group">
+    <label class="control-label" for="companyName">Company:</label>
+    <input id="companyName" name="companyName" type="text" class="form-control required">
+  </div>
+  <div class="footer">
+    <button class="btn btn-primary" type="submit">Save</button>
+  </div>
+</form>
 
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 <script src="https://static.shoutem.com/libs/web-ui/0.1.17/bootstrap.min.js"></script>
 <script src="https://static.shoutem.com/libs/iframe-resizer/3.5.8/iframeResizer.contentWindow.min.js"></script>
-<script src="https://static.shoutem.com/libs/api-sdk/1.0.0/api-sdk.min.js"></script>
+<script src="https://static.shoutem.com/libs/api-sdk/1.1.2/api-sdk.min.js"></script>
 <script src="https://static.shoutem.com/libs/extension-sandbox/0.1.4/extension-sandbox.min.js"></script>
 <script src="index.js"></script>
 </html>
