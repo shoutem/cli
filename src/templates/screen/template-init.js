@@ -15,7 +15,7 @@ export async function before(context) {
   screens.push({ name });
 
   _.merge(context, {
-    screenName: camelcase(name),
+    screenName: name,
     screenClassName: name,
   });
 
