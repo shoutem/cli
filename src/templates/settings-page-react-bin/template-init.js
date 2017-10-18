@@ -37,7 +37,7 @@ const pkgJsonTemplate = {
   },
   "dependencies": {
     "@shoutem/extension-sandbox": "^0.1.4",
-    "@shoutem/react-web-ui": "^0.5.1",
+    "@shoutem/react-web-ui": "0.8.6",
     "@shoutem/redux-api-sdk": "^1.1.0",
     "@shoutem/redux-composers": "^0.1.5",
     "@shoutem/redux-io": "^2.3.0",
