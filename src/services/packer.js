@@ -11,6 +11,12 @@ import move from 'glob-move';
 import { pathExists, copy } from 'fs-extra';
 import decompress from 'decompress';
 import {readJsonFile} from "./data";
+import {loadExtensionJson} from "./extension";
+import {getExtensionCanonicalName} from "../clients/local-extensions";
+import {getPackageJson, savePackageJson} from "./npm";
+import {getDeveloper} from "../clients/extension-manager";
+import {ensureUserIsLoggedIn} from "../commands/login";
+import confirmer from "./confirmer";
 const mv = Promise.promisify(require('mv'));
 
 function hasPackageJson(dir) {
@@ -62,12 +68,40 @@ function hasExtensionsJson(dir) {
   return pathExists(path.join(dir, 'extension.json'));
 }
 
+async function offerDevNameSync(extensionDir) {
+  const { name: extensionName } = await loadExtensionJson(extensionDir);
+
+  const appPackageJson = await getPackageJson(path.join(extensionDir, 'app'));
+  const serverPackageJson = await getPackageJson(path.join(extensionDir, 'server'));
+
+  const { name: appModuleName } = appPackageJson;
+  const { name: serverModuleName } = serverPackageJson;
+  const { name: developerName } = await ensureUserIsLoggedIn(true);
+
+  const targetModuleName = `${developerName}.${extensionName}`;
+  if (targetModuleName === appModuleName && targetModuleName === serverModuleName) {
+    return;
+  }
+
+  if (!await confirmer(`You're uploading an extension that isn't yours, do you want to rename it in the package.json files?`)) {
+    return;
+  }
+
+  appPackageJson.name = targetModuleName;
+  serverPackageJson.name = targetModuleName;
+
+  await savePackageJson(path.join(extensionDir, 'app'), appPackageJson);
+  await savePackageJson(path.join(extensionDir, 'server'), serverPackageJson);
+}
+
 export default async function shoutemPack(dir, options) {
   const packedDirectories = ['app', 'server'].map(d => path.join(dir, d));
 
   if (!await hasExtensionsJson(dir)) {
     throw new Error(`${dir} cannot be packed because it has no extension.json file.`);
   }
+
+  await await offerDevNameSync(dir);
 
   const tmpDir = (await tmp.dir()).path;
   const packageDir = path.join(tmpDir, 'package');
