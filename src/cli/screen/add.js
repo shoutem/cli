@@ -1,22 +1,19 @@
-import { handleError } from '../../extension/error-handler';
-import { createScreen } from '../../commands/screen';
+import { executeAndHandleError } from '../../services/error-handler';
+import {ensureInExtensionDir, loadExtensionJson} from "../../services/extension";
+import {askScreenCreationQuestions} from "../../services/screen";
+import {instantiateExtensionTemplate} from "../../services/extension-template";
+import {offerChanges} from "../../services/diff";
 
 export const description = 'Add a screen for applications running this extension';
-export const command = 'add <name>';
-export const builder = {
-  shortcut: {
-    alias: 's',
-    requiresArg: true,
-    description: 'adds a shortcut pointing to the screen being created'
-  }
-};
-export async function handler(args) {
-  const screenName = args.name;
-  const shortcutName = args.shortcut;
+export const command = 'add [name]';
 
-  try {
-    await createScreen(screenName, shortcutName);
-  } catch (err) {
-    await handleError(err);
-  }
+export const handler = args => executeAndHandleError(async () => {
+  const extJson = await loadExtensionJson();
+  const answers = await askScreenCreationQuestions({ ...extJson, defaultName: args.name });
+  await createScreen(answers, ensureInExtensionDir());
+});
+
+export async function createScreen(opts, extensionPath) {
+  await offerChanges(await instantiateExtensionTemplate('screen', { ...opts, extensionPath }));
+  console.log('Success'.green.bold);
 }

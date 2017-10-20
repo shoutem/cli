@@ -7,15 +7,19 @@ import semver from 'semver';
 import inquirer from 'inquirer';
 import { getExtension } from '../clients/extension-manager';
 import * as appManager from '../clients/app-manager';
-import { shoutemUnpack } from '../extension/packer';
+import { shoutemUnpack } from '../services/packer';
 import { getApp } from '../clients/legacy-service';
 import { pathExists, copy } from 'fs-extra';
-import selectApp from '../extension/app-selector';
-import { downloadApp, fixPlatform, configurePlatform, createPlatformConfig } from '../extension/platform';
+import selectApp from '../services/app-selector';
+import {
+  downloadApp, fixPlatform, configurePlatform, createPlatformConfig,
+  setPlatformConfig
+} from '../services/platform';
 import { ensureUserIsLoggedIn } from './login';
-import { createProgressHandler } from '../extension/progress-bar';
-import { spinify } from '../extension/spinner';
-import commandExists from '../extension/command-exists';
+import { createProgressHandler } from '../services/progress-bar';
+import { spinify } from '../services/spinner';
+import commandExists from '../services/command-exists';
+import slugify from 'slugify';
 import 'colors';
 
 const downloadFile = Promise.promisify(require('download-file'));
@@ -119,7 +123,8 @@ export async function clone(opts, destinationDir) {
 
   const { name } = await getApp(opts.appId);
 
-  let directoryName = opts.dir || name.replace(/ /g, '_');
+  let directoryName = slugify(opts.dir || name, { remove: /[$*_+~.()'"!\-:@]/g });
+  console.log('cloning to', directoryName);
   let appDir = path.join(destinationDir, directoryName);
 
   if (opts.force) {
@@ -155,11 +160,11 @@ export async function clone(opts, destinationDir) {
     await downloadApp(opts.appId, appDir, {
       progress: createProgressHandler({ msg: 'Downloading shoutem platform' }),
       useCache: !opts.force,
+
       versionCheck: mobileAppVersion => {
-        //TODO to be activated when mobile app version 0.58.9 is published
-        /* if (!semver.gte(mobileAppVersion, '0.58.9')) {
+        if (!semver.gte(mobileAppVersion, '0.58.9')) {
           throw new Error('This version of CLI only supports platforms containing mobile app 0.58.9 or higher');
-        } */
+        }
       }
     });
   }
@@ -167,10 +172,15 @@ export async function clone(opts, destinationDir) {
   await pullExtensions(opts.appId, path.join(appDir, 'extensions'));
 
   await fixPlatform(appDir, opts.appId);
-  if (!opts.noconfigure) {
-    const config = await createPlatformConfig(appDir, {
-      appId: opts.appId
-    });
+
+  const config = await createPlatformConfig(appDir, {
+    appId: opts.appId
+  });
+  await setPlatformConfig(appDir, config);
+
+  if (opts.noconfigure) {
+    console.log('Skipping configure step due to --noconfigure flag');
+  } else {
     await configurePlatform(appDir, config);
   }
 

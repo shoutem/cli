@@ -6,18 +6,18 @@ import async from 'async';
 import mkdirp from 'mkdirp';
 
 import {
-  loadExtensionJson,
-  saveExtensionJson,
+  loadExtensionJsonCallback,
+  saveExtensionJsonCallback,
   ensureInExtensionDir,
-} from '../extension/data';
-import { load } from '../extension/template';
+} from '../services/extension';
+import { load } from '../services/template';
 
 import msg from '../user_messages';
 
 
 export function saveSchemaToExtJson(schemaName, callback) {
   async.waterfall([
-    loadExtensionJson,
+    loadExtensionJsonCallback,
 
     (extension, done) => {
       /* eslint no-param-reassign: 0 */
@@ -37,7 +37,7 @@ export function saveSchemaToExtJson(schemaName, callback) {
       };
       if (extension.dataSchemas) extension.dataSchemas.push(schema);
       else extension.dataSchemas = [schema];
-      saveExtensionJson(extension, done);
+      saveExtensionJsonCallback(extension, done);
     },
   ],
     callback);

@@ -1,11 +1,11 @@
-import { isLatest } from '../extension/npmjs';
+import { isLatest } from '../services/npmjs';
 import apiUrls from '../../config/services';
 import msg from '../../src/user_messages';
-import { spawn } from 'superspawn';
+import { spawn } from 'child-process-promise';
 import { version } from '../../package.json';
-import confirm from '../extension/confirmer';
-import * as cache from '../extension/cache';
-import { spinify } from '../extension/spinner';
+import confirm from '../services/confirmer';
+import * as cache from '../services/cache';
+import { spinify } from '../services/spinner';
 import 'colors';
 
 async function confirmUpdate() {

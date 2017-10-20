@@ -1,6 +1,6 @@
 import { setHostEnvName } from '../clients/server-env';
 import msg from '../user_messages';
-import { getValue } from '../extension/cache-env';
+import { getValue } from '../services/cache-env';
 
 export const description = null;
 export const command = 'use <server>';

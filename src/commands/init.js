@@ -1,12 +1,15 @@
 import _ from 'lodash';
 import inquirer from 'inquirer';
+import decamelize from 'decamelize';
 import { pathExists } from 'fs-extra';
 import path from 'path';
-import { instantiateTemplatePath } from '../extension/template';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import msg from '../user_messages';
 import { getPlatforms } from '../clients/extension-manager';
-import * as utils from '../extension/data';
+import * as utils from '../services/extension';
+import {instantiateExtensionTemplate} from "../services/extension-template";
+import {offerChanges} from "../services/diff";
+import {stringify} from "../services/data";
 
 
 function generateNoPatchSemver(version) {
@@ -16,7 +19,7 @@ function generateNoPatchSemver(version) {
 
 export async function promptExtensionInit(extName) {
   const name = _.kebabCase(extName);
-  const title = _.upperFirst(extName.toLowerCase());
+  const title = _.upperFirst(decamelize(extName, ' '));
   const version = '0.0.1';
 
   const questions = [{
@@ -45,27 +48,29 @@ export async function promptExtensionInit(extName) {
   return { name, ...answer, platform: generateNoPatchSemver(_.first(platformVersions)) };
 }
 
-export async function initExtension(extName) {
+export async function initExtension(extName, extensionPath = process.cwd()) {
   const developer = await ensureUserIsLoggedIn();
   const extJson = await promptExtensionInit(extName);
 
   utils.getExtensionCanonicalName(developer.name, extJson.name, extJson.version);
 
-  const packageJson = {
-    name: `${developer.name}.${extJson.name}`,
-    version: extJson.version,
-    description: extJson.description
-  };
-
   const dirname = `${developer.name}.${extJson.name}`;
   if (await pathExists(path.join(process.cwd(), dirname))) {
-    throw new Error(`Folder ${dirname} already exists. Rename the folder.`);
+    throw new Error(`Folder ${dirname} already exists.`);
   }
 
-  await instantiateTemplatePath('init', process.cwd(), {
+  const packageJsonString = stringify({
+    name: `${developer.name}.${extJson.name}`,
+    version: extJson.version,
+    description: extJson.description,
+  });
+
+  await offerChanges(await instantiateExtensionTemplate('init', {
+    extensionPath,
     devName: developer.name,
     extJson,
-    extJsonString: JSON.stringify(extJson, null, 2),
-    packageJsonString: JSON.stringify(packageJson, null, 2)
-  });
+    packageJsonString,
+  }));
+
+  return path.join(extensionPath, dirname);
 }

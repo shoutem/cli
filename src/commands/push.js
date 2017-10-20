@@ -1,76 +1,62 @@
-import fs from 'fs';
-import path from 'path';
-import mzfs from 'mz/fs';
+import fs from 'fs-extra';
 import * as extensionManager from '../clients/extension-manager';
-import { getHostEnvName } from '../clients/server-env';
-import { getExtensionCanonicalName } from '../clients/local-extensions';
-import { ensureInExtensionDir } from '../extension/data';
-import { ensureUserIsLoggedIn } from './login';
-import * as utils from '../extension/data';
-import shoutemPack from '../extension/packer';
+import {getHostEnvName} from '../clients/server-env';
+import * as local from '../clients/local-extensions';
+import {
+  ensureInExtensionDir,
+  getExtensionCanonicalName,
+  loadExtensionJson,
+  saveExtensionJson
+} from '../services/extension';
+import shoutemPack from '../services/packer';
 import msg from '../user_messages';
 import _ from 'lodash';
-import { createProgressHandler } from '../extension/progress-bar';
-import { startSpinner } from '../extension/spinner';
-import extLint from '../extension/extlint';
-
-async function setPackageNameVersion(path, name, version) {
-  const data = await utils.readJsonFile(path);
-  if (data === null) {
-    return null;
-  }
-
-  data.name = name;
-  data.version = version;
-
-  await utils.writeJsonFile(data, path);
-  return data;
-}
-
-function setExtNameVersionInPackageJson(extName, version, root = utils.getExtensionRootDir()) {
-  const appPath = path.join(root, 'app', 'package.json');
-  const serverPath = path.join(root, 'server', 'package.json');
-
-  return Promise.all([
-    setPackageNameVersion(serverPath, extName, version),
-    setPackageNameVersion(appPath, extName, version)
-  ]);
-}
+import {createProgressHandler} from '../services/progress-bar';
+import {spinify, startSpinner} from '../services/spinner';
+import extLint from '../services/extlint';
+import {ensureUserIsLoggedIn} from "./login";
+import {canPublish} from "../clients/extension-manager";
+import { prompt } from 'inquirer';
+import semver from 'semver';
 
 export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
   if (!opts.nocheck) {
-    console.log('Checking the extension code for syntax errors...');
+    process.stdout.write('Checking the extension code for syntax errors... ');
     try {
       await extLint(extensionDir);
+      console.log(`[${'OK'.green.bold}]`);
     } catch (err) {
       err.message = 'Syntax errors detected, aborting push! Use `shoutem push --nocheck` to override';
       throw err;
     }
   }
-  const dev = await ensureUserIsLoggedIn();
-  const extJson = await utils.loadExtensionJsonAsync(extensionDir);
-  await setExtNameVersionInPackageJson(`${dev.name}.${extJson.name}`, extJson.version, extensionDir);
+  const extJson = await loadExtensionJson(extensionDir);
+  if (opts.publish) {
+    await promptPublishableVersion(extJson);
+    await saveExtensionJson(extJson, extensionDir);
+  }
+
   const packResult = await shoutemPack(extensionDir, { packToTempDir: true, nobuild: opts.nobuild });
 
-  const { size } = await mzfs.stat(packResult.package);
+  const { size } = await fs.stat(packResult.package);
   const stream = fs.createReadStream(packResult.package);
 
-  const id = await getExtensionCanonicalName(extensionDir);
+  const id = await local.getExtensionCanonicalName(extensionDir);
 
-  console.log(msg.push.uploadingInfo(extJson, getHostEnvName()));
   let spinner = null;
   const extensionId = await extensionManager.uploadExtension(
     id,
     stream,
-    createProgressHandler({ msg: 'Upload progress', total: size, onFinished: () => spinner = startSpinner('Processing upload... %s') }),
+    createProgressHandler({ msg: 'Upload progress', total: size, onFinished: () => spinner = startSpinner('Processing upload...') }),
     size
   );
-
   if (spinner) {
     spinner.stop(true);
+    console.log(`Processing upload... [${'OK'.green.bold}]`);
   }
+  console.log(msg.push.uploadingInfo(extJson, getHostEnvName()) + ` [${'OK'.green.bold}]`);
 
-  await mzfs.unlink(packResult.package);
+  await fs.unlink(packResult.package);
 
   const notPacked = _.difference(packResult.allDirs, packResult.packedDirs);
   if (notPacked.length > 0) {
@@ -78,4 +64,23 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
   }
 
   return { extensionId, packResult, extJson };
+}
+
+export async function promptPublishableVersion(extJson) {
+  const dev = await ensureUserIsLoggedIn();
+  while (true) {
+    const { name, version } = extJson;
+    const canonical = getExtensionCanonicalName(dev.name, name, version);
+    const canExtensionBePublished = await spinify(canPublish(canonical), `Checking if version ${version} can be published`);
+    if (canExtensionBePublished) {
+      return;
+    }
+    const { newVersion } = await prompt({
+      name: 'newVersion',
+      default: semver.inc(version, 'patch'),
+      message: `Version ${version} is already published. Specify another version:`,
+      validate: v => !!semver.valid(v),
+    });
+    extJson.version = newVersion;
+  }
 }

@@ -1,6 +1,6 @@
 import URI from 'urijs';
 import { extensionManager } from '../../config/services';
-import { listenStream } from '../extension/stream-listener';
+import { listenStream } from '../services/stream-listener';
 import * as jsonApi from './json-api-client';
 import FormData from 'form-data';
 
@@ -65,11 +65,14 @@ export async function getPlatforms() {
   return await jsonApi.get(url);
 }
 
-export class DeveloperNameError {
-  /*
-    Used when developer tries to register with a name which is not unique.
-  */
-  constructor(devName) {
-    this.message = `Name "${devName}" is already taken`;
+export async function canPublish(canonical) {
+  try {
+    const { tag } = await getExtension(canonical);
+    return tag === 'develop';
+  } catch (e) {
+    if (e.statusCode === 404) {
+      return true;
+    }
+    throw e;
   }
 }

@@ -3,8 +3,9 @@ import { installExtension, createApp } from '../clients/app-manager';
 import { getLatestApps } from '../clients/legacy-service';
 import { getExtensionCanonicalName } from '../clients/local-extensions';
 import * as extensionManager from '../clients/extension-manager';
-import selectApp from '../extension/app-selector';
+import selectApp from '../services/app-selector';
 import msg from '../user_messages';
+import {ensureInExtensionDir} from "../services/extension";
 
 export async function promptCreateNewApp() {
   const { answerNew } = await inquirer.prompt({
@@ -49,8 +50,8 @@ export async function createNewApp(name) {
   return await createApp({ name });
 }
 
-export async function installLocalExtension(appId) {
-  const canonicalName = await getExtensionCanonicalName();
+export async function installLocalExtension(appId, extensionRoot = ensureInExtensionDir()) {
+  const canonicalName = await getExtensionCanonicalName(extensionRoot);
   const extensionId = await extensionManager.getExtensionId(canonicalName);
 
   if (extensionId) {

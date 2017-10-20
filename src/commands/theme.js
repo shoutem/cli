@@ -1,21 +1,20 @@
 import _ from 'lodash';
 import inquirer from 'inquirer';
 import request from 'request-promise';
-import { instantiateTemplatePath } from '../extension/template';
-import { ensureInExtensionDir } from '../extension/data';
+import { ensureInExtensionDir } from '../services/extension';
+import {instantiateExtensionTemplate} from "../services/extension-template";
 
 const themeUrls = {
   theme: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/app/themes/Rubicon.js',
   variables: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/server/primeThemeVariables.json'
 };
 
-
 async function promptThemeDetails(themeName) {
   console.log('Enter theme information.');
   const questions = [{
     message: 'Title',
     name: 'title',
-    default: themeName,
+    default: _.upperFirst(themeName),
     type: 'input',
   }, {
     message: 'Description',
@@ -36,7 +35,8 @@ async function getThemeVariablesContent(themeName) {
 export async function createTheme(themeName) {
   const { title, description } = await promptThemeDetails(_.upperFirst(_.camelCase(themeName)));
 
-  return await instantiateTemplatePath('theme', ensureInExtensionDir(), {
+  return await instantiateExtensionTemplate('theme', {
+    extensionPath: ensureInExtensionDir(),
     title,
     themeName,
     description,

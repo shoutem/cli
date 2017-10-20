@@ -1,5 +1,5 @@
 import { ensureUserIsLoggedIn } from '../commands/login';
-import confirm from '../extension/confirmer';
+import confirm from '../services/confirmer';
 import { getHostEnvName } from '../clients/server-env';
 
 export default async function(msg) {

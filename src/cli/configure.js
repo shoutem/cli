@@ -1,6 +1,5 @@
-import { executeAndHandleError } from '../extension/error-handler';
-import { getPlatformRootDir } from '../extension/platform';
-import * as npm from '../extension/npm';
+import { executeAndHandleError } from '../services/error-handler';
+import {configurePlatform, getPlatformConfig, getPlatformRootDir, setPlatformConfig} from '../services/platform';
 
 export const description = 'Runs platform\'s configure script to sync with native changes to local extensions';
 export const command = 'configure';
@@ -26,11 +25,12 @@ export async function handler(args) {
   await executeAndHandleError(async () => {
     const appDir = await getPlatformRootDir();
 
-    const configureArgs = args.release ? ['--release'] : [];
-    if (args.production) {
-      configureArgs.push('--production');
-    }
+    await setPlatformConfig(appDir, {
+      ...await getPlatformConfig(appDir),
+      release: !!args.release,
+      production: !!args.production
+    });
 
-    await npm.run(appDir, 'configure', configureArgs);
+    await configurePlatform(appDir);
   });
 }

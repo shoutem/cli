@@ -14,6 +14,16 @@ export async function installExtension(appId, extensionId) {
   });
 }
 
+export async function updateExtension(appId, installationId, extensionId) {
+  const url = appManagerUri.clone().segment(`/v1/apps/${appId}/installations/${installationId}`);
+  return await jsonApi.patch(url, {
+    data: {
+      type: 'shoutem.core.installations',
+      attributes: { extension: extensionId },
+    }
+  });
+}
+
 export async function uninstallExtension(appId, extensionId) {
   const uri = appManagerUri.clone().segment(`/v1/apps/${appId}/installations/${extensionId}`);
   return jsonApi.del(uri);
@@ -41,5 +51,10 @@ export async function getApplicationPlatform(appId) {
 
 export async function getInstallations(appId) {
   const url = appManagerUri.clone().segment(`/v1/apps/${appId}/installations`);
+  return await jsonApi.get(url);
+}
+
+export async function getInstallation(appId, canonical) {
+  const url = appManagerUri.clone().segment(`/v1/apps/${appId}/installations/${canonical}`);
   return await jsonApi.get(url);
 }

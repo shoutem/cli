@@ -1,13 +1,13 @@
 import url from 'url';
 import ip from 'ip';
-import * as tunnel from '../extension/tunnel';
-import { startPackager } from '../extension/react-native';
+import * as tunnel from '../services/tunnel';
+import { startPackager } from '../services/react-native';
 import { printMobilizerQR } from '../commands/qr-generator';
-import * as analytics from '../extension/analytics';
-import { handleError } from '../extension/error-handler';
+import * as analytics from '../services/analytics';
+import { handleError } from '../services/error-handler';
 import { ensureUserIsLoggedIn } from './login';
-import { getPlatformRootDir, getPlatformConfig } from '../extension/platform';
-import commandExists from '../extension/command-exists';
+import { getPlatformRootDir, getPlatformConfig } from '../services/platform';
+import commandExists from '../services/command-exists';
 
 export default async function (options) {
   try {

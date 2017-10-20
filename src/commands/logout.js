@@ -1,4 +1,4 @@
-import * as cache from '../extension/cache-env';
+import * as cache from '../services/cache-env';
 import { clearTokens } from '../clients/auth-service';
 import msg from '../user_messages';
 

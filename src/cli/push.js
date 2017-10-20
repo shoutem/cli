@@ -1,8 +1,8 @@
 import { pushAll } from '../commands/push-all';
 import { uploadExtension } from '../commands/push';
 import msg from '../user_messages';
-import { handleError } from '../extension/error-handler';
-import multiglob from '../extension/multiglob';
+import { executeAndHandleError } from '../services/error-handler';
+import multiglob from '../services/multiglob';
 import confirmPush from '../commands/confirm-admin-action';
 
 export const description = 'Upload local extension code and assets.';
@@ -31,21 +31,19 @@ export const builder = yargs => {
     .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 
-export async function handler(args) {
+export const handler = args => executeAndHandleError(async () => {
   if (!await confirmPush('WARNING: you are about tu push using shoutem developer. Are you sure about that?')) {
     console.log('Push aborted'.bold.yellow);
     return null;
   }
-
-  try {
-    if (args.paths.length === 0) {
-      await uploadExtension(args);
-      console.log(msg.push.complete());
-    } else {
-      args.paths = multiglob(args.paths);
-      await pushAll(args);
-    }
-  } catch (err) {
-    await handleError(err);
+  console.log('WARNING: shoutem push command is deprecated. Use shoutem publish instead'.yellow.bold);
+  if (!args.paths.length) {
+    await uploadExtension(args);
+    console.log(msg.push.complete());
+    return;
   }
-}
+
+  args.paths = multiglob(args.paths);
+  await pushAll(args);
+});
+

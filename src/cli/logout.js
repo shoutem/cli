@@ -1,5 +1,5 @@
 import logout from '../commands/logout';
-import { executeAndHandleError } from '../extension/error-handler';
+import { executeAndHandleError } from '../services/error-handler';
 
 export const description = 'Erase all locally stored credentials.';
 export const command = 'logout';
