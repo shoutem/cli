@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.10.1",
+  "version": "0.11.0-beta1",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -33,6 +33,7 @@
     "command-exists": "1.0.2",
     "decamelize": "^1.2.0",
     "decompress": "4.0.0",
+    "depcheck": "^0.6.8",
     "diff": "^3.3.1",
     "download-cached": "1.0.8",
     "download-file": "latest",
