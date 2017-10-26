@@ -76,7 +76,7 @@ class {{pageClassName}} extends Component {
     return (
       <div className="hello-page settings-page">
         <form onSubmit={this.handleSubmit}>
-          <FormGroup>
+          <FormGroup>s
             <h3>Choose your greeting</h3>
             <ControlLabel>Name:</ControlLabel>
             <FormControl
