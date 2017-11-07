@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import getOrSet from 'lodash-get-or-set';
 
-export async function after({ title, themeName, description, extJson }) {
+export async function before({ title, themeName, description, extJson }) {
   const themes = getOrSet(extJson, 'themes', []);
   if (_.find(themes, { name: themeName })) {
     throw new Error(`Theme \`${themeName}\` already exists. Pick another name.`);
