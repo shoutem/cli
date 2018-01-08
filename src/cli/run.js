@@ -1,4 +1,4 @@
-import forkTerminal from 'fork-terminal';
+import forkTerminal from '@shoutem/fork-terminal';
 import path from 'path';
 
 export const description = 'Run shoutem application on using Shoutem preview app';
