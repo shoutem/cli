@@ -1,4 +1,5 @@
 import inquirer from 'inquirer';
+import _ from 'lodash';
 import { authorizeRequests, getRefreshToken } from '../clients/auth-service';
 import { getDeveloper, createDeveloper } from '../clients/extension-manager';
 import msg from '../user_messages';
@@ -6,10 +7,26 @@ import urls from '../../config/services';
 import * as logger from '../services/logger';
 import * as cache from '../services/cache-env';
 
+async function resolveCredentials(args) {
+  if (args.credentials) {
+    return await parseCredentials(args.credentials)
+  }
+  return await promptUserCredentials(args);
+}
+
+function parseCredentials(credentials) {
+  const parts = credentials.split(':');
+  return {
+    email: _.get(parts, '[0]'),
+    password: _.get(parts, '[1]'),
+  };
+}
+
 function promptUserCredentials(args = {}) {
   if (!args.email || !args.password) {
     console.log(msg.login.credentialsPrompt(urls.appBuilder));
   }
+
   const questions = [{
     name: 'email',
     message: 'Email',
@@ -39,11 +56,11 @@ function promptDeveloperName() {
  * service, and saves the received API token locally for further requests.
  */
 export async function loginUser(args) {
-  const credentials = await promptUserCredentials(args);
+  const credentials = await resolveCredentials(args);
   const refreshToken = await getRefreshToken(credentials);
   await authorizeRequests(refreshToken);
-  let developer = null;
 
+  let developer = null;
   try {
     developer = await getDeveloper();
   } catch (err) {
