@@ -6,8 +6,8 @@ import {instantiateExtensionTemplate} from "../services/extension-template";
 import {offerChanges} from "../services/diff";
 
 const themeUrls = {
-  theme: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/app/themes/Rubicon.js',
-  variables: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem-rubicon-theme/server/primeThemeVariables.json'
+  theme: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem.rubicon-theme/app/themes/Rubicon.js',
+  variables: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem.rubicon-theme/server/primeThemeVariables.json'
 };
 
 async function promptThemeDetails(themeName) {
