@@ -1,26 +1,32 @@
-import Promise from 'bluebird';
+import { pathExists, copy } from 'fs-extra';
 import mkdirp from 'mkdirp-promise';
+import inquirer from 'inquirer';
+import Promise from 'bluebird';
 import tmp from 'tmp-promise';
+import slugify from 'slugify';
+import semver from 'semver';
 import rmrf from 'rmfr';
 import path from 'path';
-import semver from 'semver';
-import inquirer from 'inquirer';
+import 'colors';
+
+import { ensureUserIsLoggedIn } from './login';
 import { getExtension } from '../clients/extension-manager';
 import * as appManager from '../clients/app-manager';
-import { shoutemUnpack } from '../services/packer';
 import { getApp } from '../clients/legacy-service';
-import { pathExists, copy } from 'fs-extra';
-import selectApp from '../services/app-selector';
-import {
-  downloadApp, fixPlatform, configurePlatform, createPlatformConfig,
-  setPlatformConfig
-} from '../services/platform';
-import { ensureUserIsLoggedIn } from './login';
+
+import { getHttpErrorMessage } from '../services/get-http-error-message';
 import { createProgressHandler } from '../services/progress-bar';
-import { spinify } from '../services/spinner';
 import commandExists from '../services/command-exists';
-import slugify from 'slugify';
-import 'colors';
+import { shoutemUnpack } from '../services/packer';
+import selectApp from '../services/app-selector';
+import { spinify } from '../services/spinner';
+import {
+  downloadApp,
+  fixPlatform,
+  configurePlatform,
+  createPlatformConfig,
+  setPlatformConfig,
+} from '../services/platform';
 
 const downloadFile = Promise.promisify(require('download-file'));
 
@@ -35,13 +41,23 @@ export async function pullExtensions(appId, destinationDir) {
 }
 
 async function pullExtension(destinationDir, { extension, canonicalName }) {
+  const url = await getExtensionUrl(extension);
+  const tgzDir = (await tmp.dir()).path;
+
   try {
-    const url = await getExtensionUrl(extension);
-    const tgzDir = (await tmp.dir()).path;
     await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
-    await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), path.join(destinationDir, canonicalName));
   } catch (err) {
-    err.message = `Could not fetch extension ${canonicalName}`;
+    const errorMessage = getHttpErrorMessage(err.message);
+    err.message = `Could not fetch extension ${canonicalName}\nRequested URL: ${url}\n${errorMessage}`;
+    throw err;
+  }
+
+  const tgzFile = path.join(tgzDir, 'extension.tgz');
+  const destination = path.join(destinationDir, canonicalName);
+
+  try {
+    await shoutemUnpack(tgzFile, destination);
+  } catch (err) {
     throw err;
   }
 }
@@ -50,7 +66,7 @@ async function getExtensionUrl(extId) {
   const resp = await getExtension(extId);
   const { location: { extension } } = resp;
 
- return `${removeTrailingSlash(extension.package)}/extension.tgz`;
+  return `${removeTrailingSlash(extension.package)}/extension.tgz`;
 }
 
 function removeTrailingSlash(str) {
