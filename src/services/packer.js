@@ -1,23 +1,39 @@
-import { exec } from 'child-process-promise';
-import fs from 'fs-extra';
+import tar from 'tar';
 import path from 'path';
-import Promise from 'bluebird';
-import tmp from 'tmp-promise';
+import zlib from 'zlib';
 import targz from 'tar.gz';
-import { buildNodeProject } from './node';
-import { writeJsonFile } from './data';
-import {spinify} from './spinner';
 import move from 'glob-move';
-import { pathExists, copy } from 'fs-extra';
+import tmp from 'tmp-promise';
+import Promise from 'bluebird';
 import decompress from 'decompress';
-import {readJsonFile} from "./data";
-import {loadExtensionJson} from "./extension";
-import {getExtensionCanonicalName} from "../clients/local-extensions";
-import {getPackageJson, savePackageJson} from "./npm";
-import {getDeveloper} from "../clients/extension-manager";
-import {ensureUserIsLoggedIn} from "../commands/login";
-import confirmer from "./confirmer";
+import { exec } from 'child-process-promise';
+import fs, { pathExists, copy } from 'fs-extra';
+
+import confirmer from './confirmer';
+import { spinify } from './spinner';
+import { buildNodeProject } from './node';
+import { loadExtensionJson } from './extension';
+import { readJsonFile, writeJsonFile } from './data';
+import { getPackageJson, savePackageJson } from './npm';
+
+import { ensureUserIsLoggedIn } from '../commands/login';
+import { getDeveloper } from '../clients/extension-manager';
+import { getExtensionCanonicalName } from '../clients/local-extensions';
+
 const mv = Promise.promisify(require('mv'));
+
+export function checkZipFileIntegrity(filePath) {
+  const zipBuffer = fs.readFileSync(filePath);
+
+  try {
+    zlib.gunzipSync(zipBuffer);
+  } catch (err) {
+    err.message = `Zip integrity error: ${err.message} (${filePath})`;
+    return err;
+  }
+
+  return true;
+}
 
 function hasPackageJson(dir) {
   return pathExists(path.join(dir, 'package.json'));
@@ -50,8 +66,24 @@ export async function npmUnpack(tgzFile, destinationDir) {
     return [];
   }
 
+  const zipCheck = checkZipFileIntegrity(tgzFile);
+
+  if (zipCheck !== true) {
+    throw(zipCheck);
+  }
+
   const tmpDir = (await tmp.dir()).path;
-  await decompress(tgzFile, tmpDir);
+
+  try {
+    tar.extract({
+      file: tgzFile,
+      strict: true,
+      sync: true,
+    });
+  } catch (err) {
+    throw err;
+  }
+
   return await move(path.join(tmpDir, 'package', '*'), destinationDir, { dot: true });
 }
 
@@ -61,6 +93,7 @@ export async function shoutemUnpack(tgzFile, destinationDir) {
 
   await npmUnpack(path.join(tmpDir, 'app.tgz'), path.join(destinationDir, 'app'));
   await npmUnpack(path.join(tmpDir, 'server.tgz'), path.join(destinationDir, 'server'));
+
   await move(path.join(tmpDir, 'extension.json'), destinationDir);
 }
 
