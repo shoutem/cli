@@ -43,9 +43,6 @@ export function getErrorMessage(err) {
     }
   }
 
-  if (err.statusCode === 401 || err.statusCode === 403) {
-    return 'Access denied, use `shoutem login` command to login';
-  }
 
   return 'Unrecognized error. Run `shoutem last-error` for more additional details'
 }
