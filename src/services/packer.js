@@ -22,7 +22,6 @@ import { getExtensionCanonicalName } from '../clients/local-extensions';
 const mv = Promise.promisify(require('mv'));
 
 export function checkZipFileIntegrity(filePath) {
-  filePath = 'c:/projects/shoutem-cli/LICENSE';
   const zipBuffer = fs.readFileSync(filePath);
   const zlibOptions = {
     flush: zlib.Z_SYNC_FLUSH,
