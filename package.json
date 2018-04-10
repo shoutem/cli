@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.11.0-beta3",
+  "version": "0.11.0-beta4",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -71,7 +71,6 @@
     "slugify": "^1.2.1",
     "streamsearch": "0.1.2",
     "tar": "^4.4.1",
-    "tar.gz": "1.0.2",
     "tmp-promise": "1.0.2",
     "universal-analytics": "0.4.13",
     "uppercamelcase": "^3.0.0",

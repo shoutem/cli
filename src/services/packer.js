@@ -1,7 +1,6 @@
 import tar from 'tar';
 import path from 'path';
 import zlib from 'zlib';
-import targz from 'tar.gz';
 import move from 'glob-move';
 import tmp from 'tmp-promise';
 import Promise from 'bluebird';
@@ -23,10 +22,15 @@ import { getExtensionCanonicalName } from '../clients/local-extensions';
 const mv = Promise.promisify(require('mv'));
 
 export function checkZipFileIntegrity(filePath) {
+  filePath = 'c:/projects/shoutem-cli/LICENSE';
   const zipBuffer = fs.readFileSync(filePath);
+  const zlibOptions = {
+    flush: zlib.Z_SYNC_FLUSH,
+    finishFlush: zlib.Z_SYNC_FLUSH,
+  };
 
   try {
-    zlib.gunzipSync(zipBuffer);
+    zlib.gunzipSync(zipBuffer, zlibOptions);
   } catch (err) {
     err.message = `Zip integrity error: ${err.message} (${filePath})`;
     return err;
@@ -50,6 +54,7 @@ async function npmPack(dir, destinationDir) {
   packageJson.version = `${packageJson.version}-build${timestamp}`;
 
   await writeJsonFile(packageJson, packageJsonPath);
+
   const { stdout } = await exec('npm pack', { cwd: dir });
   const packageFilename = stdout.replace(/\n$/, '');
   const packagePath = path.join(dir, packageFilename);
@@ -69,7 +74,10 @@ export async function npmUnpack(tgzFile, destinationDir) {
   const zipCheck = checkZipFileIntegrity(tgzFile);
 
   if (zipCheck !== true) {
-    throw(zipCheck);
+    // ignore Z_BUF_ERRORs as they're non-consequential most of the time
+    if (zipCheck.code !== 'Z_BUF_ERROR') {
+      throw(zipCheck);
+    }
   }
 
   const tmpDir = (await tmp.dir()).path;
@@ -150,20 +158,35 @@ export default async function shoutemPack(dir, options) {
   }
 
   return await spinify(async () => {
-    for (const dir of dirsToPack) {
-      await npmPack(dir, packageDir);
+    for (const partDir of dirsToPack) {
+      await npmPack(partDir, packageDir);
     }
+
     const extensionJsonPathSrc = path.join(dir, 'extension.json');
     const extensionJsonPathDest = path.join(packageDir, 'extension.json');
+    const destinationDir = options.packToTempDir ? tmpDir : dir;
+    const destinationPackage = path.join(destinationDir, 'extension.tgz');
+
     await copy(extensionJsonPathSrc, extensionJsonPathDest);
 
-    const destinationDirectory = path.join(options.packToTempDir ? tmpDir : dir, 'extension.tgz');
-    await targz().compress(packageDir, destinationDirectory);
+    try {
+      tar.create({
+          gzip: true,
+          sync: true,
+        cwd: tmpDir,
+          file: destinationPackage,
+        },
+        ['package']
+      );
+    } catch (err) {
+      err.message = `TAR error while trying to gzip '${packageDir}' to '${destinationPackage}': ${err.message}`;
+      throw err;
+    }
 
     return ({
       packedDirs: dirsToPack,
       allDirs: packedDirectories,
-      package: destinationDirectory,
+      package: destinationPackage,
     });
   }, 'Packing extension...', 'OK');
 }
