@@ -4,7 +4,6 @@ import zlib from 'zlib';
 import move from 'glob-move';
 import tmp from 'tmp-promise';
 import Promise from 'bluebird';
-import decompress from 'decompress';
 import { exec } from 'child-process-promise';
 import fs, { pathExists, copy } from 'fs-extra';
 
@@ -66,19 +65,6 @@ async function npmPack(dir, destinationDir) {
 }
 
 export async function npmUnpack(tgzFile, destinationDir) {
-  if (!(await pathExists(tgzFile))) {
-    return [];
-  }
-
-  const zipCheck = checkZipFileIntegrity(tgzFile);
-
-  if (zipCheck !== true) {
-    // ignore Z_BUF_ERRORs as they're non-consequential most of the time
-    if (zipCheck.code !== 'Z_BUF_ERROR') {
-      throw(zipCheck);
-    }
-  }
-
   const tmpDir = (await tmp.dir()).path;
 
   try {
@@ -86,6 +72,7 @@ export async function npmUnpack(tgzFile, destinationDir) {
       file: tgzFile,
       strict: true,
       sync: true,
+      cwd: tmpDir,
     });
   } catch (err) {
     throw err;
@@ -96,11 +83,10 @@ export async function npmUnpack(tgzFile, destinationDir) {
 
 export async function shoutemUnpack(tgzFile, destinationDir) {
   const tmpDir = (await tmp.dir()).path;
-  await npmUnpack(tgzFile, tmpDir);
 
+  await npmUnpack(tgzFile, tmpDir);
   await npmUnpack(path.join(tmpDir, 'app.tgz'), path.join(destinationDir, 'app'));
   await npmUnpack(path.join(tmpDir, 'server.tgz'), path.join(destinationDir, 'server'));
-
   await move(path.join(tmpDir, 'extension.json'), destinationDir);
 }
 
@@ -145,6 +131,7 @@ export default async function shoutemPack(dir, options) {
 
   const tmpDir = (await tmp.dir()).path;
   const packageDir = path.join(tmpDir, 'package');
+
   await fs.mkdir(packageDir);
 
   const dirsToPack = await Promise.filter(packedDirectories, hasPackageJson);
@@ -172,7 +159,7 @@ export default async function shoutemPack(dir, options) {
       tar.create({
           gzip: true,
           sync: true,
-        cwd: tmpDir,
+          cwd: tmpDir,
           file: destinationPackage,
         },
         ['package']
