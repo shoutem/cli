@@ -1,8 +1,8 @@
 import URI from 'urijs';
+import FormData from 'form-data';
 import { extensionManager } from '../../config/services';
 import { listenStream } from '../services/stream-listener';
 import * as jsonApi from './json-api-client';
-import FormData from 'form-data';
 
 const extensionManagerUri = new URI(extensionManager);
 
@@ -63,6 +63,28 @@ export async function publishExtension(canonicalName) {
 export async function getPlatforms() {
   const url = extensionManagerUri.clone().segment('/v1/platforms');
   return await jsonApi.get(url);
+}
+
+export async function uploadPlatform(tgzStream, progressHandler, size) {
+  // a temporary workaround, forces access token to refresh
+  await getDeveloper();
+
+  if (progressHandler) {
+    listenStream(tgzStream, progressHandler, size);
+  }
+
+  const uri = extensionManagerUri.clone().segment('/v1/platforms');
+  const form = new FormData();
+  form.append('platform', tgzStream, {
+    contentType: 'application/gzip',
+  });
+
+  const response = await jsonApi.post(uri, null, {
+    body: form,
+    headers: form.getHeaders(),
+  });
+
+  return response;
 }
 
 export async function canPublish(canonical) {

@@ -77,7 +77,9 @@
     "urijs": "1.18.0",
     "uuid": "3.0.1",
     "yargonaut": "1.1.2",
-    "yargs": "6.6.0"
+    "yargs": "6.6.0",
+    "archiver": "^3.0.0",
+    "ignore": "^5.0.2"
   },
   "devDependencies": {
     "babel-cli": "6.8.0",
