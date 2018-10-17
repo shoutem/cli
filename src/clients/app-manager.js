@@ -45,9 +45,9 @@ export async function createApp(app) {
   });
 }
 
-export async function getApplicationPlatform(appId) {
+export async function getApplicationPlatform(appId, plain = false) {
   const url = appManagerUri.clone().segment(`/v1/apps/${appId}/platform`);
-  return await jsonApi.get(url);
+  return await jsonApi.get(url, { plain });
 }
 
 export async function getInstallations(appId) {

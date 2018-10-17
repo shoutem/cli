@@ -55,6 +55,11 @@ export async function getExtension(canonicalName) {
   return await jsonApi.get(url);
 }
 
+export async function getPlatform(id) {
+  const url = extensionManagerUri.clone().segment(`/v1/platforms/${id}`);
+  return await jsonApi.get(url);
+}
+
 export async function publishExtension(canonicalName) {
   const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}/publish`);
   return await jsonApi.post(url);
