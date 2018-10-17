@@ -33,12 +33,12 @@ export async function uploadExtension(canonicalName, tgzStream, progressHandler,
   const uri = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}`);
   const form = new FormData();
   form.append('extension', tgzStream, {
-    contentType: 'application/gzip'
+    contentType: 'application/gzip',
   });
 
   const { id } = await jsonApi.put(uri, null, {
     body: form,
-    headers: form.getHeaders()
+    headers: form.getHeaders(),
   });
 
   return id;
@@ -85,6 +85,11 @@ export async function uploadPlatform(tgzStream, progressHandler, size) {
   });
 
   return response;
+}
+
+export async function publishPlatform(platformId) {
+  const url = extensionManagerUri.clone().segment(`/v1/platforms/${platformId}/actions/publish`);
+  return await jsonApi.post(url);
 }
 
 export async function canPublish(canonical) {

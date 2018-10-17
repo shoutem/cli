@@ -11,11 +11,13 @@ export const builder = yargs => yargs
       description: 'Id of the application to install the new platform to',
       type: 'number',
       requiresArg: true,
+      alias: 'a',
     },
     platform: {
       description: 'Id of platform to install',
       type: 'string',
       requiresArg: true,
+      alias: 'p',
     },
   })
   .usage(`shoutem ${command} [options]\n\n${description}`);

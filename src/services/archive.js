@@ -13,7 +13,6 @@ import { downloadFileFollowRedirect } from './donwload';
 
 const SHOUTEM_IGNORE_FILE_NAME = '.shoutemignore';
 const ARCHIVE_FORMAT = 'zip';
-const ROOT_ARCHIVE_PREFIX = 'platform/';
 
 class ArchiveProvider {
   constructor() {
@@ -35,19 +34,26 @@ class RemoteArchiveProvider extends ArchiveProvider {
     this.url = url;
   }
 
+  getType() {
+    return 'remote';
+  }
+
   async getArchivePath() {
     const data = await this.getArchiveData();
     return data.path;
   }
 
-  async getPlatformJson() {
+  async getPlatformJsonPath() {
     const data = await this.getArchiveData();
 
     const extractDirectory = path.join(data.temporaryDir.path, 'extracted');
     await decompress(data.path, extractDirectory);
 
     const zipContent = fs.readdirSync(extractDirectory);
-    if (_.size(zipContent) !== 1 || !_.first(zipContent) || !_.first(zipContent).isDirectory()) {
+    if (_.size(zipContent) !== 1
+      || !_.first(zipContent)
+      || !fs.lstatSync(path.join(extractDirectory, _.first(zipContent))).isDirectory()
+    ) {
       throw new Error('Platform archive must contain a single directory');
     }
 
@@ -56,6 +62,11 @@ class RemoteArchiveProvider extends ArchiveProvider {
       throw new Error('Platform archive is missing platform/platform.json');
     }
 
+    return platformJsonPath;
+  }
+
+  async getPlatformJson() {
+    const platformJsonPath = await this.getPlatformJsonPath();
     const platformJsonFile = fs.readFileSync(platformJsonPath);
     const jsonContent = JSON.parse(platformJsonFile);
 
@@ -98,13 +109,22 @@ class LocalArchiveProvider extends ArchiveProvider {
     this.path = path;
   }
 
+  getType() {
+    return 'local';
+  }
+
   async getArchivePath() {
     const data = await this.getArchiveData();
     return data.path;
   }
 
-  async getPlatformJson() {
+  async getPlatformJsonPath() {
     const platformJsonFile = fs.readFileSync(path.join(this.path, 'platform', 'platform.json'));
+    return platformJsonFile;
+  }
+
+  async getPlatformJson() {
+    const platformJsonFile = await this.getPlatformJsonPath();
     const jsonContent = JSON.parse(platformJsonFile);
 
     return jsonContent;
@@ -119,7 +139,10 @@ class LocalArchiveProvider extends ArchiveProvider {
 
       const ignores = this.loadIgnoreList();
 
-      await packItUp(this.path, destinationDir, platformFileName, ignores);
+      const platformJson = await this.getPlatformJson();
+      const rootDirectoryName = `platform-${platformJson.version}`;
+
+      await packItUp(this.path, destinationDir, platformFileName, ignores, rootDirectoryName);
 
       this.archiveData = {
         path: path.join(destinationDir, platformFileName),
@@ -143,14 +166,18 @@ class LocalArchiveProvider extends ArchiveProvider {
 
   loadIgnoreList() {
     const ignoreFilePath = path.join(this.path, SHOUTEM_IGNORE_FILE_NAME);
-    const customIgnores = readLinesInFile(ignoreFilePath);
+    const shoutemIgnores = readLinesInFile(ignoreFilePath);
+
+    if(_.isEmpty(shoutemIgnores)) {
+      console.log("WARNING: missing or empty .shoutemignore file!\nPacking everything into the platform archive...")
+    }
 
     // no need to remove comments, 'ignores' does that for us
-    return ignore().add(customIgnores);
+    return ignore().add(shoutemIgnores);
   }
 }
 
-export function packItUp(sourcePath, destinationDir, platformFileName, ignores) {
+export function packItUp(sourcePath, destinationDir, platformFileName, ignores, rootDirectoryName) {
   return new Promise((resolve, reject) => {
     const archive = archiver(ARCHIVE_FORMAT);
 
@@ -168,13 +195,13 @@ export function packItUp(sourcePath, destinationDir, platformFileName, ignores) 
     const files = listDirectoryContent(sourcePath, true);
 
     // create a root directory in archive
-    archive.append(null, { name: `${ROOT_ARCHIVE_PREFIX}/` });
+    archive.append(null, { name: `${rootDirectoryName}/` });
 
     files.forEach((file) => {
       const ignoreTest = ignores.test(file);
       if (!ignoreTest.ignored) {
         archive
-          .append(fs.createReadStream(file), { name: `${ROOT_ARCHIVE_PREFIX}${file}` });
+          .append(fs.createReadStream(file), { name: `${rootDirectoryName}/${file}` });
       }
     });
 
