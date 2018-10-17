@@ -17,7 +17,11 @@ export async function uploadPlatform(platformArchiveProvider) {
   let spinner = null;
   const platformResponse = await extensionManager.uploadPlatform(
     stream,
-    createProgressHandler({ msg: 'Upload progress', total: size, onFinished: () => spinner = startSpinner('Processing upload...') }),
+    createProgressHandler({
+      msg: 'Upload progress',
+      total: size,
+      onFinished: () => spinner = startSpinner('Processing upload...'),
+    }),
     size,
   );
   if (spinner) {

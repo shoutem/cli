@@ -42,8 +42,8 @@ export async function validatePlatformArchive(archiveProvider) {
 
   const appetizeKey = _.get(platformJson, ['settings', 'appetizeKey']);
   if (_.isNull(appetizeKey)) {
-    throw new Error(`platform.json must contain settings.appetizeKey${
-      os.EOL}NOTE: Appetize (App preview in Builder) is currently not supported for custom platforms,${
-      os.EOL}      so if you don't have, just leave an empty string as a value`);
+    throw new Error(`platform.json must contain settings.appetizeKey
+      ${os.EOL}NOTE: Appetize (App preview in Builder) is currently not supported for custom platforms,
+      ${os.EOL}      so if you don't have, just leave an non-empty placeholder string as a value`);
   }
 }

@@ -31,7 +31,6 @@ export async function listPlatforms({ all }) {
     sortedPlatformsByAuthor = _.map(sortedPlatformsByAuthor, platforms => _.slice(platforms, 0, 3));
   }
 
-  console.table(['apples', 'oranges', 'bananas']);
   console.log('\nID\t\t\t\tAuthor\t\tVersion\t\tPublished');
   _.forEach(sortedPlatformsByAuthor, (platforms) => {
     _.forEach(platforms, (platform) => {

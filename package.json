@@ -13,7 +13,7 @@
     "extlint": "eslint",
     "lint": "eslint ./",
     "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\"",
-    "shoutem": "node %NODE_DEBUG_OPTION% src/shoutem.js -p 5bc73101227f2e13dd115ced",
+    "shoutem": "node src/shoutem.js",
     "prepublish": "dos2unix src/shoutem.js",
     "beta": "npm publish --access public --tag beta",
     "hotfix": "npm publish --access public --tag hotfix"
