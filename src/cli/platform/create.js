@@ -49,7 +49,7 @@ export async function createPlatform({ url }) {
 
   const { appId } = await getPlatformConfig();
   if (_.isNumber(appId)) {
-    if (await confirmer(`Do you want to install the new platform to the app ${appId}?`)) {
+    if (await confirmer(`Do you want to install the new platform into app ${appId}?`)) {
       await spinify(installApplicationPlatform(appId, platformResponse.id));
     }
   } else {

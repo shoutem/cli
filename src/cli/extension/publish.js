@@ -47,7 +47,7 @@ export async function offerInstallationUpdate(extensionId, extensionName, newVer
     if (e.statusCode !== 404) {
       throw e;
     }
-    if (await confirmer(`Do you want to install ${canonical} extension to the app ${appId}?`)) {
+    if (await confirmer(`Do you want to install ${canonical} extension into app ${appId}?`)) {
       await installExtension(appId, extensionId);
     }
   }
