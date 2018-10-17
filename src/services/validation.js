@@ -20,9 +20,20 @@ export function isValidPlatformUrl(url) {
   return match != null;
 }
 
-export function validatePlatformJson(platformJson) {
+export async function validatePlatformArchive(archiveProvider) {
+  const platformJson = await archiveProvider.getPlatformJson();
+
   if (!semver.valid(platformJson.version)) {
     throw new Error('platform.json \'version\' must be a valid semantic version');
+  }
+
+  // when publishing from local source, we pack with a correct root directory name, so no need to check that one
+  if(archiveProvider.getType() === 'remote') {
+    const jsonPath = await archiveProvider.getPlatformJsonPath();
+
+    if(!jsonPath.includes(`platform-${platformJson.version}`)) {
+      throw new Error('archive root directory must be named like platform-x.y.z where x.y.z is version of the platform');
+    }
   }
 
   if (!semver.valid(platformJson.mobileAppVersion)) {
