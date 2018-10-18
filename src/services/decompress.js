@@ -9,7 +9,7 @@ const download = downloadCached(cacheDir, downloadCached.fetchGet(fetch));
 const cacheDirCompat = path.join(getHomeDir(), 'cache', 'cached-requests-compat');
 const downloadCompat = downloadCached(cacheDirCompat);
 
-export default async function(url, destination, options) {
+export default async function decompress(url, destination, options) {
   if (!options.useCache) {
     await download.clear(url);
   }

@@ -5,7 +5,7 @@ import replace from 'replace-in-file';
 import * as appManager from '../clients/app-manager';
 import * as extensionManager from '../clients/extension-manager';
 import * as authService from '../clients/auth-service';
-import decompressCompat from './decompress';
+import { decompressCompat } from './decompress';
 import cliUrls from '../../config/services';
 import { writeJsonFile} from './data';
 import * as npm from './npm';
