@@ -3,6 +3,7 @@ import path from 'path';
 import _ from 'lodash';
 import replace from 'replace-in-file';
 import * as appManager from '../clients/app-manager';
+import * as extensionManager from '../clients/extension-manager';
 import * as authService from '../clients/auth-service';
 import decompressUri from './decompress';
 import cliUrls from '../../config/services';
@@ -131,18 +132,21 @@ export async function downloadApp(appId, destinationDir, options = {}) {
 
   const versionCheck = options.versionCheck || (() => {});
 
-  const { mobileAppVersion } = await appManager.getApplicationPlatform(appId);
-  await versionCheck(mobileAppVersion);
+  const platformInstallationData = await appManager.getApplicationPlatform(appId, true);
+  const { platform: platformId, mobileAppVersion } = platformInstallationData;
 
-  await pullPlatform(mobileAppVersion, destinationDir, options);
+  const platform = await extensionManager.getPlatform(platformId);
+
+  await versionCheck(mobileAppVersion);
+  await pullPlatform(platform.location, mobileAppVersion, destinationDir, options);
 
   if (!await pathExists(destinationDir)) {
     throw new Error('Platform code could not be downloaded from github. Make sure that platform is setup correctly.');
   }
 }
 
-async function pullPlatform(version, destination, options) {
-  const url = `${cliUrls.mobileAppUrl}/archive/v${version}.tar.gz`;
+async function pullPlatform(location, version, destination, options) {
+  const url = !!location ? location : `${cliUrls.mobileAppUrl}/archive/v${version}.tar.gz`;
   await decompressUri(url, destination, { ...options, strip: 1, useCache: options.useCache });
 }
 
