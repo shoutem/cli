@@ -1,9 +1,9 @@
-import _ from 'lodash';
 import os from 'os';
+import _ from 'lodash';
 import semver from 'semver';
 
 export function isValidExtensionName(name) {
-    return /^[a-z]+[a-z0-9\-]*$/.test(name);
+  return /^[a-z]+[a-z0-9\-]*$/.test(name);
 }
 
 export function isAscii(str) {
@@ -28,10 +28,10 @@ export async function validatePlatformArchive(archiveProvider) {
   }
 
   // when publishing from local source, we pack with a correct root directory name, so no need to check that one
-  if(archiveProvider.getType() === 'remote') {
+  if (archiveProvider.getType() === 'remote') {
     const jsonPath = await archiveProvider.getPlatformJsonPath();
 
-    if(!jsonPath.includes(`platform-${platformJson.version}`)) {
+    if (!jsonPath.includes(`platform-${platformJson.version}`)) {
       throw new Error('archive root directory must be named like platform-x.y.z where x.y.z is version of the platform');
     }
   }
@@ -41,9 +41,9 @@ export async function validatePlatformArchive(archiveProvider) {
   }
 
   const appetizeKey = _.get(platformJson, ['settings', 'appetizeKey']);
-  if (_.isNull(appetizeKey)) {
+  if (_.isNil(appetizeKey)) {
     throw new Error(`platform.json must contain settings.appetizeKey
       ${os.EOL}NOTE: Appetize (App preview in Builder) is currently not supported for custom platforms,
-      ${os.EOL}      so if you don't have, just leave an non-empty placeholder string as a value`);
+      ${os.EOL}      so please just leave an non-empty placeholder string as a value`);
   }
 }

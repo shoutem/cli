@@ -11,7 +11,7 @@ export async function installExtension(appId, extensionId) {
     data: {
       type: 'shoutem.core.installations',
       attributes: { extension: extensionId },
-    }
+    },
   });
 }
 
@@ -21,7 +21,7 @@ export async function updateExtension(appId, installationId, extensionId) {
     data: {
       type: 'shoutem.core.installations',
       attributes: { extension: extensionId },
-    }
+    },
   });
 }
 

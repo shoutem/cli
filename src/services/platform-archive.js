@@ -1,18 +1,34 @@
 import _ from 'lodash';
 import fs from 'fs-extra';
 import path from 'path';
-import tmp from 'tmp-promise';
 import ignore from 'ignore';
+import tmp from 'tmp-promise';
 import Promise from 'bluebird';
-import decompress from 'decompress';
 import archiver from 'archiver';
-import { isValidPlatformUrl } from './validation';
+import decompress from 'decompress';
+import confirmer from './confirmer';
 import { getPlatformRootDir } from './platform';
-import { listDirectoryContent, readLinesInFile } from './file';
+import { isValidPlatformUrl } from './validation';
 import { downloadFileFollowRedirect } from './donwload';
+import { listDirectoryContent, readLinesInFile } from './file';
 
 const SHOUTEM_IGNORE_FILE_NAME = '.shoutemignore';
 const ARCHIVE_FORMAT = 'zip';
+
+const DEFAULT_SHOUTEM_IGNORE = `
+# we don't neet it
+.git
+# node modules will get installed during the build process of the app
+node_modules
+# Shoutem platform should not come with any extensions or config file
+extensions
+config
+config.json
+
+# the following are build folders which will be recreated while building the app
+ios/Pods
+
+`;
 
 class ArchiveProvider {
   constructor() {
@@ -137,7 +153,7 @@ class LocalArchiveProvider extends ArchiveProvider {
       const destinationDir = temporaryDir.path;
       const platformFileName = `platform.${ARCHIVE_FORMAT}`;
 
-      const ignores = this.loadIgnoreList();
+      const ignores = await this.loadIgnoreList();
 
       const platformJson = await this.getPlatformJson();
       const rootDirectoryName = `platform-${platformJson.version}`;
@@ -164,13 +180,23 @@ class LocalArchiveProvider extends ArchiveProvider {
     }
   }
 
-  loadIgnoreList() {
+  async validateShoutemIgnore() {
+    const ignoreFilePath = path.join(this.path, SHOUTEM_IGNORE_FILE_NAME);
+
+    const ignoreExists = await fs.pathExists(ignoreFilePath);
+    if (!ignoreExists) {
+      console.log('WARNING: missing or empty .shoutemignore file!');
+      if (await confirmer('Do you want to create a default .shoutemignore file?')) {
+        await fs.writeFile(ignoreFilePath, DEFAULT_SHOUTEM_IGNORE);
+      } else {
+        console.log('WARNING: Packing everything up, please make sure your folder does not contain any unneeded files');
+      }
+    }
+  }
+
+  async loadIgnoreList() {
     const ignoreFilePath = path.join(this.path, SHOUTEM_IGNORE_FILE_NAME);
     const shoutemIgnores = readLinesInFile(ignoreFilePath);
-
-    if(_.isEmpty(shoutemIgnores)) {
-      console.log("WARNING: missing or empty .shoutemignore file!\nPacking everything into the platform archive...")
-    }
 
     // no need to remove comments, 'ignores' does that for us
     return ignore().add(shoutemIgnores);

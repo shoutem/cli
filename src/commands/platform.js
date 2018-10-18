@@ -1,13 +1,22 @@
+import _ from 'lodash';
+import semver from 'semver';
 import fs from 'fs-extra';
-import * as extensionManager from '../clients/extension-manager';
-import { createProgressHandler } from '../services/progress-bar';
-import { spinify, startSpinner } from '../services/spinner';
 import msg from '../user_messages';
 import { getHostEnvName } from '../clients/server-env';
+import { spinify, startSpinner } from '../services/spinner';
+import { createProgressHandler } from '../services/progress-bar';
 import { validatePlatformArchive } from '../services/validation';
+import { uploadPlatform, getPlatforms, getDeveloper } from '../clients/extension-manager';
 
-export async function uploadPlatform(platformArchiveProvider) {
+export async function uploadPlatformArchive(platformArchiveProvider) {
+  if (platformArchiveProvider.getType() === 'local') {
+    await platformArchiveProvider.validateShoutemIgnore();
+  }
+
   const archivePath = await spinify(platformArchiveProvider.getArchivePath(), 'Packing the platform');
+  if (!fs.pathExists(archivePath)) {
+    throw new Error('Unable to create or download archive');
+  }
 
   await spinify(validatePlatformArchive(platformArchiveProvider), 'Validating platform archive');
 
@@ -15,7 +24,7 @@ export async function uploadPlatform(platformArchiveProvider) {
   const stream = fs.createReadStream(archivePath);
 
   let spinner = null;
-  const platformResponse = await extensionManager.uploadPlatform(
+  const platformResponse = await uploadPlatform(
     stream,
     createProgressHandler({
       msg: 'Upload progress',
@@ -33,4 +42,19 @@ export async function uploadPlatform(platformArchiveProvider) {
   platformArchiveProvider.cleanUp();
 
   return platformResponse;
+}
+
+export async function getAvailablePlatforms(limit) {
+  const developer = await getDeveloper();
+  const allPlatforms = await getPlatforms();
+
+  let ownPlatforms = _.filter(allPlatforms, platform => _.get(platform, ['author', 'name']) === developer.name);
+
+  ownPlatforms.sort((p1, p2) => semver.compare(p1.version, p2.version, true) * -1); // highest versions first
+
+  if (_.isNumber(limit)) {
+    ownPlatforms = _.slice(ownPlatforms, 0, limit);
+  }
+
+  return ownPlatforms;
 }

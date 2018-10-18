@@ -1,9 +1,9 @@
 import _ from 'lodash';
-import { executeAndHandleError } from '../../services/error-handler';
 import 'colors';
 import { spinify } from '../../services/spinner';
-import { getPlatforms } from '../../clients/extension-manager';
-import semver from 'semver';
+import { ensureUserIsLoggedIn } from '../../commands/login';
+import { getAvailablePlatforms } from '../../commands/platform';
+import { executeAndHandleError } from '../../services/error-handler';
 
 export const description = 'Lists available platforms';
 export const command = 'list';
@@ -20,24 +20,15 @@ export const builder = yargs => yargs
 export const handler = args => executeAndHandleError(() => listPlatforms(args));
 
 export async function listPlatforms({ all }) {
-  const allPlatforms = await spinify(getPlatforms());
+  const developer = await ensureUserIsLoggedIn();
+  const platforms = await spinify(getAvailablePlatforms(all ? null : 20));
 
-  const groupBy = _.groupBy(allPlatforms, 'author.name');
-  let sortedPlatformsByAuthor = _.map(groupBy, platforms => platforms.sort(
-    (p1, p2) => semver.compare(p1.version, p2.version, true) * -1), // highest versions first
-  );
+  console.log('\nID\t\t\t\tPublished\tAuthor@Version');
 
-  if (!all) {
-    sortedPlatformsByAuthor = _.map(sortedPlatformsByAuthor, platforms => _.slice(platforms, 0, 3));
-  }
+  _.forEach(platforms, (platform) => {
+    const { id, published, version } = platform;
+    const author = _.get(platform, ['author', 'name']);
 
-  console.log('\nID\t\t\t\tAuthor\t\tVersion\t\tPublished');
-  _.forEach(sortedPlatformsByAuthor, (platforms) => {
-    _.forEach(platforms, (platform) => {
-      console.log(
-        _.get(platform, 'id'),
-        `${_.get(platform, ['author', 'name'])}@${_.get(platform, 'version')}\t\t${_.get(platform, 'published')}`,
-      );
-    });
+    console.log(`${id}\t${published}\t\t${author}@${version}`);
   });
 }
