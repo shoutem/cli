@@ -1,14 +1,14 @@
 import 'colors';
 import _ from 'lodash';
-import { executeAndHandleError } from '../../services/error-handler';
-import { ensureUserIsLoggedIn } from '../../commands/login';
-import { createPlatformArchiveProvider } from '../../services/archive';
-import { uploadPlatform } from '../../commands/platform';
-import { getPlatforms } from '../../clients/extension-manager';
-import { getPlatformConfig } from '../../services/platform';
+import { installPlatform } from './install';
+import { publishOwnPlatform } from './publish';
 import confirmer from '../../services/confirmer';
-import { installApplicationPlatform, installExtension } from '../../clients/app-manager';
 import { spinify } from '../../services/spinner';
+import { ensureUserIsLoggedIn } from '../../commands/login';
+import { getPlatformConfig } from '../../services/platform';
+import { executeAndHandleError } from '../../services/error-handler';
+import { uploadPlatformArchive } from '../../commands/platform';
+import { createPlatformArchiveProvider } from '../../services/platform-archive';
 
 export const description = 'Create a new platform';
 export const command = 'create';
@@ -43,20 +43,37 @@ export async function createPlatform({ url }) {
     throw new Error('Invalid URL parameter or not run in the valid Shoutem platform directory');
   }
 
-  const platformResponse = await uploadPlatform(provider);
+  const platformResponse = await uploadPlatformArchive(provider);
 
   console.log(`\nCongratulations, your new platform with ID ${platformResponse.id} is ready!`.green.bold);
 
-  const { appId } = await getPlatformConfig();
-  if (_.isNumber(appId)) {
-    if (await confirmer(`Do you want to install the new platform into app ${appId}?`)) {
-      await spinify(installApplicationPlatform(appId, platformResponse.id));
-    }
-  } else {
-    console.log(postRunInstall(platformResponse.id));
+  let published = false;
+  let installed = false;
+  if (await confirmer('Do you want to publish the new platform?')) {
+    await spinify(publishOwnPlatform({ platform: platformResponse.id }));
+    published = true;
   }
 
-  console.log(postRunPublish(platformResponse.id));
+  const { appId } = await getPlatformConfig();
+  if (!_.isNil(appId)) {
+    if (await confirmer(`Do you want to install the new platform to this app (${appId})?`)) {
+      await spinify(installPlatform({ app: appId, platform: platformResponse.id }));
+      installed = true;
+    }
+  }
+
+  if (!published || !installed) {
+    console.log('You might want to try: ');
+
+    if (!published) {
+      console.log(postRunPublish(platformResponse.id));
+    }
+
+    if (!installed) {
+      console.log(postRunInstall(platformResponse.id));
+    }
+  }
+
   console.log('Success!'.green.bold);
   console.log('Happy coding!');
 }

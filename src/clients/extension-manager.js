@@ -70,17 +70,17 @@ export async function getPlatforms() {
   return await jsonApi.get(url);
 }
 
-export async function uploadPlatform(tgzStream, progressHandler, size) {
+export async function uploadPlatform(archiveStream, progressHandler, size) {
   // a temporary workaround, forces access token to refresh
   await getDeveloper();
 
   if (progressHandler) {
-    listenStream(tgzStream, progressHandler, size);
+    listenStream(archiveStream, progressHandler, size);
   }
 
   const uri = extensionManagerUri.clone().segment('/v1/platforms');
   const form = new FormData();
-  form.append('platform', tgzStream, {
+  form.append('platform', archiveStream, {
     contentType: 'application/gzip',
   });
 

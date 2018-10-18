@@ -1,5 +1,5 @@
-import Promise from 'bluebird';
 import url from 'url';
+import Promise from 'bluebird';
 import { getHttpErrorMessage } from './get-http-error-message';
 
 const downloadFile = Promise.promisify(require('download-file'));
@@ -14,7 +14,7 @@ export async function downloadFileFollowRedirect(uri, options) {
       redirectLocation = await getRedirectLocation(uri);
     } else {
       const errorMessage = getHttpErrorMessage(err.message);
-      err.message = `Could not fetch platform\nRequested URL: ${this.url}\n${errorMessage}`;
+      err.message = `Could not fetch platform\nRequested URL: ${uri}\n${errorMessage}`;
       throw err;
     }
 
