@@ -10,9 +10,11 @@ const cacheDirCompat = path.join(getHomeDir(), 'cache', 'cached-requests-compat'
 const downloadCompat = downloadCached(cacheDirCompat);
 
 async function decompressFromUrl(url, destination, options) {
-  if (!options.useCache) {
-    await download.clear(url);
-  }
+  // disable cache until it's bug free
+  // if (!options.useCache) {
+  //   await download.clear(url);
+  // }
+  await download.clear(url);
 
   const onData = options.progress || (() => {});
 
@@ -27,9 +29,11 @@ async function decompressFromUrl(url, destination, options) {
 // unification of all download/archive/unpack methods into one service.
 async function decompressFromUrlCompat(url, destination, options) {
   try {
-    if (!options.useCache) {
-      await downloadCompat.clear(url);
-    }
+    // disable cache until it's bug free
+    // if (!options.useCache) {
+    //   await download.clear(url);
+    // }
+    await download.clear(url);
 
     const onData = options.progress || (() => {});
 
