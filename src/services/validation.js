@@ -1,6 +1,7 @@
 import os from 'os';
 import _ from 'lodash';
 import semver from 'semver';
+import { getValue } from '../services/cache-env';
 
 export function isValidExtensionName(name) {
   return /^[a-z]+[a-z0-9\-]*$/.test(name);
@@ -40,8 +41,11 @@ export async function validatePlatformArchive(archiveProvider) {
     throw new Error('platform.json \'mobileAppVersion\' must be a valid semantic version');
   }
 
+  const developer = await getValue('developer');
+  const isCustomPlatform = developer.name !== 'shoutem';
   const appetizeKey = _.get(platformJson, ['settings', 'appetizeKey']);
-  if (_.isNil(appetizeKey)) {
+
+  if (!isCustomPlatform && _.isNil(appetizeKey)) {
     throw new Error(`platform.json must contain settings.appetizeKey
       ${os.EOL}NOTE: Appetize (App preview in Builder) is currently not supported for custom platforms,
       ${os.EOL}      so please just leave an non-empty placeholder string as a value`);

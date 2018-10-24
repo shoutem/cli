@@ -9,14 +9,14 @@ import { getPlatformConfig } from '../../services/platform';
 import { executeAndHandleError } from '../../services/error-handler';
 import { uploadPlatformArchive } from '../../commands/platform';
 import { createPlatformArchiveProvider } from '../../services/platform-archive';
+import { platformMessages } from '../const';
 
 export const description = 'Create a new platform';
 export const command = 'create';
 export const builder = yargs => yargs
   .options({
     url: {
-      description: 'Download location for the platform archive, if omitted the platform will be '
-            + 'automatically generated from the current directory tree',
+      description: platformMessages.platformUrlDescription,
       type: 'string',
       default: '',
     },
@@ -40,7 +40,7 @@ export async function createPlatform({ url }) {
 
   const provider = await createPlatformArchiveProvider(url);
   if (provider == null) {
-    throw new Error('Invalid URL parameter or not run in the valid Shoutem platform directory');
+    throw new Error(platformMessages.platformLocationInvalidMessage);
   }
 
   const platformResponse = await uploadPlatformArchive(provider);
