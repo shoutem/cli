@@ -1,4 +1,5 @@
-import { pathExists, copy } from 'fs-extra';
+import { pathExists, pathExistsSync, copy } from 'fs-extra';
+import fs from 'fs';
 import mkdirp from 'mkdirp-promise';
 import inquirer from 'inquirer';
 import Promise from 'bluebird';
@@ -32,6 +33,8 @@ const downloadFile = Promise.promisify(require('download-file'));
 
 const extensionDownloadRetried = {};
 
+const fsPromise = Promise.promisifyAll(fs);
+
 export async function pullExtensions(appId, destinationDir) {
   const installations = await appManager.getInstallations(appId);
   const n = installations.length;
@@ -58,7 +61,15 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
 
   const tgzFile = path.join(tgzDir, 'extension.tgz');
   
-  if (!(await pathExists(tgzFile))) {
+  // on some systems, download-file will resolve before the file is actually available
+  // this should ensure enough time passes for the OS to list the file
+  await new Promise((resolve, reject) => {
+    fs.readdir(tgzDir, (err, files) => {
+      resolve(files);
+    });
+  });
+
+  if (!(pathExistsSync(tgzFile))) {
     throw new Error(`File not found: ${tgzFile}`);
   }
 
