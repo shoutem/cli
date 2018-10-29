@@ -73,7 +73,4 @@ export async function createPlatform({ url }) {
       console.log(postRunInstall(platformResponse.id));
     }
   }
-
-  console.log('Success!'.green.bold);
-  console.log('Happy coding!');
 }
