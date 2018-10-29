@@ -60,6 +60,8 @@ export async function createPlatform({ url }) {
       await spinify(installPlatform({ app: appId, platform: platformResponse.id }));
       installed = true;
     }
+
+    console.log(`\nYou can manage your platforms for this app any time at https://builder.shoutem.com/app/${appId}/settings/platform`);
   }
 
   if (!published || !installed) {
