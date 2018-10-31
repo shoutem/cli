@@ -11,18 +11,26 @@ import getHomeDir from '../home-dir';
 const cacheDir = path.join(getHomeDir(), 'cache', 'cached-requests');
 const download = downloadCached(cacheDir, downloadCached.requestGet(request));
 
-const defaultHandlers = {
+const defaultRequestHandlers = {
   onResponse: (response) => {
     if (response.statusCode !== 200) {
       throw new Error(`Invalid status code; ${response.statusCode}`);
     }
   },
   onError: (err) => {
-    throw (err);
+    throw err;
   },
   onEnd: () => { },
   destinations: [],
 };
+
+function extractZipPromise(filePath, options) {
+  return new Promise((resolve, reject) => {
+    extractZip(filePath, options, (err) => {
+      err ? reject(err) : resolve(filePath);
+    });
+  });
+}
 
 function pipeDownload(url, handlers = {}, options = {}) {
   const {
@@ -30,7 +38,7 @@ function pipeDownload(url, handlers = {}, options = {}) {
     onEnd,
     onResponse,
     destinations,
-  } = { ...defaultHandlers, ...handlers };
+  } = { ...defaultRequestHandlers, ...handlers };
 
   const progressHandler = options.progress || (() => { });
 
@@ -88,8 +96,8 @@ function decompressZipFromUrl(url, destination, options = {}) {
   let firstDirPath = '';
 
   // since there is no (apparent) easy way to strip/skip the first
-  // directory, we need to save the first directory's
-  // name for later, so we can move files one directory up
+  // directory, we need to save the first directory's name for later,
+  // so we can move the extracted files one directory up
   function onZipFileEntry(entry) {
     if (firstDirPath !== '') {
       return;
@@ -98,26 +106,23 @@ function decompressZipFromUrl(url, destination, options = {}) {
     firstDirPath = path.resolve(destination, entry.fileName);
   }
 
-  return new Promise((resolve, reject) => {
-    pipeDownloadToFile(url, destination, options)
-      .then(() => {
-        const extractOptions = {
-          dir: destination,
-          onEntry: onZipFileEntry,
-        };
+  return new Promise(async (resolve, reject) => {
+    const extractOptions = {
+      dir: destination,
+      onEntry: onZipFileEntry,
+    };
 
-        extractZip(filePath, extractOptions, (err) => {
-          if (err) {
-            reject(err);
-            return;
-          }
+    try {
+      await pipeDownloadToFile(url, destination, options);
+      await extractZipPromise(filePath, extractOptions);
+      fs.moveSync(firstDirPath, destination);
+      fs.removeSync(firstDirPath);
+      fs.removeSync(filePath);
+    } catch (err) {
+      return reject(err);
+    }
 
-          fs.moveSync(firstDirPath, destination);
-          fs.removeSync(firstDirPath);
-
-          resolve();
-        });
-      });
+    return resolve();
   });
 }
 
