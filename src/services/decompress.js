@@ -124,7 +124,7 @@ function decompressZipFromUrl(url, destination, options = {}) {
 function decompressFromUrl(url, destination, options = {}) {
   const fileName = url.split('/').pop();
 
-  if (fileName.match(/\.tar\.gz$/)) {
+  if (fileName.match(/(\.tar\.gz|\.tgz)$/)) {
     return decompressTarGzFromUrl(url, destination, options);
   }
 
