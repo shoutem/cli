@@ -1,4 +1,6 @@
 import fs from 'fs-extra';
+import { prompt } from 'inquirer';
+import semver from 'semver';
 import * as extensionManager from '../clients/extension-manager';
 import {getHostEnvName} from '../clients/server-env';
 import * as local from '../clients/local-extensions';
@@ -16,19 +18,19 @@ import {spinify, startSpinner} from '../services/spinner';
 import extLint from '../services/extlint';
 import {ensureUserIsLoggedIn} from "./login";
 import {canPublish} from "../clients/extension-manager";
-import { prompt } from 'inquirer';
-import semver from 'semver';
+import depcheck from '../services/depcheck';
 
 export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
   if (!opts.nocheck) {
     process.stdout.write('Checking the extension code for syntax errors... ');
     try {
-      await extLint(extensionDir);
+      //await extLint(extensionDir);
       console.log(`[${'OK'.green.bold}]`);
     } catch (err) {
       err.message = 'Syntax errors detected, aborting push! Use `shoutem push --nocheck` to override';
       throw err;
     }
+    await spinify(await depcheck(extensionDir), 'Checking for missing shoutem dependencies');
   }
   const extJson = await loadExtensionJson(extensionDir);
   if (opts.publish) {

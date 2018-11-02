@@ -1,11 +1,9 @@
 import tar from 'tar';
 import path from 'path';
 import zlib from 'zlib';
-import targz from 'tar.gz';
 import move from 'glob-move';
 import tmp from 'tmp-promise';
 import Promise from 'bluebird';
-import decompress from 'decompress';
 import { exec } from 'child-process-promise';
 import fs, { pathExists, copy } from 'fs-extra';
 
@@ -24,9 +22,13 @@ const mv = Promise.promisify(require('mv'));
 
 export function checkZipFileIntegrity(filePath) {
   const zipBuffer = fs.readFileSync(filePath);
+  const zlibOptions = {
+    flush: zlib.Z_SYNC_FLUSH,
+    finishFlush: zlib.Z_SYNC_FLUSH,
+  };
 
   try {
-    zlib.gunzipSync(zipBuffer);
+    zlib.gunzipSync(zipBuffer, zlibOptions);
   } catch (err) {
     err.message = `Zip integrity error: ${err.message} (${filePath})`;
     return err;
@@ -50,6 +52,7 @@ async function npmPack(dir, destinationDir) {
   packageJson.version = `${packageJson.version}-build${timestamp}`;
 
   await writeJsonFile(packageJson, packageJsonPath);
+
   const { stdout } = await exec('npm pack', { cwd: dir });
   const packageFilename = stdout.replace(/\n$/, '');
   const packagePath = path.join(dir, packageFilename);
@@ -62,16 +65,6 @@ async function npmPack(dir, destinationDir) {
 }
 
 export async function npmUnpack(tgzFile, destinationDir) {
-  if (!(await pathExists(tgzFile))) {
-    return [];
-  }
-
-  const zipCheck = checkZipFileIntegrity(tgzFile);
-
-  if (zipCheck !== true) {
-    throw(zipCheck);
-  }
-
   const tmpDir = (await tmp.dir()).path;
 
   try {
@@ -79,6 +72,7 @@ export async function npmUnpack(tgzFile, destinationDir) {
       file: tgzFile,
       strict: true,
       sync: true,
+      cwd: tmpDir,
     });
   } catch (err) {
     throw err;
@@ -89,11 +83,10 @@ export async function npmUnpack(tgzFile, destinationDir) {
 
 export async function shoutemUnpack(tgzFile, destinationDir) {
   const tmpDir = (await tmp.dir()).path;
-  await npmUnpack(tgzFile, tmpDir);
 
+  await npmUnpack(tgzFile, tmpDir);
   await npmUnpack(path.join(tmpDir, 'app.tgz'), path.join(destinationDir, 'app'));
   await npmUnpack(path.join(tmpDir, 'server.tgz'), path.join(destinationDir, 'server'));
-
   await move(path.join(tmpDir, 'extension.json'), destinationDir);
 }
 
@@ -138,6 +131,7 @@ export default async function shoutemPack(dir, options) {
 
   const tmpDir = (await tmp.dir()).path;
   const packageDir = path.join(tmpDir, 'package');
+
   await fs.mkdir(packageDir);
 
   const dirsToPack = await Promise.filter(packedDirectories, hasPackageJson);
@@ -150,20 +144,35 @@ export default async function shoutemPack(dir, options) {
   }
 
   return await spinify(async () => {
-    for (const dir of dirsToPack) {
-      await npmPack(dir, packageDir);
+    for (const partDir of dirsToPack) {
+      await npmPack(partDir, packageDir);
     }
+
     const extensionJsonPathSrc = path.join(dir, 'extension.json');
     const extensionJsonPathDest = path.join(packageDir, 'extension.json');
+    const destinationDir = options.packToTempDir ? tmpDir : dir;
+    const destinationPackage = path.join(destinationDir, 'extension.tgz');
+
     await copy(extensionJsonPathSrc, extensionJsonPathDest);
 
-    const destinationDirectory = path.join(options.packToTempDir ? tmpDir : dir, 'extension.tgz');
-    await targz().compress(packageDir, destinationDirectory);
+    try {
+      tar.create({
+          gzip: true,
+          sync: true,
+          cwd: tmpDir,
+          file: destinationPackage,
+        },
+        ['package']
+      );
+    } catch (err) {
+      err.message = `TAR error while trying to gzip '${packageDir}' to '${destinationPackage}': ${err.message}`;
+      throw err;
+    }
 
     return ({
       packedDirs: dirsToPack,
       allDirs: packedDirectories,
-      package: destinationDirectory,
+      package: destinationPackage,
     });
   }, 'Packing extension...', 'OK');
 }

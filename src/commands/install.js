@@ -4,8 +4,9 @@ import { getLatestApps } from '../clients/legacy-service';
 import { getExtensionCanonicalName } from '../clients/local-extensions';
 import * as extensionManager from '../clients/extension-manager';
 import selectApp from '../services/app-selector';
+import { ensureInExtensionDir } from '../services/extension';
 import msg from '../user_messages';
-import {ensureInExtensionDir} from "../services/extension";
+
 
 export async function promptCreateNewApp() {
   const { answerNew } = await inquirer.prompt({
