@@ -5,24 +5,13 @@ import tar from 'tar';
 import fs from 'fs-extra';
 import request from 'request';
 import extractZip from 'extract-zip';
+import isGzip from 'is-gzip';
 
+import { pipeDownloadToFile } from './download';
 import getHomeDir from '../home-dir';
 
 const cacheDir = path.join(getHomeDir(), 'cache', 'cached-requests');
 const download = downloadCached(cacheDir, downloadCached.requestGet(request));
-
-const defaultRequestHandlers = {
-  onResponse: (response) => {
-    if (response.statusCode !== 200) {
-      throw new Error(`Invalid status code; ${response.statusCode}`);
-    }
-  },
-  onError: (err) => {
-    throw err;
-  },
-  onEnd: () => { },
-  destinations: [],
-};
 
 function extractZipPromise(filePath, options) {
   return new Promise((resolve, reject) => {
@@ -32,67 +21,7 @@ function extractZipPromise(filePath, options) {
   });
 }
 
-function pipeDownload(url, handlers = {}, options = {}) {
-  const {
-    onError,
-    onEnd,
-    onResponse,
-    destinations,
-  } = { ...defaultRequestHandlers, ...handlers };
-
-  const progressHandler = options.progress || (() => { });
-
-  let req = request(url)
-    .on('error', onError)
-    .on('response', onResponse)
-    .on('data', progressHandler)
-    .on('end', () => {
-      progressHandler();
-      onEnd();
-    });
-
-  destinations.forEach(destination => {
-    req = req.pipe(destination);
-  });
-
-  return req;
-}
-
-function pipeDownloadPromise(url, destinations, options) {
-  return new Promise((resolve, reject) => {
-    const handlers = {
-      onError: reject,
-      onEnd: resolve,
-      destinations,
-    };
-
-    pipeDownload(url, handlers, options);
-  });
-}
-
-function pipeDownloadToFile(url, destinationDir, options = {}) {
-  const fileName = url.split('/').pop();
-  const filePath = path.join(destinationDir, fileName);
-  const fileStream = fs.createWriteStream(filePath);
-  
-  return pipeDownloadPromise(url, [fileStream], options);
-}
-
-// uses 'node-tar'
-function decompressTarGzFromUrl(url, destination, options = {}) {
-  const extractor = tar.extract({
-    cwd: destination,
-    strict: true,
-    strip: 1,
-  });
-
-  return pipeDownloadPromise(url, [extractor], options);
-}
-
-// uses 'extract-zip', which is a wrapper around 'yauzl'
-function decompressZipFromUrl(url, destination, options = {}) {
-  const fileName = url.split('/').pop();
-  const filePath = path.join(destination, fileName);
+export async function decompressZip(filePath, destination, stripFirstDir = true) {
   let firstDirPath = '';
 
   // since there is no (apparent) easy way to strip/skip the first
@@ -106,41 +35,83 @@ function decompressZipFromUrl(url, destination, options = {}) {
     firstDirPath = path.resolve(destination, entry.fileName);
   }
 
-  return new Promise(async (resolve, reject) => {
-    const extractOptions = {
-      dir: destination,
-      onEntry: onZipFileEntry,
-    };
+  const extractOptions = {
+    dir: destination,
+    onEntry: onZipFileEntry,
+  };
 
-    try {
-      await pipeDownloadToFile(url, destination, options);
-      await extractZipPromise(filePath, extractOptions);
-      fs.moveSync(firstDirPath, destination);
-      fs.removeSync(firstDirPath);
-      fs.removeSync(filePath);
-    } catch (err) {
-      return reject(err);
+  try {
+    await extractZipPromise(filePath, extractOptions);
+
+    if (stripFirstDir) {
+      execSync(`mv ${firstDirPath}/.[!.]* ${destination}`);
+      execSync(`mv ${firstDirPath}/* ${destination}`);
+      execSync(`rm -rf ${firstDirPath}`);
     }
 
-    return resolve();
+    return Promise.resolve(destination);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+}
+
+// uses 'node-tar'
+export function decompressTarGz(filePath, destination, stripFirstDir = true) {
+  return tar.extract({
+    file: filePath,
+    cwd: destination,
+    strict: true,
+    strip: stripFirstDir ? 1 : 0,
   });
 }
 
-function decompressFromUrl(url, destination, options = {}) {
+export async function decompressTarGzFromUrl(url, destination, options = {}) {
   const fileName = url.split('/').pop();
+  const filePath = path.join(destination, fileName);
 
-  if (fileName.match(/(\.tar\.gz|\.tgz)$/)) {
-    return decompressTarGzFromUrl(url, destination, options);
+  try {
+    await pipeDownloadToFile(url, destination, options);
+    await decompressTarGz(filePath, destination);
+
+    return Promise.resolve(destination);
+  } catch (err) {
+    return Promise.reject(err);
   }
-
-  if (fileName.match(/\.zip$/)) {
-    return decompressZipFromUrl(url, destination, options);
-  }
-
-  throw new Error('Only zip and tar.gz files are supported');
 }
 
-async function decompressFromUrlLegacy(url, destination, options) {
+// uses 'extract-zip', which is a wrapper around 'yauzl'
+export async function decompressZipFromUrl(url, destination, options = {}) {
+  const fileName = url.split('/').pop();
+  const filePath = path.join(destination, fileName);
+
+  try {
+    await pipeDownloadToFile(url, destination, options);
+    await decompressZip(filePath, destination);
+
+    return Promise.resolve(destination);
+  } catch (err) {
+    return Promise.reject(err);
+  }
+}
+
+export async function decompressFromUrl(url, destination, options = {}) {
+  const fileName = url.split('/').pop();
+  const filePath = path.join(destination, fileName);
+
+  fs.ensureDirSync(destination);
+
+  await pipeDownloadToFile(url, destination, options);
+
+  const fileBuffer = fs.readFileSync(filePath);
+
+  if (isGzip(fileBuffer)) {
+    return decompressTarGz(filePath, destination);
+  }
+
+  return decompressZip(filePath, destination);
+}
+
+export async function decompressFromUrlLegacy(url, destination, options) {
   if (!options.useCache) {
     await download.clear(url);
   }
@@ -150,8 +121,3 @@ async function decompressFromUrlLegacy(url, destination, options) {
   const tmpPath = await download.toCache(url, { onData });
   await decompress(tmpPath, destination, options);
 }
-
-export {
-  decompressFromUrlLegacy,
-  decompressFromUrl,
-};
