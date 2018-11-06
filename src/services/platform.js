@@ -141,7 +141,7 @@ export async function downloadApp(appId, destinationDir, options = {}) {
   await pullPlatform(platform.location, mobileAppVersion, destinationDir, options);
 
   if (!await pathExists(destinationDir)) {
-    throw new Error('Platform code could not be downloaded from github. Make sure that platform is setup correctly.');
+    throw new Error('Platform code could not be downloaded. Make sure that platform is setup correctly.');
   }
 }
 

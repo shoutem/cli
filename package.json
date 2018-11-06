@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.12.0-alpha10",
+  "version": "0.12.0-alpha11",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -53,6 +53,7 @@
     "ignore": "^5.0.2",
     "inquirer": "1.0.3",
     "ip": "1.1.5",
+    "is-gzip": "^2.0.0",
     "json-stringify-safe": "5.0.1",
     "jsonapi-serializer": "3.5.3",
     "linklocal": "^2.8.1",

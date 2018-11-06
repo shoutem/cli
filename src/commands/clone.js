@@ -1,9 +1,7 @@
-import { pathExists, pathExistsSync, copy } from 'fs-extra';
-import fs from 'fs';
+import { pathExists, copy } from 'fs-extra';
+import fs from 'fs-extra';
 import mkdirp from 'mkdirp-promise';
 import inquirer from 'inquirer';
-import Promise from 'bluebird';
-import tmp from 'tmp-promise';
 import slugify from 'slugify';
 import semver from 'semver';
 import rmrf from 'rmfr';
@@ -15,12 +13,11 @@ import { getExtension } from '../clients/extension-manager';
 import * as appManager from '../clients/app-manager';
 import { getApp } from '../clients/legacy-service';
 
-import { getHttpErrorMessage } from '../services/get-http-error-message';
 import { createProgressHandler } from '../services/progress-bar';
 import commandExists from '../services/command-exists';
-import { shoutemUnpack, checkZipFileIntegrity } from '../services/packer';
 import selectApp from '../services/app-selector';
 import { spinify } from '../services/spinner';
+import { decompressFromUrl, decompressFile } from '../services/decompress';
 import {
   downloadApp,
   fixPlatform,
@@ -28,12 +25,6 @@ import {
   createPlatformConfig,
   setPlatformConfig,
 } from '../services/platform';
-
-const downloadFile = Promise.promisify(require('download-file'));
-
-const extensionDownloadRetried = {};
-
-const fsPromise = Promise.promisifyAll(fs);
 
 export async function pullExtensions(appId, destinationDir) {
   const installations = await appManager.getInstallations(appId);
@@ -49,52 +40,29 @@ export async function pullExtensions(appId, destinationDir) {
 
 async function pullExtension(destinationDir, { extension, canonicalName }) {
   const url = await getExtensionUrl(extension);
-  const tgzDir = (await tmp.dir()).path;
-
-  try {
-    await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
-  } catch (err) {
-    const errorMessage = getHttpErrorMessage(err.message);
-    err.message = `Could not fetch extension ${canonicalName}\nRequested URL: ${url}\n${errorMessage}`;
-    throw err;
-  }
-
-  const tgzFile = path.join(tgzDir, 'extension.tgz');
-  
-  // on some systems, download-file will resolve before the file is actually available
-  // this should ensure enough time passes for the OS to list the file
-  await new Promise((resolve, reject) => {
-    fs.readdir(tgzDir, (err, files) => {
-      resolve(files);
-    });
-  });
-
-  if (!(pathExistsSync(tgzFile))) {
-    throw new Error(`File not found: ${tgzFile}`);
-  }
-
-  const zipCheck = checkZipFileIntegrity(tgzFile);
-  
-  if (zipCheck !== true) {
-    if (zipCheck.code === 'Z_BUF_ERROR') {
-      if (extensionDownloadRetried[canonicalName] !== true) {
-        // try downloading the (possibly corrupted) archive one more time
-        console.warn("\nReceived Z_BUF_ERROR, retrying download...");
-        extensionDownloadRetried[canonicalName] = true;
-        return pullExtension(destinationDir, { extension, canonicalName });
-      }
-    }
-
-    throw (zipCheck);
-  }
-
+  const ext = path.extname(url.split('/').pop());
+  const fileName = `extension-${canonicalName}${ext}`;
   const destination = path.join(destinationDir, canonicalName);
 
+  fs.ensureDirSync(destination);
+
   try {
-    await shoutemUnpack(tgzFile, destination);
+    await decompressFromUrl(url, destination, { fileName, deleteArchiveWhenDone: true });
+    await unpackExtension(destination, { deleteArchiveWhenDone: true });
   } catch (err) {
+    err.message = `Could not fetch extension ${canonicalName}\nRequested URL: ${url}\n${err.message}`;
     throw err;
   }
+}
+
+export async function unpackExtension(extensionDir, options) {
+  const appFile = path.join(extensionDir, 'app.tgz');
+  const serverFile = path.join(extensionDir, 'server.tgz');
+  const appDir = path.join(extensionDir, 'app');
+  const serverDir = path.join(extensionDir, 'server');
+
+  await decompressFile(appFile, appDir, options);
+  await decompressFile(serverFile, serverDir, options);
 }
 
 async function getExtensionUrl(extId) {
@@ -211,6 +179,7 @@ export async function clone(opts, destinationDir) {
     await downloadApp(opts.appId, appDir, {
       progress: createProgressHandler({ msg: 'Downloading shoutem platform' }),
       useCache: !opts.force,
+      deleteArchiveWhenDone: true,
 
       versionCheck: mobileAppVersion => {
         if (!semver.gte(mobileAppVersion, '0.58.9')) {

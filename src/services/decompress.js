@@ -6,6 +6,7 @@ import fs from 'fs-extra';
 import request from 'request';
 import extractZip from 'extract-zip';
 import isGzip from 'is-gzip';
+import { execSync } from 'child_process';
 
 import { pipeDownloadToFile } from './download';
 import getHomeDir from '../home-dir';
@@ -40,6 +41,8 @@ export async function decompressZip(filePath, destination, stripFirstDir = true)
     onEntry: onZipFileEntry,
   };
 
+  fs.ensureDirSync(destination);
+
   try {
     await extractZipPromise(filePath, extractOptions);
 
@@ -57,10 +60,13 @@ export async function decompressZip(filePath, destination, stripFirstDir = true)
 
 // uses 'node-tar'
 export function decompressTarGz(filePath, destination, stripFirstDir = true) {
+  fs.ensureDirSync(destination);
+
   return tar.extract({
     file: filePath,
     cwd: destination,
-    strict: true,
+    strict: false,
+    sync: false,
     strip: stripFirstDir ? 1 : 0,
   });
 }
@@ -95,20 +101,30 @@ export async function decompressZipFromUrl(url, destination, options = {}) {
 }
 
 export async function decompressFromUrl(url, destination, options = {}) {
-  const fileName = url.split('/').pop();
+  const fileName = options.fileName || url.split('/').pop();
   const filePath = path.join(destination, fileName);
 
-  fs.ensureDirSync(destination);
-
   await pipeDownloadToFile(url, destination, options);
+
+  return decompressFile(filePath, destination, options);
+}
+
+export async function decompressFile(filePath, destination, options = {}) {
+  const { stripFirstDir = true, deleteArchiveWhenDone = false } = options;
 
   const fileBuffer = fs.readFileSync(filePath);
 
   if (isGzip(fileBuffer)) {
-    return decompressTarGz(filePath, destination);
+    await decompressTarGz(filePath, destination, stripFirstDir);
+  } else {
+    await decompressZip(filePath, destination, stripFirstDir);
   }
 
-  return decompressZip(filePath, destination);
+  if (deleteArchiveWhenDone) {
+    fs.remove(filePath);
+  }
+
+  Promise.resolve(destination);
 }
 
 export async function decompressFromUrlLegacy(url, destination, options) {

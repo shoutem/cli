@@ -1,5 +1,9 @@
 import url from 'url';
+import path from 'path';
+import fs from 'fs-extra';
+import request from 'request';
 import Promise from 'bluebird';
+
 import { getHttpErrorMessage } from './get-http-error-message';
 
 const downloadFile = Promise.promisify(require('download-file'));
@@ -54,10 +58,8 @@ export function pipeDownload(url, handlers = {}, options = {}) {
     destinations,
   } = { ...defaultRequestHandlers, ...handlers };
 
-  const fileName = url.split('/').pop();
+  const fileName = options.fileName || url.split('/').pop();
   const progressHandler = options.progress || (() => { });
-
-  console.time(`Download "${fileName}"`);
 
   let req = request(url)
     .on('error', onError)
@@ -66,7 +68,6 @@ export function pipeDownload(url, handlers = {}, options = {}) {
     .on('end', () => {
       progressHandler();
       onEnd();
-      console.timeEnd(`Download "${fileName}"`);
     });
 
   destinations.forEach(destination => {
@@ -89,12 +90,17 @@ export function pipeDownloadPromise(url, destinations, options) {
 }
 
 export function pipeDownloadToFile(url, destinationDir, options = {}) {
-  const fileName = url.split('/').pop();
+  const fileName = options.fileName || url.split('/').pop();
   const filePath = path.join(destinationDir, fileName);
 
   fs.ensureFileSync(filePath);
 
   const fileStream = fs.createWriteStream(filePath);
+
+  pipeDownloadPromise(url, [fileStream], options);
   
-  return pipeDownloadPromise(url, [fileStream], options);
+  return new Promise((resolve, reject) => {
+    fileStream.on('error', reject);
+    fileStream.on('close', resolve);
+  });
 }
