@@ -9,7 +9,7 @@ import decompress from 'decompress';
 import confirmer from './confirmer';
 import { getPlatformRootDir } from './platform';
 import { isValidPlatformUrl } from './validation';
-import { downloadFileFollowRedirect } from './donwload';
+import { downloadFileFollowRedirect } from './download';
 import { listDirectoryContent, readLinesInFile } from './file';
 
 const SHOUTEM_IGNORE_FILE_NAME = '.shoutemignore';

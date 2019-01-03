@@ -15,27 +15,8 @@ import { readJsonFile, writeJsonFile } from './data';
 import { getPackageJson, savePackageJson } from './npm';
 
 import { ensureUserIsLoggedIn } from '../commands/login';
-import { getDeveloper } from '../clients/extension-manager';
-import { getExtensionCanonicalName } from '../clients/local-extensions';
 
 const mv = Promise.promisify(require('mv'));
-
-export function checkZipFileIntegrity(filePath) {
-  const zipBuffer = fs.readFileSync(filePath);
-  const zlibOptions = {
-    flush: zlib.Z_SYNC_FLUSH,
-    finishFlush: zlib.Z_SYNC_FLUSH,
-  };
-
-  try {
-    zlib.gunzipSync(zipBuffer, zlibOptions);
-  } catch (err) {
-    err.message = `Zip integrity error: ${err.message} (${filePath})`;
-    return err;
-  }
-
-  return true;
-}
 
 function hasPackageJson(dir) {
   return pathExists(path.join(dir, 'package.json'));
@@ -62,32 +43,6 @@ async function npmPack(dir, destinationDir) {
   if (originalFileContent !== null) {
     await fs.writeFile(packageJsonPath, originalFileContent, 'utf8');
   }
-}
-
-export async function npmUnpack(tgzFile, destinationDir) {
-  const tmpDir = (await tmp.dir()).path;
-
-  try {
-    tar.extract({
-      file: tgzFile,
-      strict: true,
-      sync: true,
-      cwd: tmpDir,
-    });
-  } catch (err) {
-    throw err;
-  }
-
-  return await move(path.join(tmpDir, 'package', '*'), destinationDir, { dot: true });
-}
-
-export async function shoutemUnpack(tgzFile, destinationDir) {
-  const tmpDir = (await tmp.dir()).path;
-
-  await npmUnpack(tgzFile, tmpDir);
-  await npmUnpack(path.join(tmpDir, 'app.tgz'), path.join(destinationDir, 'app'));
-  await npmUnpack(path.join(tmpDir, 'server.tgz'), path.join(destinationDir, 'server'));
-  await move(path.join(tmpDir, 'extension.json'), destinationDir);
 }
 
 function hasExtensionsJson(dir) {
