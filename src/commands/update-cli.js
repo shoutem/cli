@@ -1,12 +1,14 @@
-import { isLatest } from '../services/npmjs';
-import apiUrls from '../../config/services';
-import msg from '../../src/user_messages';
-import { spawn } from 'child-process-promise';
-import { version } from '../../package.json';
-import confirm from '../services/confirmer';
-import * as cache from '../services/cache';
-import { spinify } from '../services/spinner';
+import { execSync } from 'child_process';
 import 'colors';
+
+import msg from '../user_messages';
+import { version } from '../../package.json';
+import apiUrls from '../../config/services';
+
+import cache from '../services/cache';
+import confirm from '../services/confirmer';
+import { isLatest } from '../services/npmjs';
+import { spinify } from '../services/spinner';
 
 async function confirmUpdate() {
   if (cache.getValue('updateConfirmed') === false) {
@@ -34,19 +36,22 @@ export default async function () {
     return false;
   }
 
+  const options = { stdio: 'inherit' };
+
   try {
-    await spawn('npm', ['install', '-g', '@shoutem/cli'], { stdio: 'inherit' });
+    execSync('npm install -g @shoutem/cli', options);
   } catch (err) {
     if (process.platform !== 'win32') {
       console.log('Current user does not have permissions to update shoutem CLI. Using sudo...');
-      await spawn('sudo', ['npm', 'install', '-g', '@shoutem/cli'], { stdio: 'inherit' });
+      execSync('sudo npm install -g @shoutem/cli', options);
     } else {
       throw err;
     }
   }
 
   console.log('Update complete');
-  await spawn('shoutem', process.argv.filter((_, index) => index > 1), { stdio: 'inherit' });
+
+  execSync('shoutem', process.argv.slice(2), options);
 
   return true;
 }
