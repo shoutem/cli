@@ -1,8 +1,8 @@
-import fs from "fs-extra";
+import fs from 'fs-extra';
 
-export async function readJsonFile(filePath) {
+export function readJsonFile(filePath) {
   try {
-    return JSON.parse(await fs.readFile(filePath, 'utf8'));
+    return fs.readJsonSync(filePath);
   } catch (err) {
     if (err.code === 'ENOENT') {
       return null;
@@ -12,12 +12,15 @@ export async function readJsonFile(filePath) {
   }
 }
 
-export async function writeJsonFile(json, filePath) {
-  const str = stringify(json);
-  await fs.writeFile(filePath, str, 'utf8');
-  return str;
-}
-
 export function stringify(json) {
   return `${JSON.stringify(json, null, 2)}\n`;
+}
+
+export function writeJsonFile(filePath, json) {
+  try {
+    fs.writeJsonSync(filePath, json);
+  } catch (err) {
+    err.message = `Could not write to file ${filePath}\n${err.message}`;
+    throw err;
+  }
 }

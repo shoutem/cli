@@ -8,7 +8,7 @@ export const description = 'Add a settings page to current extension';
 export const command = 'add [name]';
 
 export const handler = args => executeAndHandleError(async () => {
-  const extJson = await loadExtensionJson();
+  const extJson = loadExtensionJson();
   const answers = await askPageCreationQuestions({ ...extJson, defaultName: args.name });
   await createPage(answers, ensureInExtensionDir());
 });

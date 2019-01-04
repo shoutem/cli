@@ -8,7 +8,7 @@ export const description = 'Add a screen for applications running this extension
 export const command = 'add [name]';
 
 export const handler = args => executeAndHandleError(async () => {
-  const extJson = await loadExtensionJson();
+  const extJson = loadExtensionJson();
   const answers = await askScreenCreationQuestions({ ...extJson, defaultName: args.name });
   await createScreen(answers, ensureInExtensionDir());
 });

@@ -1,9 +1,9 @@
 import _ from 'lodash';
 import getOrSet from 'lodash-get-or-set';
-import camelcase from 'uppercamelcase';
-import * as shortcut from '../../services/shortcut';
 
-export async function before(context) {
+import shortcut from '../../services/shortcut';
+
+export function before(context) {
   const { extJson, name } = context;
 
   const screens = getOrSet(extJson, 'screens', []);

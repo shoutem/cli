@@ -1,8 +1,9 @@
 import URI from 'urijs';
-import { post } from './json-api-client';
+import { post as jsonApiPost } from './json-api-client';
 import services from '../../config/services';
-import * as cache from '../services/cache-env';
-import * as logger from '../services/logger';
+import cache from '../services/cache-env';
+import logger from '../services/logger';
+import fetchTokenIntercept from '@shoutem/fetch-token-intercept';
 
 export class AuthServiceError {
   /*
@@ -38,7 +39,7 @@ function getBasicAuthHeaderValue(email, password) {
 
 export async function createRefreshToken(email, password) {
   try {
-    const response = await post(tokensUrl, null, {
+    const response = await jsonApiPost(tokensUrl, null, {
       headers: {
         Authorization: getBasicAuthHeaderValue(email, password)
       }
@@ -66,7 +67,7 @@ export async function createAppAccessToken(appId, refreshToken) {
     }
   };
 
-  const { token } = await post(appAccessTokenUrl, body, {
+  const { token } = await jsonApiPost(appAccessTokenUrl, body, {
     headers: {
       Authorization: `Bearer ${refreshToken}`
     }
@@ -77,17 +78,18 @@ export async function createAppAccessToken(appId, refreshToken) {
 
 export async function getRefreshToken({ email, password } = {}) {
   if (email && password) {
-    const refreshToken = await cache.setValue('refresh-token', await createRefreshToken(email, password));
-    await cache.setValue('access-token', null);
+    const refreshToken = await createRefreshToken(email, password);
+    cache.setValue('refresh-token', refreshToken);
+    cache.setValue('access-token', null);
     return refreshToken;
   }
 
-  return await cache.getValue('refresh-token');
+  return cache.getValue('refresh-token');
 }
 
-export async function clearTokens() {
-  await cache.setValue('access-token', null);
-  await cache.setValue('refresh-token', null);
+export function clearTokens() {
+  cache.setValue('access-token', null);
+  cache.setValue('refresh-token', null);
 }
 
 const authorizationConfig = {
@@ -113,7 +115,7 @@ const authorizationConfig = {
   async parseAccessToken(response) {
     if (response.ok) {
       const { data: { attributes: { token } } } = await response.json();
-      await cache.setValue('access-token', token);
+      cache.setValue('access-token', token);
       return token;
     }
     logger.info('parseAccessToken', response);
@@ -136,20 +138,23 @@ const authorizationConfig = {
   shouldWaitForTokenRenewal: true
 };
 
-export async function authorizeRequests(refreshToken) {
+export function authorizeRequests(refreshToken) {
   if (!refreshToken) {
     return;
   }
+
   try {
-    const intercept = require('@shoutem/fetch-token-intercept');
-    intercept.configure(authorizationConfig);
-    intercept.authorize(refreshToken, await cache.getValue('access-token'));
+    const accessToken = cache.getValue('access-token');
+    fetchTokenIntercept.configure(authorizationConfig);
+    fetchTokenIntercept.authorize(refreshToken, accessToken);
     return true;
   } catch (err) {
     logger.info(err);
+
     if (err.statusCode !== 401) {
       throw err;
     }
+
     return false;
   }
 }

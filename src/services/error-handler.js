@@ -1,9 +1,10 @@
 import 'colors';
+import 'exit-code';
 import _ from 'lodash';
 import stringify from 'json-stringify-safe';
+
 import * as cache from './cache-env';
 import * as spinner from './spinner';
-import 'exit-code';
 
 function getJsonApiErrorMessage(errors) {
   const generalDetail = _.upperFirst(_.get(errors, '[0].detail') || _.get(errors, '[0].title'));
@@ -36,6 +37,7 @@ export function getErrorMessage(err) {
   if (typeof(_.get(err, 'response.body')) === 'string') {
     try {
       const body = JSON.parse(_.get(err, 'response.body'));
+
       if (body.errors) {
         return getJsonApiErrorMessage(body.errors);
       }
@@ -43,28 +45,30 @@ export function getErrorMessage(err) {
     }
   }
 
-
   return 'Unrecognized error. Run `shoutem last-error` for more additional details'
 }
 
 let reportInfoPrinted = false;
 
-export async function handleError(err) {
+export function handleError(err) {
   try {
     if (err) {
       process.exitCode = err.code || -1;
     }
-      spinner.stopAll();
-      console.error(getErrorMessage(err).red.bold);
 
-      const errorJson = JSON.parse(stringify(err));
-      errorJson.stack = (err || {}).stack;
-      errorJson.message = (err || {}).message;
-      await cache.setValue('last-error', errorJson);
-      if (!reportInfoPrinted) {
-        console.error(`\nUse ${'shoutem last-error'.cyan} for more info`);
-        reportInfoPrinted = true;
-      }
+    spinner.stopAll();
+    console.error(getErrorMessage(err).red.bold);
+
+    const errorJson = JSON.parse(stringify(err));
+    errorJson.stack = (err || {}).stack;
+    errorJson.message = (err || {}).message;
+
+    cache.setValue('last-error', errorJson);
+
+    if (!reportInfoPrinted) {
+      console.error(`\nUse ${'shoutem last-error'.cyan} for more info`);
+      reportInfoPrinted = true;
+    }
   } catch (err) {
       console.log(err);
   }
@@ -74,6 +78,6 @@ export async function executeAndHandleError(func) {
   try {
     await func();
   } catch (err) {
-    await handleError(err);
+    handleError(err);
   }
 }

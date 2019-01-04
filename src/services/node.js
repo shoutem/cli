@@ -1,10 +1,11 @@
 import _ from 'lodash';
-import * as npm from "./npm";
 import { exec } from 'child-process-promise'
 
-export async function containsBuildTask(dir) {
+import npm from "./npm";
+
+export function containsBuildTask(dir) {
   try {
-    const pkgJson = await npm.getPackageJson(dir);
+    const pkgJson = npm.getPackageJson(dir);
     return !!_.get(pkgJson, 'scripts.build');
   } catch (err) {
     return false;
@@ -12,7 +13,7 @@ export async function containsBuildTask(dir) {
 }
 
 export async function buildNodeProject(dir) {
-  if (!await containsBuildTask(dir)) {
+  if (!containsBuildTask(dir)) {
     return false;
   }
 

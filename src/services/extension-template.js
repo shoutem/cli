@@ -3,7 +3,7 @@ import * as template from "./template";
 
 export async function instantiateExtensionTemplate(localTemplatePath, context, opts) {
   if (!context.extJson && context.extensionPath) {
-    context.extJson = await loadExtensionJson(context.extensionPath);
+    context.extJson = loadExtensionJson(context.extensionPath);
   }
 
   if (!context.extensionPath) {

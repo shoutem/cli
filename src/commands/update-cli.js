@@ -9,12 +9,14 @@ import { spinify } from '../services/spinner';
 import 'colors';
 
 async function confirmUpdate() {
-  if (await cache.getValue('updateConfirmed') === false) {
+  if (cache.getValue('updateConfirmed') === false) {
     return false;
   }
 
-  const updateConfirmed = await confirm(msg.version.updateRequired());
-  await cache.setValue('updateConfirmed', false, 24 * 3600);
+  const message = msg.version.updateRequired();
+  const updateConfirmed = await confirm(message);
+
+  cache.setValue('updateConfirmed', false, 24 * 3600);
 
   return updateConfirmed;
 }

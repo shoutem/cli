@@ -1,26 +1,29 @@
-import * as cache from './cache';
 import analytics from 'universal-analytics';
 import uuid from 'uuid/v4';
 import _ from 'lodash';
-import { getValue } from './cache-env';
-import { analyticsTrackingId } from '../../config/services';
-import * as logger from './logger';
 
-async function getClientId() {
-  return await cache.get('ga-client-id', null, () => uuid());
+import { analyticsTrackingId } from '../../config/services';
+import { getValue } from './cache-env';
+import logger from './logger';
+import cache from './cache';
+
+function getClientId() {
+  return cache.get('ga-client-id', null, () => uuid());
 }
 
-async function getAnalyticsVisitor() {
-  const clientId = await getClientId();
+function getAnalyticsVisitor() {
+  const clientId = getClientId();
 
   const visitor = analytics(analyticsTrackingId, clientId);
   reportData.clientId = clientId;
 
-  const { email } = await getValue('developer') || {};
+  const { email } = getValue('developer') || {};
+
   if (email) {
     visitor.set('userId', email);
     reportData.userId = email;
   }
+
   visitor.set('isDeveloper', true);
   reportData.isDeveloper = true;
 
@@ -28,7 +31,7 @@ async function getAnalyticsVisitor() {
 }
 
 async function reportEvent({ category, action, label }) {
-  const visitor = await getAnalyticsVisitor();
+  const visitor = getAnalyticsVisitor();
 
   await visitor.event(category, action, label).send(err => {
     if (err) {

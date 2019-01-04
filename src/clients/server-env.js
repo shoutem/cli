@@ -1,10 +1,12 @@
-import path from 'path';
-import fs from 'fs-extra';
-import { getLocalStoragePathSync } from '../clients/cli-paths';
+const path = require('path');
+const fs = require('fs-extra');
 
-const serverEnvNamePath = path.join(getLocalStoragePathSync(), 'server-env');
+const cliPaths = require(path.resolve(__dirname, '../clients/cli-paths.js'));
 
-export function getHostEnvName() {
+const localStoragePath = cliPaths.getLocalStoragePath();
+const serverEnvNamePath = path.join(localStoragePath, 'server-env');
+
+function getHostEnvName() {
   try {
     return fs.readFileSync(serverEnvNamePath, 'utf8');
   } catch (err) {
@@ -12,6 +14,9 @@ export function getHostEnvName() {
   }
 }
 
-export async function setHostEnvName(name) {
-  await fs.writeFile(serverEnvNamePath, name);
+function setHostEnvName(name) {
+  fs.writeFileSync(serverEnvNamePath, name);
 }
+
+module.exports.getHostEnvName = getHostEnvName;
+module.exports.setHostEnvName = setHostEnvName;

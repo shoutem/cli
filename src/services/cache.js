@@ -1,31 +1,36 @@
 import path from 'path';
-import mkdirp from 'mkdirp-promise'
+import fs from 'fs-extra'
 import { readJsonFile, writeJsonFile } from './data';
 import { getLocalStoragePath } from '../clients/cli-paths';
 
-async function getCacheFilePath(key) {
-  const cacheDir = path.join(await getLocalStoragePath(), 'cache');
-  await mkdirp(cacheDir);
-  return path.join(cacheDir, encodeURIComponent(typeof key === 'string' ? key : JSON.stringify(key)));
+function getCacheFilePath(_key) {
+  const cacheDir = path.join(getLocalStoragePath(), 'cache');
+  const key = (typeof _key === 'string') ? _key : JSON.stringify(_key);
+
+  fs.ensureDirSync(cacheDir);
+
+  return path.join(cacheDir, encodeURIComponent(key));
 }
 
-export async function getValue(key) {
-  const cached = await readJsonFile(await getCacheFilePath(key)) || {};
+export function getValue(key) {
+  const cached = readJsonFile(getCacheFilePath(key)) || {};
+
   if (!cached.expiration || cached.expiration > new Date().getTime()) {
     return cached.value;
-  } else {
-    return null;
   }
+
+  return null;
 }
 
-export async function setValue(key, value, expirationSeconds) {
-  const expiration = expirationSeconds ? new Date().getTime() + expirationSeconds * 1000 : null;
+export function setValue(key, value, expirationSeconds) {
+  const expiration = expirationSeconds ? (new Date().getTime() + (expirationSeconds * 1000)) : null;
+  const filePath = getCacheFilePath(key)
 
-  await writeJsonFile({ expiration, value }, await getCacheFilePath(key));
+  writeJsonFile(filePath, { expiration, value });
 
   return value;
 }
 
 export async function get(key, expirationSeconds, func) {
-  return await getValue(key) || setValue(key, await func(), expirationSeconds);
+  return getValue(key) || setValue(key, await func(), expirationSeconds);
 }

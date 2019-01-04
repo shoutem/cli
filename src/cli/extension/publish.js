@@ -31,7 +31,8 @@ export const handler = ({ name }) => executeAndHandleError(async () => {
 });
 
 export async function offerInstallationUpdate(extensionId, extensionName, newVersion) {
-  const { appId } = await getPlatformConfig();
+  const { appId } = getPlatformConfig();
+
   const dev = await ensureUserIsLoggedIn();
   const canonical = `${dev.name}.${extensionName}`;
 
