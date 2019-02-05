@@ -1,12 +1,13 @@
 import path from 'path';
-import decompress from 'decompress';
-import downloadCached from 'download-cached';
-import tar from 'tar';
 import fs from 'fs-extra';
-import request from 'request';
-import extractZip from 'extract-zip';
-import isGzip from 'is-gzip';
+import decompress from 'decompress';
 import { execSync } from 'child_process';
+import downloadCached from 'download-cached';
+import commandExists from 'command-exists';
+import extractZip from 'extract-zip';
+import request from 'request';
+import isGzip from 'is-gzip';
+import tar from 'tar';
 
 import { pipeDownloadToFile } from './download';
 import getHomeDir from '../home-dir';
@@ -16,9 +17,9 @@ const download = downloadCached(cacheDir, downloadCached.requestGet(request));
 
 function extractZipPromise(filePath, options) {
   return new Promise((resolve, reject) => {
-    extractZip(filePath, options, (err) => {
-      err ? reject(err) : resolve(filePath);
-    });
+    extractZip(filePath, options, (err) => (
+      err ? reject(err) : resolve(filePath)
+    ));
   });
 }
 
@@ -47,9 +48,13 @@ export async function decompressZip(filePath, destination, stripFirstDir = true)
     await extractZipPromise(filePath, extractOptions);
 
     if (stripFirstDir) {
-      execSync(`mv ${firstDirPath}/.[!.]* ${destination}`);
-      execSync(`mv ${firstDirPath}/* ${destination}`);
-      execSync(`rm -rf ${firstDirPath}`);
+      if (await commandExists('mv')) {
+        execSync(`mv ${firstDirPath}/.[!.]* ${destination}`);
+        execSync(`mv ${firstDirPath}/* ${destination}`);
+        execSync(`rm -rf ${firstDirPath}`);
+      } else {
+        fs.moveSync(firstDirPath, destination);
+      }
     }
 
     return Promise.resolve(destination);

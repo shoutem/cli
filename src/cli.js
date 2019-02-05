@@ -1,21 +1,22 @@
+import 'colors';
+import 'fetch-everywhere';
+import yargs from 'yargs';
+
+import getHomeDir from './home-dir';
+import autoUpdate from './commands/update-cli';
+import * as analytics from './services/analytics';
+import { isAscii, containsSpace } from './services/validation';
+import { authorizeRequests, getRefreshToken } from './clients/auth-service';
+import apiUrls from '../config/services';
+
 require('yargonaut')
   .helpStyle('green.underline')
   .errorsStyle('red.bold');
 
-import 'colors';
-import 'fetch-everywhere';
-import yargs from 'yargs';
-import { version } from '../package.json';
-import apiUrls from '../config/services';
-import autoUpdate from './commands/update-cli';
-import * as analytics from './services/analytics';
-import { isAscii, containsSpace } from './services/validation';
-import getHomeDir from './home-dir';
-import { authorizeRequests, getRefreshToken } from './clients/auth-service';
-
-const cliReferenceUrl = 'https://shoutem.github.io/docs/extensions/reference/cli';
-
 const homeDir = getHomeDir();
+const cliReferenceUrl = 'https://shoutem.github.io/docs/extensions/reference/cli';
+const cliArgs = process.argv.slice(2);
+
 if (!isAscii(homeDir) || containsSpace(homeDir)) {
   console.log(`ERROR: shoutem CLI homedir (currently \`${homeDir}\`) contains non-ascii characters or a space`.red.bold);
   console.log('Change it by setting SHOUTEM_CLI_HOME environmental variable'.red.bold);
@@ -26,27 +27,27 @@ if (!isAscii(homeDir) || containsSpace(homeDir)) {
 analytics.setArgv(process.argv);
 
 (async () => {
-  if (await autoUpdate()) {
+  if (await autoUpdate(cliArgs)) {
     return null;
   }
-  await authorizeRequests(await getRefreshToken());
+  const refreshToken = await getRefreshToken();
+  authorizeRequests(refreshToken);
 
   const cli = yargs.usage('Usage: shoutem [command] [-h]')
     .option('version', {
       alias: 'v',
-      description: 'Show version number'
+      description: 'Show version number',
     })
-    .commandDir('cli')
+    .commandDir('cli') // takes over a second to go through all the files in the 'commands' dir
     .strict()
     .help()
-    .epilog(`If you don't have a developer account, you can register at ${apiUrls.appBuilder.bold}.\n\n` +
-      `More detailed reference on how to use CLI can be found on the Developer Portal: ${cliReferenceUrl.bold}`)
+    .epilog(`If you don't have a developer account, you can create one at ${apiUrls.appBuilder.bold}.\n\n` +
+      `A more detailed reference on how to use Shoutem CLI can be found on the Developer Portal: ${cliReferenceUrl.bold}`)
     .alias('help', 'h');
 
-  const argv = cli.argv;
-  if (argv.version) {
-    console.log(require('../package.json').version);
-  } else if (argv._.length === 0) {
+  const { argv } = cli;
+
+  if (argv._.length === 0) {
     cli.showHelp();
   }
 
