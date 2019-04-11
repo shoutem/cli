@@ -2,7 +2,7 @@ import path from 'path';
 import {executeAndHandleError} from "../../services/error-handler";
 import {ensureUserIsLoggedIn} from "../../commands/login";
 import {getPlatformConfig, getPlatformExtensionsDir} from "../../services/platform";
-import { pathExists } from 'fs-extra';
+import fs from 'fs-extra';
 import {uploadExtension} from "../../commands/push";
 import {publishExtension} from "../../commands/publish";
 import {updateExtension, getInstallation, installExtension} from "../../clients/app-manager";
@@ -16,20 +16,6 @@ export const builder = yargs => {
     .usage(`shoutem ${command}\n\n${description}`);
 };
 
-export const handler = ({ name }) => executeAndHandleError(async () => {
-  const dev = await ensureUserIsLoggedIn();
-  const extensionPath = path.join(await getPlatformExtensionsDir(), `${dev.name}.${name}`);
-
-  if (!await pathExists(extensionPath)) {
-    throw new Error(`Path ${path.relative(process.cwd(), extensionPath)} does not exist`);
-  }
-
-  await uploadExtension({ publish: true }, extensionPath);
-  const { id: extensionId, version } = await publishExtension(extensionPath);
-  await offerInstallationUpdate(extensionId, name, version);
-  console.log('Success'.green.bold);
-});
-
 export async function offerInstallationUpdate(extensionId, extensionName, newVersion) {
   const { appId } = getPlatformConfig();
 
@@ -39,8 +25,10 @@ export async function offerInstallationUpdate(extensionId, extensionName, newVer
   try {
     const { id: installationId, extension: oldExtensionId } = await getInstallation(appId, canonical);
     const { version: oldVersion } = await getExtension(oldExtensionId);
+
     const versionMsg = `${canonical}@${oldVersion} => @${newVersion}`;
     const msg = `Update the version used in the current app (${versionMsg})?`;
+
     if (await confirmer(msg)) {
       await updateExtension(appId, installationId, extensionId);
     }
@@ -48,8 +36,25 @@ export async function offerInstallationUpdate(extensionId, extensionName, newVer
     if (e.statusCode !== 404) {
       throw e;
     }
+
     if (await confirmer(`Do you want to install ${canonical} extension into app ${appId}?`)) {
       await installExtension(appId, extensionId);
     }
   }
 }
+
+async function publish (name) {
+  const dev = await ensureUserIsLoggedIn();
+  const extensionPath = path.join(getPlatformExtensionsDir(), `${dev.name}.${name}`);
+
+  if (!fs.existsSync(extensionPath)) {
+    throw new Error(`Path ${path.relative(process.cwd(), extensionPath)} does not exist`);
+  }
+
+  await uploadExtension({ publish: true }, extensionPath);
+  const { id: extensionId, version } = await publishExtension(extensionPath);
+  await offerInstallationUpdate(extensionId, name, version);
+  console.log('Success'.green.bold);
+}
+
+export const handler = ({ name }) => executeAndHandleError(publish, name);

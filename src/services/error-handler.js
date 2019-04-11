@@ -3,8 +3,8 @@ import 'exit-code';
 import _ from 'lodash';
 import stringify from 'json-stringify-safe';
 
-import * as cache from './cache-env';
-import * as spinner from './spinner';
+import cache from './cache-env';
+import spinner from './spinner';
 
 function getJsonApiErrorMessage(errors) {
   const generalDetail = _.upperFirst(_.get(errors, '[0].detail') || _.get(errors, '[0].title'));
@@ -74,9 +74,9 @@ export function handleError(err) {
   }
 }
 
-export async function executeAndHandleError(func) {
+export async function executeAndHandleError(func, ...funcArgs) {
   try {
-    await func();
+    await func.apply(null, funcArgs);
   } catch (err) {
     handleError(err);
   }

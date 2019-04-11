@@ -10,9 +10,11 @@ export const builder = yargs => {
     .usage(`shoutem ${command} \n\n${description}`);
 };
 
-export const handler = args => executeAndHandleError(() => {
+function openAppInBuilder(args) {
   const appId = args.appId || (getPlatformConfig()).appId;
   const url = `${services.appBuilder}/app/${appId}`;
   console.log(url);
   opn(url, { wait: false });
-});
+}
+
+export const handler = args => executeAndHandleError(openAppInBuilder, args);

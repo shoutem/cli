@@ -38,9 +38,7 @@ export async function configure(args) {
     production: !!args.production,
   });
 
-  await configurePlatform(appDir);
+  return configurePlatform(appDir);
 }
 
-export async function handler(args) {
-  await executeAndHandleError(async () => await configure(args));
-}
+export const handler = args => executeAndHandleError(configure, args);

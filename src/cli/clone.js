@@ -29,6 +29,4 @@ export const builder = yargs => {
     .usage(`shoutem ${command} \n\n${description}`);
 };
 
-export async function handler(args) {
-  await executeAndHandleError(() => clone(args, process.cwd()));
-}
+export const handler = args => executeAndHandleError(clone, args, process.cwd());

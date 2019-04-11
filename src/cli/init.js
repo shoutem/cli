@@ -7,6 +7,7 @@ export const builder = yargs => {
   return yargs.usage(`shoutem ${command}\n\n${description}`).strict();
 };
 
-export const handler = ({ name }) => executeAndHandleError(async () => {
-  await addExtension({ name, externalDestination: process.cwd() });
-});
+export const handler = ({ name }) => {
+  const args = { name, externalDestination: process.cwd() };
+  executeAndHandleError(addExtension, args);
+};

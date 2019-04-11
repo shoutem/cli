@@ -7,14 +7,17 @@ import {offerChanges} from "../../services/diff";
 export const description = 'Add a settings page to current extension';
 export const command = 'add [name]';
 
-export const handler = args => executeAndHandleError(async () => {
-  const extJson = loadExtensionJson();
-  const answers = await askPageCreationQuestions({ ...extJson, defaultName: args.name });
-  await createPage(answers, ensureInExtensionDir());
-});
-
 export async function createPage(opts, extensionPath) {
   const changes = await instantiateExtensionTemplate('settings-page', { ...opts, extensionPath });
   await offerChanges(changes);
   console.log('Success'.green.bold);
 }
+
+async function addPage(args) {
+  const extJson = loadExtensionJson();
+  const answers = await askPageCreationQuestions({ ...extJson, defaultName: args.name });
+
+  return createPage(answers, ensureInExtensionDir());
+}
+
+export const handler = args => executeAndHandleError(addPage, args);

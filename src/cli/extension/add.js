@@ -72,4 +72,4 @@ export async function addExtension({ name, local, externalDestination }) {
   console.log('Happy coding!');
 }
 
-export const handler = args => executeAndHandleError(() => addExtension(args));
+export const handler = args => executeAndHandleError(addExtension, args);

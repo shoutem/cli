@@ -33,8 +33,6 @@ const postRunPublish = platformId => `
   To publish this platform for everyone to use
 `;
 
-export const handler = args => executeAndHandleError(() => createPlatform(args));
-
 export async function createPlatform({ url }) {
   const developer = await ensureUserIsLoggedIn();
 
@@ -76,3 +74,5 @@ export async function createPlatform({ url }) {
     }
   }
 }
+
+export const handler = args => executeAndHandleError(createPlatform, args);
