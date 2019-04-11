@@ -68,8 +68,8 @@ function createShortcutCreationQuestions({ shortcuts, parentName, screens, defau
   }];
 }
 
-export async function askShortcutCreationQuestions(opts) {
-  return await prompt(createShortcutCreationQuestions(opts));
+export function askShortcutCreationQuestions(opts) {
+  return prompt(createShortcutCreationQuestions(opts));
 }
 
 export function addShortcutForScreen(extJson, screen, shortcut) {

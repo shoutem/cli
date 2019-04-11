@@ -1,5 +1,5 @@
-import {loadExtensionJson} from "./extension";
-import * as template from "./template";
+import { loadExtensionJson } from "./extension";
+import template from "./template";
 
 export async function instantiateExtensionTemplate(localTemplatePath, context, opts) {
   if (!context.extJson && context.extensionPath) {
@@ -11,5 +11,5 @@ export async function instantiateExtensionTemplate(localTemplatePath, context, o
   }
 
   await template.instantiateTemplatePath(localTemplatePath, context.extensionPath, context, opts);
-  return await template.instantiateTemplatePath('extension-js', context.extensionPath, context, opts);
+  return template.instantiateTemplatePath('extension-js', context.extensionPath, context, opts);
 }

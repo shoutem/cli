@@ -12,18 +12,20 @@ import {loadExtensionJson} from "../services/extension";
 export async function publishExtension(extDir) {
   const extJson = await utils.loadExtensionJson(extDir);
   const canonicalName = await getExtensionCanonicalName(extDir);
-  return await spinify(extensionManager.publishExtension(canonicalName), msg.publish.publishInfo(extJson), 'OK');
+  return spinify(extensionManager.publishExtension(canonicalName), msg.publish.publishInfo(extJson), 'OK');
 }
 
 export async function pushAndPublish(args = {}) {
   if (!args.nopush) {
     await uploadExtension({ ...args, publish: true });
   }
+
   const extPath = ensureInExtensionDir();
-  const { name } = await loadExtensionJson();
+
+  const { name } = loadExtensionJson();
   const { id: extensionId, version } = await publishExtension(extPath);
 
-  if (await getPlatformRootDir(extPath, { shouldThrow: false })) {
+  if (getPlatformRootDir(extPath, { shouldThrow: false })) {
     await offerInstallationUpdate(extensionId, name, version);
   }
 }

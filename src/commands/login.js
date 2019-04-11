@@ -7,12 +7,12 @@ import urls from '../../config/services';
 import * as logger from '../services/logger';
 import * as cache from '../services/cache-env';
 
-async function resolveCredentials(args) {
+function resolveCredentials(args) {
   if (args.credentials) {
     return parseCredentials(args.credentials);
   }
 
-  return await promptUserCredentials(args);
+  return promptUserCredentials(args);
 }
 
 function parseCredentials(credentials) {
@@ -101,5 +101,5 @@ export async function ensureUserIsLoggedIn(shouldThrow = false) {
     throw new Error('Not logged in, use `shoutem login` command to login');
   }
 
-  return await loginUser();
+  return loginUser();
 }

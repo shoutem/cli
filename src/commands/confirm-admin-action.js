@@ -9,5 +9,5 @@ export default async function(msg) {
     return true;
   }
 
-  return await confirm(msg, { default: false });
+  return confirm(msg, { default: false });
 }

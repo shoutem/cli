@@ -31,7 +31,7 @@ export async function promptAppName() {
 
 async function getNewApp() {
   const name = await promptAppName();
-  return await createApp({ name });
+  return createApp({ name });
 }
 
 export async function ensureApp() {
@@ -39,7 +39,7 @@ export async function ensureApp() {
 
   if (appList.length === 0) {
     if (!await promptCreateNewApp()) {
-      return await getNewApp();
+      return getNewApp();
     }
   }
 
@@ -47,8 +47,8 @@ export async function ensureApp() {
   return appList.filter(app => app.id === appId)[0] || await getNewApp();
 }
 
-export async function createNewApp(name) {
-  return await createApp({ name });
+export function createNewApp(name) {
+  return createApp({ name });
 }
 
 export async function installLocalExtension(appId, extensionRoot = ensureInExtensionDir()) {

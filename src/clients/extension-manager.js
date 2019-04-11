@@ -6,15 +6,15 @@ import * as jsonApi from './json-api-client';
 
 const extensionManagerUri = new URI(extensionManager);
 
-export async function getDeveloper() {
+export function getDeveloper() {
   const url = extensionManagerUri.clone().segment('/v1/devs/me');
-  return await jsonApi.get(url);
+  return jsonApi.get(url);
 }
 
-export async function createDeveloper(devName) {
+export function createDeveloper(devName) {
   const url = extensionManagerUri.clone().segment('/v1/devs');
 
-  return await jsonApi.post(url, {
+  return jsonApi.post(url, {
     data: {
       type: 'shoutem.core.developers',
       attributes: { name: devName },
@@ -50,24 +50,24 @@ export async function getExtensionId(canonicalName) {
   return id;
 }
 
-export async function getExtension(canonicalName) {
+export function getExtension(canonicalName) {
   const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}`);
-  return await jsonApi.get(url);
+  return jsonApi.get(url);
 }
 
-export async function getPlatform(id) {
+export function getPlatform(id) {
   const url = extensionManagerUri.clone().segment(`/v1/platforms/${id}`);
-  return await jsonApi.get(url);
+  return jsonApi.get(url);
 }
 
-export async function publishExtension(canonicalName) {
+export function publishExtension(canonicalName) {
   const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}/publish`);
-  return await jsonApi.post(url);
+  return jsonApi.post(url);
 }
 
-export async function getPlatforms() {
+export function getPlatforms() {
   const url = extensionManagerUri.clone().segment('/v1/platforms');
-  return await jsonApi.get(url);
+  return jsonApi.get(url);
 }
 
 export async function uploadPlatform(archiveStream, progressHandler, size) {
@@ -92,9 +92,9 @@ export async function uploadPlatform(archiveStream, progressHandler, size) {
   return response;
 }
 
-export async function publishPlatform(platformId) {
+export function publishPlatform(platformId) {
   const url = extensionManagerUri.clone().segment(`/v1/platforms/${platformId}/actions/publish`);
-  return await jsonApi.post(url);
+  return jsonApi.post(url);
 }
 
 export async function canPublish(canonical) {

@@ -32,7 +32,7 @@ async function npmPack(dir, destinationDir) {
   const timestamp = (new Date()).getTime();
   packageJson.version = `${packageJson.version}-build${timestamp}`;
 
-  await writeJsonFile(packageJson, packageJsonPath);
+  writeJsonFile(packageJson, packageJsonPath);
 
   const { stdout } = await exec('npm pack', { cwd: dir });
   const packageFilename = stdout.replace(/\n$/, '');
@@ -41,7 +41,7 @@ async function npmPack(dir, destinationDir) {
   await mv(packagePath, resultFilename);
 
   if (originalFileContent !== null) {
-    await fs.writeFile(packageJsonPath, originalFileContent, 'utf8');
+    fs.writeFileSync(packageJsonPath, originalFileContent, 'utf8');
   }
 }
 
@@ -50,10 +50,10 @@ function hasExtensionsJson(dir) {
 }
 
 async function offerDevNameSync(extensionDir) {
-  const { name: extensionName } = await loadExtensionJson(extensionDir);
+  const { name: extensionName } = loadExtensionJson(extensionDir);
 
-  const appPackageJson = await getPackageJson(path.join(extensionDir, 'app'));
-  const serverPackageJson = await getPackageJson(path.join(extensionDir, 'server'));
+  const appPackageJson = getPackageJson(path.join(extensionDir, 'app'));
+  const serverPackageJson = getPackageJson(path.join(extensionDir, 'server'));
 
   const { name: appModuleName } = appPackageJson;
   const { name: serverModuleName } = serverPackageJson;
@@ -98,7 +98,7 @@ export default async function shoutemPack(dir, options) {
     await spinify(buildNodeProject(path.join(dir, 'app')), 'Building the app part...', 'OK');
   }
 
-  return await spinify(async () => {
+  return spinify(async () => {
     for (const partDir of dirsToPack) {
       await npmPack(partDir, packageDir);
     }

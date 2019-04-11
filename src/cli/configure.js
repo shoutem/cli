@@ -28,11 +28,11 @@ export const builder = yargs => {
 };
 
 
-export async function configure(args) {
+export function configure(args) {
   const appDir = getPlatformRootDir();
   const config = getPlatformConfig(appDir);
 
-  await setPlatformConfig(appDir, {
+  setPlatformConfig(appDir, {
     ...config,
     release: !!args.release,
     production: !!args.production,

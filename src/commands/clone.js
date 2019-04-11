@@ -196,7 +196,8 @@ export async function clone(opts, destinationDir) {
   const config = await createPlatformConfig(appDir, {
     appId: opts.appId
   });
-  await setPlatformConfig(appDir, config);
+  
+  setPlatformConfig(appDir, config);
 
   if (opts.noconfigure) {
     console.log('Skipping configure step due to --noconfigure flag');

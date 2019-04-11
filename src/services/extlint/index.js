@@ -1,7 +1,7 @@
 import path from 'path';
-import * as npm from '../npm';
+import npm from '../npm';
 
-export default async function (extPath) {
+export default function (extPath) {
   const args = [
     path.join(extPath, '**/*.js'),
     path.join(extPath, '**/*.jsx'),
@@ -10,5 +10,5 @@ export default async function (extPath) {
     '--ignore-pattern', 'node_modules'
   ];
 
-  return await npm.run(__dirname, 'extlint', args, ['--silent']);
+  return npm.run(__dirname, 'extlint', args, ['--silent']);
 }
