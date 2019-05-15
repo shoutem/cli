@@ -1,5 +1,5 @@
 import URI from 'urijs';
-import fetchTokenIntercept from '@shoutem/fetch-token-intercept';
+import { configure, authorize } from '@shoutem/fetch-token-intercept';
 
 import logger from '../services/logger';
 import cache from '../services/cache-env';
@@ -145,8 +145,8 @@ function authorizeRequests(refreshToken) {
 
   try {
     const accessToken = cache.getValue('access-token');
-    fetchTokenIntercept.configure(authorizationConfig);
-    fetchTokenIntercept.authorize(refreshToken, accessToken);
+    configure(authorizationConfig);
+    authorize(refreshToken, accessToken);
     return true;
   } catch (err) {
     logger.info(err);
