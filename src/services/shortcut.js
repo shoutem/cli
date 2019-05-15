@@ -2,7 +2,7 @@ import _ from 'lodash';
 import decamelize from 'decamelize';
 import { prompt } from 'inquirer';
 import getOrSet from 'lodash-get-or-set';
-import {isVariableName} from "./cli-parsing";
+import { isVariableName } from './cli-parsing';
 
 export function addShortcut(extJson, { name, title, description, screenName, pagesNames }) {
   const shortcut = { name, title, description };

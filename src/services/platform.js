@@ -5,14 +5,14 @@ import fs from 'fs-extra';
 import replace from 'replace-in-file';
 
 import cliUrls from '../../config/services';
-import appManager from '../clients/app-manager';
-import extensionManager from '../clients/extension-manager';
-import { getRefreshToken, createAppAccessToken } from '../clients/auth-service';
+import { getApplicationPlatform } from '../clients/app-manager';
+import { getPlatform } from '../clients/extension-manager';
+import authService from '../clients/auth-service';
 import { readJsonFile, writeJsonFile } from './data';
 import { decompressFromUrl } from './decompress';
 import commandExists from './command-exists';
 import { ensureYarnInstalled } from './yarn';
-import reactNative from './react-native';
+import { ensureReactNativeInstalled } from './react-native';
 import analytics from './analytics';
 import npm from './npm';
 
@@ -50,8 +50,8 @@ export async function createPlatformConfig(platformDir, opts) {
   let authorization;
 
   try {
-    const refreshToken = await getRefreshToken();
-    authorization = await createAppAccessToken(opts.appId, refreshToken);
+    const refreshToken = await authService.getRefreshToken();
+    authorization = await authService.createAppAccessToken(opts.appId, refreshToken);
   } catch (err) {
     if (err.code === 401 || err.code === 403) {
       err.message = 'Not authorized to create application token. You must log in again using `shoutem login` command.';
@@ -82,7 +82,7 @@ export function setPlatformConfig(platformDir, mobileConfig) {
 
 export async function configurePlatform(platformDir) {
   await ensureYarnInstalled();
-  await reactNative.ensureInstalled();
+  await ensureReactNativeInstalled();
 
   if (process.platform === 'darwin' && !await commandExists('pod')) {
     throw new Error('Missing `pods` command. Please install cocoapods and run `shoutem configure` in the ' +
@@ -140,13 +140,13 @@ function pullPlatform(location, version, destination, options) {
 
 export async function downloadApp(appId, destinationDir, options = {}) {
   analytics.setAppId(appId);
-  
+
   const versionCheck = options.versionCheck || (() => {});
-  
-  const platformInstallationData = await appManager.getApplicationPlatform(appId, true);
+
+  const platformInstallationData = await getApplicationPlatform(appId, true);
   const { platform: platformId, mobileAppVersion } = platformInstallationData;
 
-  const platform = await extensionManager.getPlatform(platformId);
+  const platform = await getPlatform(platformId);
 
   await versionCheck(mobileAppVersion);
   await pullPlatform(platform.location, mobileAppVersion, destinationDir, options);

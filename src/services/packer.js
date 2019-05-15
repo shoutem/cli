@@ -1,7 +1,5 @@
 import tar from 'tar';
 import path from 'path';
-import zlib from 'zlib';
-import move from 'glob-move';
 import tmp from 'tmp-promise';
 import Promise from 'bluebird';
 import { exec } from 'child-process-promise';
@@ -12,7 +10,7 @@ import { spinify } from './spinner';
 import { buildNodeProject } from './node';
 import { loadExtensionJson } from './extension';
 import { readJsonFile, writeJsonFile } from './data';
-import { getPackageJson, savePackageJson } from './npm';
+import npm from './npm';
 
 import { ensureUserIsLoggedIn } from '../commands/login';
 
@@ -52,8 +50,8 @@ function hasExtensionsJson(dir) {
 async function offerDevNameSync(extensionDir) {
   const { name: extensionName } = loadExtensionJson(extensionDir);
 
-  const appPackageJson = getPackageJson(path.join(extensionDir, 'app'));
-  const serverPackageJson = getPackageJson(path.join(extensionDir, 'server'));
+  const appPackageJson = npm.getPackageJson(path.join(extensionDir, 'app'));
+  const serverPackageJson = npm.getPackageJson(path.join(extensionDir, 'server'));
 
   const { name: appModuleName } = appPackageJson;
   const { name: serverModuleName } = serverPackageJson;
@@ -71,8 +69,8 @@ async function offerDevNameSync(extensionDir) {
   appPackageJson.name = targetModuleName;
   serverPackageJson.name = targetModuleName;
 
-  await savePackageJson(path.join(extensionDir, 'app'), appPackageJson);
-  await savePackageJson(path.join(extensionDir, 'server'), serverPackageJson);
+  await npm.savePackageJson(path.join(extensionDir, 'app'), appPackageJson);
+  await npm.savePackageJson(path.join(extensionDir, 'server'), serverPackageJson);
 }
 
 export default async function shoutemPack(dir, options) {

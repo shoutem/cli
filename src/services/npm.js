@@ -6,7 +6,7 @@ import { writeJsonFile, readJsonFile } from './data';
 
 const linkLocal = Promise.promisify(require('linklocal'));
 
-export function install(cwd = process.cwd()) {
+function install(cwd = process.cwd()) {
   return spawn('npm', ['install'], {
     cwd,
     stdio: 'inherit',
@@ -15,7 +15,7 @@ export function install(cwd = process.cwd()) {
   });
 }
 
-export function run(cwd, task, taskArgs = [], npmOptions = []) {
+function run(cwd, task, taskArgs = [], npmOptions = []) {
   const opts = {
     cwd,
     stdio: ['ignore', 'inherit', 'inherit'],
@@ -29,15 +29,15 @@ export function run(cwd, task, taskArgs = [], npmOptions = []) {
   return spawned;
 }
 
-export function getPackageJson(npmProjectPath) {
+function getPackageJson(npmProjectPath) {
   return readJsonFile(path.join(npmProjectPath, 'package.json'));
 }
 
-export function savePackageJson(npmProjectPath, pkgJson) {
+function savePackageJson(npmProjectPath, pkgJson) {
   return writeJsonFile(path.join(npmProjectPath, 'package.json'), pkgJson);
 }
 
-export function addLocalDependency(npmProjectPath, npmModulePath) {
+function addLocalDependency(npmProjectPath, npmModulePath) {
   const { name } = getPackageJson(npmModulePath);
   const packageJson = getPackageJson(npmProjectPath);
 
@@ -52,6 +52,15 @@ export function addLocalDependency(npmProjectPath, npmModulePath) {
   });
 }
 
-export function linkLocalDependencies(npmProjectPath) {
+function linkLocalDependencies(npmProjectPath) {
   return linkLocal(npmProjectPath);
 }
+
+export default {
+  run,
+  install,
+  getPackageJson,
+  savePackageJson,
+  addLocalDependency,
+  linkLocalDependencies,
+};

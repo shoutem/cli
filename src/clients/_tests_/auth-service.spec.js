@@ -1,5 +1,5 @@
 import { assert } from 'chai';
-import * as authService from '../auth-service';
+import authService from '../auth-service';
 
 describe('Auth service client integration tests', () => {
 

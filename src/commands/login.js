@@ -1,19 +1,11 @@
 import inquirer from 'inquirer';
 import _ from 'lodash';
-import { authorizeRequests, getRefreshToken } from '../clients/auth-service';
+import authService from '../clients/auth-service';
 import { getDeveloper, createDeveloper } from '../clients/extension-manager';
 import msg from '../user_messages';
 import urls from '../../config/services';
-import * as logger from '../services/logger';
-import * as cache from '../services/cache-env';
-
-function resolveCredentials(args) {
-  if (args.credentials) {
-    return parseCredentials(args.credentials);
-  }
-
-  return promptUserCredentials(args);
-}
+import logger from '../services/logger';
+import cache from '../services/cache-env';
 
 function parseCredentials(credentials) {
   const parts = credentials.split(':');
@@ -43,6 +35,14 @@ function promptUserCredentials(args = {}) {
   return inquirer.prompt(questions);
 }
 
+function resolveCredentials(args) {
+  if (args.credentials) {
+    return parseCredentials(args.credentials);
+  }
+
+  return promptUserCredentials(args);
+}
+
 function promptDeveloperName() {
   /* eslint no-confusing-arrow: 0 */
   console.log('Enter developer name.');
@@ -51,7 +51,7 @@ function promptDeveloperName() {
     .prompt({
       name: 'devName',
       message: 'Developer name',
-      validate() {
+      validate(value) {
         return value ? true : 'Developer name cannot be blank.';
       },
     })
@@ -64,10 +64,10 @@ function promptDeveloperName() {
  */
 export async function loginUser(args) {
   const credentials = await resolveCredentials(args);
-  const refreshToken = await getRefreshToken(credentials);
+  const refreshToken = await authService.getRefreshToken(credentials);
   let developer = null;
 
-  authorizeRequests(refreshToken);
+  authService.authorizeRequests(refreshToken);
 
   try {
     developer = await getDeveloper();
@@ -88,7 +88,8 @@ export async function loginUser(args) {
 
 /**
  * Asks user for email and password if refreshToken is not already cached
- * @param shouldThrow Should an error be thrown if user is not logged in or should user be asked for credentials
+ * @param shouldThrow Should an error be thrown if user is not logged in
+ * or should user be asked for credentials
  */
 export async function ensureUserIsLoggedIn(shouldThrow = false) {
   const developer = cache.getValue('developer');

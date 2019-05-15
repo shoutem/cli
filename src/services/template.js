@@ -15,9 +15,10 @@ export function load(pathWithSlashes, templateContext) {
 
 async function instantiateTemplatePathRec(localTemplatePath, destinationPath, context, opts) {
   if (localTemplatePath.endsWith('template-init.js')) {
-    return null;
+    return;
   }
 
+  // eslint-disable-next-line no-param-reassign
   destinationPath = Mustache.render(destinationPath, context);
 
   const templatePath = path.join(templatesDirectory, localTemplatePath);
@@ -28,19 +29,21 @@ async function instantiateTemplatePathRec(localTemplatePath, destinationPath, co
   if (templatePathState.isDirectory()) {
     const files = fs.readdirSync(templatePath);
 
-    await Promise.map(files, file => {
+    await Promise.map(files, (file) => {
       const src = path.join(localTemplatePath, file);
       const dest = path.join(destinationPath, file);
       return instantiateTemplatePathRec(src, dest, context, opts);
     });
   } else if (templatePathState.isFile()) {
     const templateContent = fs.readFileSync(templatePath, 'utf8');
+    // eslint-disable-next-line no-param-reassign
     context.diffLog[destinationPath] = Mustache.render(templateContent, context);
   }
 }
 
 function importName(modulePath, name, defaultValue) {
   try {
+    // eslint-disable-next-line import/no-dynamic-require
     return require(modulePath)[name] || defaultValue;
   } catch (err) {
     if (err.code === 'MODULE_NOT_FOUND') {
@@ -51,10 +54,11 @@ function importName(modulePath, name, defaultValue) {
 }
 
 export async function instantiateTemplatePath(localTemplatePath, destinationPath, context, opts = {}) {
+  // eslint-disable-next-line no-param-reassign
   opts.overwrite = opts.overwrite || (() => false);
-  
+
   const initPath = path.join(templatesDirectory, localTemplatePath, 'template-init');
-  
+
   const postRunActions = getOrSet(context, 'postRunActions', []);
   const before = importName(initPath, 'before', () => {});
   const after = importName(initPath, 'after', () => {});

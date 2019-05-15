@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { exec } from 'child-process-promise'
 
-import npm from "./npm";
+import npm from './npm';
 
 export function containsBuildTask(dir) {
   try {
@@ -23,7 +23,7 @@ export async function buildNodeProject(dir) {
   } catch (err) {
     console.log(err.stdout);
     console.error(err.stderr);
-    err.message = `${err.message + '\n'}Build failed for ${dir} directory.`;
+    err.message = `${err.message}\nBuild failed for ${dir} directory.`;
     throw err;
   }
   return true;

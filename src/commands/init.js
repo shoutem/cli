@@ -6,10 +6,10 @@ import path from 'path';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import msg from '../user_messages';
 import { getPlatforms } from '../clients/extension-manager';
-import * as utils from '../services/extension';
-import {instantiateExtensionTemplate} from "../services/extension-template";
-import {offerChanges} from "../services/diff";
-import {stringify} from "../services/data";
+import { getExtensionCanonicalName } from '../services/extension';
+import { instantiateExtensionTemplate } from '../services/extension-template';
+import { offerChanges } from '../services/diff';
+import { stringify } from '../services/data';
 
 
 function generateNoPatchSemver(version) {
@@ -30,9 +30,9 @@ export async function promptExtensionInit(extName) {
     name: 'version',
     message: 'Version',
     default: version,
-    validate: value => value.match(/^(\d+)\.(\d+)\.(\d+)+$/)
-                        ? true
-                        : 'Version must contain numbers in format X.Y.Z',
+    validate: value => (value.match(/^(\d+)\.(\d+)\.(\d+)+$/)
+      ? true
+      : 'Version must contain numbers in format X.Y.Z'),
   }, {
     name: 'description',
     message: 'Description',
@@ -52,7 +52,7 @@ export async function initExtension(extName, extensionPath = process.cwd()) {
   const developer = await ensureUserIsLoggedIn();
   const extJson = await promptExtensionInit(extName);
 
-  utils.getExtensionCanonicalName(developer.name, extJson.name, extJson.version);
+  getExtensionCanonicalName(developer.name, extJson.name, extJson.version);
 
   const dirname = `${developer.name}.${extJson.name}`;
   if (await pathExists(path.join(process.cwd(), dirname))) {

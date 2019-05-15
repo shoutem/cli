@@ -4,7 +4,7 @@ import _ from 'lodash';
 import stringify from 'json-stringify-safe';
 
 import cache from './cache-env';
-import spinner from './spinner';
+import { stopAllSpinners } from './spinner';
 
 function getJsonApiErrorMessage(errors) {
   const generalDetail = _.upperFirst(_.get(errors, '[0].detail') || _.get(errors, '[0].title'));
@@ -34,18 +34,21 @@ export function getErrorMessage(err) {
     return getJsonApiErrorMessage(err.body.errors);
   }
 
-  if (typeof(_.get(err, 'response.body')) === 'string') {
+  const msg = 'Unrecognized error. Run `shoutem last-error` for more additional details';
+
+  if (typeof _.get(err, 'response.body') === 'string') {
     try {
       const body = JSON.parse(_.get(err, 'response.body'));
 
       if (body.errors) {
         return getJsonApiErrorMessage(body.errors);
       }
-    } catch (err){
+    } catch (err) {
+      return `${msg}: ${err}`;
     }
   }
 
-  return 'Unrecognized error. Run `shoutem last-error` for more additional details'
+  return msg;
 }
 
 let reportInfoPrinted = false;
@@ -56,7 +59,7 @@ export function handleError(err) {
       process.exitCode = err.code || -1;
     }
 
-    spinner.stopAll();
+    stopAllSpinners();
     console.error(getErrorMessage(err).red.bold);
 
     const errorJson = JSON.parse(stringify(err));
@@ -70,13 +73,13 @@ export function handleError(err) {
       reportInfoPrinted = true;
     }
   } catch (err) {
-      console.log(err);
+    console.log(err);
   }
 }
 
 export async function executeAndHandleError(func, ...funcArgs) {
   try {
-    await func.apply(null, funcArgs);
+    await func(...funcArgs);
   } catch (err) {
     handleError(err);
   }

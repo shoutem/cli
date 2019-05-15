@@ -1,21 +1,22 @@
 import _ from 'lodash';
 import { Deserializer } from 'jsonapi-serializer';
-import * as logger from '../services/logger';
+import logger from '../services/logger';
 
 const deserializer = new Deserializer({
-  keyForAttribute: 'camelCase'
+  keyForAttribute: 'camelCase',
 });
 
-// jsonapi-serializer seems to ignore non-included relationships no matter what its docs say
-// therefore, support an option to use our own deserialization when specified(default still jsonapi-serializer)
+// jsonapi-serializer seems to ignore non-included relationships
+// no matter what its docs say therefore, support an option to
+// use our own deserialization when specified (default still jsonapi-serializer)
 function deserializePlainSingle(json) {
-  const relationships = json.relationships;
+  const { relationships } = json;
   const relationshipKeys = _.keys(relationships);
 
   const relationshipIds = {};
-  _.forEach(relationshipKeys, key => {
+  _.forEach(relationshipKeys, (key) => {
     relationshipIds[key] = _.get(relationships[key], 'data.id');
-  })
+  });
 
   return {
     ...relationshipIds,
@@ -28,7 +29,7 @@ function deserializePlain(json) {
     return null;
   }
 
-  const data = json.data;
+  const { data } = json;
 
   if (_.isArray(data)) {
     return _.map(data, item => deserializePlainSingle(item));
@@ -37,7 +38,7 @@ function deserializePlain(json) {
   return deserializePlainSingle(data);
 }
 
-export class JsonApiError {
+class JsonApiError {
   constructor(message, request, body, response, statusCode) {
     this.message = message;
     this.request = request;
@@ -47,8 +48,8 @@ export class JsonApiError {
   }
 }
 
-export async function execute(method, url, opts = {}) {
-  url = url.toString();
+async function execute(method, _url, opts = {}) {
+  const url = _url.toString();
 
   const jsonApiHeaders = {
     Accept: 'application/vnd.api+json',
@@ -59,11 +60,11 @@ export async function execute(method, url, opts = {}) {
 
   const req = new Request(url, {
     ...opts,
-    method: method,
+    method,
     headers: {
       ...jsonApiHeaders,
-      ...opts.headers
-    }
+      ...opts.headers,
+    },
   });
 
   logger.info(`${method} ${url}`, req);
@@ -80,7 +81,6 @@ export async function execute(method, url, opts = {}) {
   }
 
   if (response.ok) {
-    
     try {
       const deserialized = await deserializer.deserialize(json);
 
@@ -95,43 +95,53 @@ export async function execute(method, url, opts = {}) {
   throw new JsonApiError(null, req, json, response, response.status);
 }
 
-export function get(uri, opts = {}) {
+function get(uri, opts = {}) {
   return execute('get', uri, opts);
 }
 
-export function put(url, jsonBody = null, opts) {
+function put(url, jsonBody = null, opts) {
   if (jsonBody) {
     return execute('put', url, {
       ...opts,
-      body: JSON.stringify(jsonBody)
+      body: JSON.stringify(jsonBody),
     });
   }
 
   return execute('put', url, opts);
 }
 
-export function patch(url, jsonBody = null, opts) {
+function patch(url, jsonBody = null, opts) {
   if (jsonBody) {
     return execute('patch', url, {
       ...opts,
-      body: JSON.stringify(jsonBody)
+      body: JSON.stringify(jsonBody),
     });
   }
 
   return execute('patch', url, opts);
 }
 
-export function del(uri) {
+function del(uri) {
   return execute('delete', uri);
 }
 
-export function post(url, jsonBody = null, opts = {}) {
+function post(url, jsonBody = null, opts = {}) {
   if (jsonBody) {
     return execute('post', url, {
       ...opts,
-      body: JSON.stringify(jsonBody)
+      body: JSON.stringify(jsonBody),
     });
   }
 
   return execute('post', url, opts);
 }
+
+export default {
+  JsonApiError,
+  execute,
+  get,
+  put,
+  patch,
+  del,
+  post,
+};

@@ -2,7 +2,7 @@ import URI from 'urijs';
 import FormData from 'form-data';
 import { extensionManager } from '../../config/services';
 import { listenStream } from '../services/stream-listener';
-import * as jsonApi from './json-api-client';
+import jsonApi from './json-api-client';
 
 const extensionManagerUri = new URI(extensionManager);
 

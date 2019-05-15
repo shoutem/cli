@@ -1,7 +1,8 @@
+
 import _ from 'lodash';
 import getOrSet from 'lodash-get-or-set';
 
-import shortcut from '../../services/shortcut';
+import { addShortcutForScreen } from '../../services/shortcut';
 
 export function before(context) {
   const { extJson, name } = context;
@@ -20,6 +21,6 @@ export function before(context) {
   });
 
   if (context.newShortcut) {
-    shortcut.addShortcutForScreen(extJson, context, context.newShortcut);
+    addShortcutForScreen(extJson, context, context.newShortcut);
   }
 }

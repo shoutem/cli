@@ -1,17 +1,15 @@
 import * as extensionManager from '../clients/extension-manager';
-import * as utils from '../services/extension';
 import { uploadExtension } from '../commands/push';
-import { ensureInExtensionDir } from '../services/extension';
-import { getExtensionCanonicalName } from '../clients/local-extensions';
+import { getLocalExtensionCanonicalName } from '../clients/local-extensions';
 import msg from '../user_messages';
-import {spinify} from "../services/spinner";
-import {getPlatformRootDir} from "../services/platform";
-import {offerInstallationUpdate} from "../cli/extension/publish";
-import {loadExtensionJson} from "../services/extension";
+import { spinify } from '../services/spinner';
+import { getPlatformRootDir } from '../services/platform';
+import { offerInstallationUpdate } from '../cli/extension/publish';
+import { loadExtensionJson, ensureInExtensionDir } from '../services/extension';
 
 export async function publishExtension(extDir) {
-  const extJson = await utils.loadExtensionJson(extDir);
-  const canonicalName = await getExtensionCanonicalName(extDir);
+  const extJson = await loadExtensionJson(extDir);
+  const canonicalName = await getLocalExtensionCanonicalName(extDir);
   return spinify(extensionManager.publishExtension(canonicalName), msg.publish.publishInfo(extJson), 'OK');
 }
 

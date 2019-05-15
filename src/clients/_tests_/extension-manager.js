@@ -1,19 +1,13 @@
-import { assert } from 'chai';
-import * as authService from '../auth-service';
-import * as extManager from '../extension-manager';
+import authService from '../auth-service';
+import { getDeveloper } from '../extension-manager';
 
 describe('Extension manager client integration tests', () => {
-
   describe('Fetch developer info', () => {
-
     it('should fetch developer info', async () => {
       const refreshToken = await authService.getRefreshToken({ email: 'cli-test@shoutem.com', password: 'password' });
       await authService.authorizeRequests(refreshToken);
-      const dev = await extManager.getDeveloper();
+      const dev = await getDeveloper();
       console.log(dev);
     });
-
-
-
-  })
+  });
 });

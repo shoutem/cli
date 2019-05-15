@@ -1,8 +1,8 @@
 import inquirer from 'inquirer';
 import { installExtension, createApp } from '../clients/app-manager';
 import { getLatestApps } from '../clients/legacy-service';
-import { getExtensionCanonicalName } from '../clients/local-extensions';
-import * as extensionManager from '../clients/extension-manager';
+import { getLocalExtensionCanonicalName } from '../clients/local-extensions';
+import { getExtensionId } from '../clients/extension-manager';
 import selectApp from '../services/app-selector';
 import { ensureInExtensionDir } from '../services/extension';
 import msg from '../user_messages';
@@ -52,8 +52,8 @@ export function createNewApp(name) {
 }
 
 export async function installLocalExtension(appId, extensionRoot = ensureInExtensionDir()) {
-  const canonicalName = await getExtensionCanonicalName(extensionRoot);
-  const extensionId = await extensionManager.getExtensionId(canonicalName);
+  const canonicalName = await getLocalExtensionCanonicalName(extensionRoot);
+  const extensionId = await getExtensionId(canonicalName);
 
   if (extensionId) {
     await installExtension(appId, extensionId);

@@ -1,7 +1,6 @@
-import os from 'os';
 import _ from 'lodash';
 import semver from 'semver';
-import { getValue } from '../services/cache-env';
+import cache from '../services/cache-env';
 
 export function isValidExtensionName(name) {
   return /^[a-z]+[a-z0-9\-]*$/.test(name);
@@ -28,7 +27,8 @@ export async function validatePlatformArchive(archiveProvider) {
     throw new Error('platform.json \'version\' must be a valid semantic version');
   }
 
-  // when publishing from local source, we pack with a correct root directory name, so no need to check that one
+  // when publishing from local source, we pack with a correct root directory name,
+  // so no need to check that one
   if (archiveProvider.getType() === 'remote') {
     const jsonPath = await archiveProvider.getPlatformJsonPath();
 
@@ -41,11 +41,11 @@ export async function validatePlatformArchive(archiveProvider) {
     throw new Error('platform.json \'mobileAppVersion\' must be a valid semantic version');
   }
 
-  const developer = await getValue('developer');
+  const developer = cache.getValue('developer');
   const isCustomPlatform = developer.name !== 'shoutem';
   const appetizeKey = _.get(platformJson, ['settings', 'appetizeKey']);
 
   if (!isCustomPlatform && _.isNil(appetizeKey)) {
-    throw new Error(`platform.json must contain settings.appetizeKey`);
+    throw new Error('platform.json must contain settings.appetizeKey');
   }
 }

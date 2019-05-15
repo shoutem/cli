@@ -1,5 +1,5 @@
 import URI from 'urijs';
-import * as jsonApi from './json-api-client';
+import jsonApi from './json-api-client';
 import { appManager } from '../../config/services';
 import { getDeveloper } from './extension-manager';
 

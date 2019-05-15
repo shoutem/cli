@@ -1,4 +1,5 @@
-import { Spinner } from 'cli-spinner'
+import { Spinner } from 'cli-spinner';
+
 import { isVerbose } from './logger';
 
 let spinners = [];
@@ -6,7 +7,7 @@ let spinners = [];
 export function startSpinner(msg) {
   if (isVerbose()) {
     console.log(msg);
-    return { stop(){} };
+    return { stop() {} };
   }
 
   const spinner = new Spinner(msg);
@@ -16,7 +17,7 @@ export function startSpinner(msg) {
   return spinner;
 }
 
-export function stopAll() {
+export function stopAllSpinners() {
   spinners.forEach(s => s.stop(true));
   spinners = [];
 }
