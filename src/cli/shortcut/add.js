@@ -6,13 +6,17 @@ import {offerChanges} from "../../services/diff";
 
 export const description = 'Add an application shortcut';
 export const command = 'add [name]';
-export const handler = args => executeAndHandleError(async () => {
-  const extJson = await loadExtensionJson();
-  const answers = await askShortcutCreationQuestions({ ...extJson, defaultName: args.name });
-  await createShortcut(answers, ensureInExtensionDir());
-});
 
 export async function createShortcut(answers, extensionPath) {
   await offerChanges(await instantiateExtensionTemplate('shortcut', { ...answers, extensionPath }));
   console.log('Success!'.bold.green);
 }
+
+async function addShortcut(args) {
+  const extJson = loadExtensionJson();
+  const answers = await askShortcutCreationQuestions({ ...extJson, defaultName: args.name });
+
+  return createShortcut(answers, ensureInExtensionDir());
+}
+
+export const handler = args => executeAndHandleError(addShortcut, args);

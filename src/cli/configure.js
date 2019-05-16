@@ -1,5 +1,10 @@
+import {
+  configurePlatform,
+  getPlatformConfig,
+  getPlatformRootDir,
+  setPlatformConfig,
+} from '../services/platform';
 import { executeAndHandleError } from '../services/error-handler';
-import {configurePlatform, getPlatformConfig, getPlatformRootDir, setPlatformConfig} from '../services/platform';
 
 export const description = 'Runs platform\'s configure script to sync with native changes to local extensions';
 export const command = 'configure';
@@ -21,16 +26,19 @@ export const builder = yargs => {
     })
     .usage(`shoutem ${command} \n\n${description}`);
 };
-export async function handler(args) {
-  await executeAndHandleError(async () => {
-    const appDir = await getPlatformRootDir();
 
-    await setPlatformConfig(appDir, {
-      ...await getPlatformConfig(appDir),
-      release: !!args.release,
-      production: !!args.production
-    });
 
-    await configurePlatform(appDir);
+export function configure(args) {
+  const appDir = getPlatformRootDir();
+  const config = getPlatformConfig(appDir);
+
+  setPlatformConfig(appDir, {
+    ...config,
+    release: !!args.release,
+    production: !!args.production,
   });
+
+  return configurePlatform(appDir);
 }
+
+export const handler = args => executeAndHandleError(configure, args);

@@ -1,7 +1,5 @@
 import tar from 'tar';
 import path from 'path';
-import zlib from 'zlib';
-import move from 'glob-move';
 import tmp from 'tmp-promise';
 import Promise from 'bluebird';
 import { exec } from 'child-process-promise';
@@ -12,7 +10,7 @@ import { spinify } from './spinner';
 import { buildNodeProject } from './node';
 import { loadExtensionJson } from './extension';
 import { readJsonFile, writeJsonFile } from './data';
-import { getPackageJson, savePackageJson } from './npm';
+import npm from './npm';
 
 import { ensureUserIsLoggedIn } from '../commands/login';
 
@@ -32,7 +30,7 @@ async function npmPack(dir, destinationDir) {
   const timestamp = (new Date()).getTime();
   packageJson.version = `${packageJson.version}-build${timestamp}`;
 
-  await writeJsonFile(packageJson, packageJsonPath);
+  writeJsonFile(packageJson, packageJsonPath);
 
   const { stdout } = await exec('npm pack', { cwd: dir });
   const packageFilename = stdout.replace(/\n$/, '');
@@ -41,7 +39,7 @@ async function npmPack(dir, destinationDir) {
   await mv(packagePath, resultFilename);
 
   if (originalFileContent !== null) {
-    await fs.writeFile(packageJsonPath, originalFileContent, 'utf8');
+    fs.writeFileSync(packageJsonPath, originalFileContent, 'utf8');
   }
 }
 
@@ -50,10 +48,10 @@ function hasExtensionsJson(dir) {
 }
 
 async function offerDevNameSync(extensionDir) {
-  const { name: extensionName } = await loadExtensionJson(extensionDir);
+  const { name: extensionName } = loadExtensionJson(extensionDir);
 
-  const appPackageJson = await getPackageJson(path.join(extensionDir, 'app'));
-  const serverPackageJson = await getPackageJson(path.join(extensionDir, 'server'));
+  const appPackageJson = npm.getPackageJson(path.join(extensionDir, 'app'));
+  const serverPackageJson = npm.getPackageJson(path.join(extensionDir, 'server'));
 
   const { name: appModuleName } = appPackageJson;
   const { name: serverModuleName } = serverPackageJson;
@@ -71,8 +69,8 @@ async function offerDevNameSync(extensionDir) {
   appPackageJson.name = targetModuleName;
   serverPackageJson.name = targetModuleName;
 
-  await savePackageJson(path.join(extensionDir, 'app'), appPackageJson);
-  await savePackageJson(path.join(extensionDir, 'server'), serverPackageJson);
+  await npm.savePackageJson(path.join(extensionDir, 'app'), appPackageJson);
+  await npm.savePackageJson(path.join(extensionDir, 'server'), serverPackageJson);
 }
 
 export default async function shoutemPack(dir, options) {
@@ -98,7 +96,7 @@ export default async function shoutemPack(dir, options) {
     await spinify(buildNodeProject(path.join(dir, 'app')), 'Building the app part...', 'OK');
   }
 
-  return await spinify(async () => {
+  return spinify(async () => {
     for (const partDir of dirsToPack) {
       await npmPack(partDir, packageDir);
     }

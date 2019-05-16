@@ -1,15 +1,12 @@
-import mkdirp from 'mkdirp-promise';
-import { sync as mkdirpSync } from 'mkdirp';
-import getHomeDir from '../home-dir';
+const fs = require('fs-extra');
+const path = require('path');
 
-export async function getLocalStoragePath() {
+const getHomeDir = require(path.resolve(__dirname, '../home-dir.js'));
+
+function getLocalStoragePath() {
   const storagePath = getHomeDir();
-  await mkdirp(storagePath);
+  fs.ensureDirSync(storagePath);
   return storagePath;
 }
 
-export function getLocalStoragePathSync() {
-  const storagePath = getHomeDir();
-  mkdirpSync(storagePath);
-  return storagePath;
-}
+module.exports.getLocalStoragePath = getLocalStoragePath;

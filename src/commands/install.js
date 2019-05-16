@@ -1,8 +1,8 @@
 import inquirer from 'inquirer';
 import { installExtension, createApp } from '../clients/app-manager';
 import { getLatestApps } from '../clients/legacy-service';
-import { getExtensionCanonicalName } from '../clients/local-extensions';
-import * as extensionManager from '../clients/extension-manager';
+import { getLocalExtensionCanonicalName } from '../clients/local-extensions';
+import { getExtensionId } from '../clients/extension-manager';
 import selectApp from '../services/app-selector';
 import { ensureInExtensionDir } from '../services/extension';
 import msg from '../user_messages';
@@ -31,7 +31,7 @@ export async function promptAppName() {
 
 async function getNewApp() {
   const name = await promptAppName();
-  return await createApp({ name });
+  return createApp({ name });
 }
 
 export async function ensureApp() {
@@ -39,7 +39,7 @@ export async function ensureApp() {
 
   if (appList.length === 0) {
     if (!await promptCreateNewApp()) {
-      return await getNewApp();
+      return getNewApp();
     }
   }
 
@@ -47,13 +47,13 @@ export async function ensureApp() {
   return appList.filter(app => app.id === appId)[0] || await getNewApp();
 }
 
-export async function createNewApp(name) {
-  return await createApp({ name });
+export function createNewApp(name) {
+  return createApp({ name });
 }
 
 export async function installLocalExtension(appId, extensionRoot = ensureInExtensionDir()) {
-  const canonicalName = await getExtensionCanonicalName(extensionRoot);
-  const extensionId = await extensionManager.getExtensionId(canonicalName);
+  const canonicalName = await getLocalExtensionCanonicalName(extensionRoot);
+  const extensionId = await getExtensionId(canonicalName);
 
   if (extensionId) {
     await installExtension(appId, extensionId);

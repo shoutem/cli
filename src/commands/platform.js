@@ -29,7 +29,9 @@ export async function uploadPlatformArchive(platformArchiveProvider) {
     createProgressHandler({
       msg: 'Upload progress',
       total: size,
-      onFinished: () => spinner = startSpinner('Processing upload...'),
+      onFinished() {
+        spinner = startSpinner('Processing upload...');
+      },
     }),
     size,
   );
@@ -50,7 +52,9 @@ export async function getAvailablePlatforms(limit) {
 
   let ownPlatforms = _.filter(allPlatforms, platform => _.get(platform, ['author', 'name']) === developer.name);
 
-  ownPlatforms.sort((p1, p2) => semver.compare(p1.version, p2.version, true) * -1); // highest versions first
+  // highest versions first
+  ownPlatforms.sort((p1, p2) =>
+    semver.compare(p1.version, p2.version, true) * -1);
 
   if (_.isNumber(limit)) {
     ownPlatforms = _.slice(ownPlatforms, 0, limit);

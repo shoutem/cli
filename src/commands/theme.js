@@ -10,7 +10,7 @@ const themeUrls = {
   variables: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem.rubicon-theme/server/primeThemeVariables.json'
 };
 
-async function promptThemeDetails(themeName) {
+function promptThemeDetails(themeName) {
   console.log('Enter theme information.');
   const questions = [{
     message: 'Title',
@@ -23,7 +23,7 @@ async function promptThemeDetails(themeName) {
     type: 'input',
   }];
 
-  return await inquirer.prompt(questions)
+  return inquirer.prompt(questions)
 }
 
 async function getThemeVariablesContent(themeName) {

@@ -1,26 +1,37 @@
-import * as cache from './cache';
 import analytics from 'universal-analytics';
 import uuid from 'uuid/v4';
 import _ from 'lodash';
-import { getValue } from './cache-env';
-import { analyticsTrackingId } from '../../config/services';
-import * as logger from './logger';
 
-async function getClientId() {
-  return await cache.get('ga-client-id', null, () => uuid());
+import { analyticsTrackingId } from '../../config/services';
+import envCache from './cache-env';
+import logger from './logger';
+import cache from './cache';
+
+const reportData = {
+  commandName: null,
+  extensionCanonicalName: null,
+  appId: null,
+  argv: [],
+  reportSent: false,
+};
+
+function getClientId() {
+  return cache.get('ga-client-id', null, () => uuid());
 }
 
-async function getAnalyticsVisitor() {
-  const clientId = await getClientId();
+function getAnalyticsVisitor() {
+  const clientId = getClientId();
 
   const visitor = analytics(analyticsTrackingId, clientId);
   reportData.clientId = clientId;
 
-  const { email } = await getValue('developer') || {};
+  const { email } = envCache.getValue('developer') || {};
+
   if (email) {
     visitor.set('userId', email);
     reportData.userId = email;
   }
+
   visitor.set('isDeveloper', true);
   reportData.isDeveloper = true;
 
@@ -28,9 +39,9 @@ async function getAnalyticsVisitor() {
 }
 
 async function reportEvent({ category, action, label }) {
-  const visitor = await getAnalyticsVisitor();
+  const visitor = getAnalyticsVisitor();
 
-  await visitor.event(category, action, label).send(err => {
+  await visitor.event(category, action, label).send((err) => {
     if (err) {
       console.error(err);
     } else {
@@ -40,7 +51,7 @@ async function reportEvent({ category, action, label }) {
         label,
         clientId: reportData.clientId,
         userId: reportData.userId,
-        isDeveloper: reportData.isDeveloper
+        isDeveloper: reportData.isDeveloper,
       });
     }
   });
@@ -50,19 +61,27 @@ async function reportCliCommand(commandName, canonicalNameOrAppId) {
   await reportEvent({
     category: 'CLI',
     action: commandName,
-    label: canonicalNameOrAppId
+    label: canonicalNameOrAppId,
   });
 }
 
-const reportData = {
-  commandName: null,
-  extensionCanonicalName: null,
-  appId: null,
-  argv: [],
-  reportSent: false
-};
+async function finishReport() {
+  const {
+    appId,
+    reportSent,
+    commandName,
+    extensionCanonicalName,
+  } = reportData;
 
-export function setCommandName(name) {
+  const label = extensionCanonicalName || appId;
+
+  if (commandName && !reportSent) {
+    await reportCliCommand(commandName, label);
+    reportData.reportSent = true;
+  }
+}
+
+function setCommandName(name) {
   reportData.commandName = name;
 
   if (reportData.extensionCanonicalName || reportData.appId) {
@@ -71,7 +90,7 @@ export function setCommandName(name) {
   }
 }
 
-export function setAppId(appId) {
+function setAppId(appId) {
   reportData.appId = appId;
 
   if (reportData.commandName) {
@@ -80,7 +99,7 @@ export function setAppId(appId) {
   }
 }
 
-export function setExtensionCanonicalName(name) {
+function setExtensionCanonicalName(name) {
   reportData.extensionCanonicalName = name;
 
   if (reportData.commandName) {
@@ -89,16 +108,13 @@ export function setExtensionCanonicalName(name) {
   }
 }
 
-export function setArgv(argv) {
+function setArgv(argv) {
   reportData.argv = _.drop(argv, 2);
 }
 
-async function finishReport() {
-  const { commandName, extensionCanonicalName, appId, reportSent } = reportData;
-  const label = extensionCanonicalName || appId;
-
-  if (commandName && !reportSent) {
-    await reportCliCommand(commandName, label);
-    reportData.reportSent = true;
-  }
-}
+export default {
+  setCommandName,
+  setAppId,
+  setExtensionCanonicalName,
+  setArgv,
+};

@@ -1,10 +1,12 @@
 import URI from 'urijs';
-import { post } from './json-api-client';
-import services from '../../config/services';
-import * as cache from '../services/cache-env';
-import * as logger from '../services/logger';
+import { configure, authorize } from '@shoutem/fetch-token-intercept';
 
-export class AuthServiceError {
+import logger from '../services/logger';
+import cache from '../services/cache-env';
+import services from '../../config/services';
+import jsonApi from './json-api-client';
+
+class AuthServiceError {
   /*
     Used whenever AuthService misbehaves and returns errors not listed in the
     API specification.
@@ -17,7 +19,7 @@ export class AuthServiceError {
   }
 }
 
-export class UnauthorizedError {
+class UnauthorizedError {
   /*
     Used when bad username or password is supplied.
   */
@@ -36,16 +38,15 @@ function getBasicAuthHeaderValue(email, password) {
   return 'Basic ' + new Buffer(`${email}:${password}`).toString('base64');
 }
 
-export async function createRefreshToken(email, password) {
+async function createRefreshToken(email, password) {
   try {
-    const response = await post(tokensUrl, null, {
+    const response = await jsonApi.post(tokensUrl, null, {
       headers: {
-        Authorization: getBasicAuthHeaderValue(email, password)
-      }
+        Authorization: getBasicAuthHeaderValue(email, password),
+      },
     });
-    const { token } = response;
-    return token;
 
+    return response.token;
   } catch (err) {
     if (err.statusCode === 401) {
       throw new UnauthorizedError(err.url, err.response, err.statusCode);
@@ -54,40 +55,41 @@ export async function createRefreshToken(email, password) {
   }
 }
 
-export async function createAppAccessToken(appId, refreshToken) {
+async function createAppAccessToken(appId, refreshToken) {
   const body = {
     data: {
       type: 'shoutem.auth.tokens',
       attributes: {
         tokenType: 'access-token',
         subjectType: 'application',
-        subjectId: appId.toString()
-      }
-    }
+        subjectId: appId.toString(),
+      },
+    },
   };
 
-  const { token } = await post(appAccessTokenUrl, body, {
+  const { token } = await jsonApi.post(appAccessTokenUrl, body, {
     headers: {
-      Authorization: `Bearer ${refreshToken}`
-    }
+      Authorization: `Bearer ${refreshToken}`,
+    },
   });
 
   return token;
 }
 
-export async function getRefreshToken({ email, password } = {}) {
+async function getRefreshToken({ email, password } = {}) {
   if (email && password) {
-    const refreshToken = await cache.setValue('refresh-token', await createRefreshToken(email, password));
-    await cache.setValue('access-token', null);
+    const refreshToken = await createRefreshToken(email, password);
+    cache.setValue('refresh-token', refreshToken);
+    cache.setValue('access-token', null);
     return refreshToken;
   }
 
-  return await cache.getValue('refresh-token');
+  return cache.getValue('refresh-token');
 }
 
-export async function clearTokens() {
-  await cache.setValue('access-token', null);
-  await cache.setValue('refresh-token', null);
+function clearTokens() {
+  cache.setValue('access-token', null);
+  cache.setValue('refresh-token', null);
 }
 
 const authorizationConfig = {
@@ -98,22 +100,22 @@ const authorizationConfig = {
       headers: {
         Authorization: `Bearer ${refreshToken}`,
         Accept: 'application/vnd.api+json',
-        'Content-Type': 'application/vnd.api+json'
+        'Content-Type': 'application/vnd.api+json',
       },
       body: JSON.stringify({
         data: {
           type: 'shoutem.auth.tokens',
           attributes: {
-            tokenType: 'access-token'
-          }
-        }
-      })
+            tokenType: 'access-token',
+          },
+        },
+      }),
     });
   },
   async parseAccessToken(response) {
     if (response.ok) {
       const { data: { attributes: { token } } } = await response.json();
-      await cache.setValue('access-token', token);
+      cache.setValue('access-token', token);
       return token;
     }
     logger.info('parseAccessToken', response);
@@ -133,23 +135,36 @@ const authorizationConfig = {
   isResponseUnauthorized({ status }) {
     return status === 401 || status === 403;
   },
-  shouldWaitForTokenRenewal: true
+  shouldWaitForTokenRenewal: true,
 };
 
-export async function authorizeRequests(refreshToken) {
+function authorizeRequests(refreshToken) {
   if (!refreshToken) {
-    return;
+    return undefined;
   }
+
   try {
-    const intercept = require('@shoutem/fetch-token-intercept');
-    intercept.configure(authorizationConfig);
-    intercept.authorize(refreshToken, await cache.getValue('access-token'));
+    const accessToken = cache.getValue('access-token');
+    configure(authorizationConfig);
+    authorize(refreshToken, accessToken);
     return true;
   } catch (err) {
     logger.info(err);
+
     if (err.statusCode !== 401) {
       throw err;
     }
+
     return false;
   }
 }
+
+export default {
+  AuthServiceError,
+  UnauthorizedError,
+  createRefreshToken,
+  createAppAccessToken,
+  getRefreshToken,
+  clearTokens,
+  authorizeRequests,
+};

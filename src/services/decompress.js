@@ -3,12 +3,12 @@ import fs from 'fs-extra';
 import decompress from 'decompress';
 import { execSync } from 'child_process';
 import downloadCached from 'download-cached';
-import commandExists from 'command-exists';
 import extractZip from 'extract-zip';
 import request from 'request';
 import isGzip from 'is-gzip';
 import tar from 'tar';
 
+import commandExists from './command-exists';
 import { pipeDownloadToFile } from './download';
 import getHomeDir from '../home-dir';
 
@@ -105,15 +105,6 @@ export async function decompressZipFromUrl(url, destination, options = {}) {
   }
 }
 
-export async function decompressFromUrl(url, destination, options = {}) {
-  const fileName = options.fileName || url.split('/').pop();
-  const filePath = path.join(destination, fileName);
-
-  await pipeDownloadToFile(url, destination, options);
-
-  return decompressFile(filePath, destination, options);
-}
-
 export async function decompressFile(filePath, destination, options = {}) {
   const { stripFirstDir = true, deleteArchiveWhenDone = false } = options;
 
@@ -130,6 +121,15 @@ export async function decompressFile(filePath, destination, options = {}) {
   }
 
   Promise.resolve(destination);
+}
+
+export async function decompressFromUrl(url, destination, options = {}) {
+  const fileName = options.fileName || url.split('/').pop();
+  const filePath = path.join(destination, fileName);
+
+  await pipeDownloadToFile(url, destination, options);
+
+  return decompressFile(filePath, destination, options);
 }
 
 export async function decompressFromUrlLegacy(url, destination, options) {

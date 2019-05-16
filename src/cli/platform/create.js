@@ -33,8 +33,6 @@ const postRunPublish = platformId => `
   To publish this platform for everyone to use
 `;
 
-export const handler = args => executeAndHandleError(() => createPlatform(args));
-
 export async function createPlatform({ url }) {
   const developer = await ensureUserIsLoggedIn();
 
@@ -54,7 +52,8 @@ export async function createPlatform({ url }) {
     published = true;
   }
 
-  const { appId } = await getPlatformConfig();
+  const { appId } = getPlatformConfig();
+
   if (!_.isNil(appId)) {
     if (await confirmer(`Do you want to install the new platform to this app (${appId})?`)) {
       await spinify(installPlatform({ app: appId, platform: platformResponse.id }));
@@ -76,3 +75,5 @@ export async function createPlatform({ url }) {
     }
   }
 }
+
+export const handler = args => executeAndHandleError(createPlatform, args);

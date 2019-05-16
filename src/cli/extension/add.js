@@ -1,18 +1,19 @@
 import path from 'path';
+import 'colors';
+
 import {
   addToExtensionsJs,
   getPlatformConfig,
   getPlatformExtensionsDir,
   getPlatformRootDir,
-  linkLocalExtension
-} from "../../services/platform";
-import {executeAndHandleError} from "../../services/error-handler";
-import {initExtension} from "../../commands/init";
-import {uploadExtension} from "../../commands/push";
-import {installLocalExtension} from "../../commands/install";
-import 'colors';
-import {spinify} from "../../services/spinner";
-import {publishExtension} from "../../commands/publish";
+  linkLocalExtension,
+} from '../../services/platform';
+import { spinify } from '../../services/spinner';
+import { executeAndHandleError } from '../../services/error-handler';
+
+import { initExtension } from '../../commands/init';
+import { installLocalExtension } from '../../commands/install';
+import { uploadExtension, publishExtension } from '../../commands/publish';
 
 export const description = 'Create a new extension for the current app';
 export const command = 'add <name>';
@@ -43,31 +44,32 @@ const postRunMessage =
     add a new settings page 
 `;
 
-export const handler = args => executeAndHandleError(() => addExtension(args));
-
 export async function addExtension({ name, local, externalDestination }) {
-  const platformDir = externalDestination || await getPlatformRootDir();
-  const extensionPath = await initExtension(name, externalDestination || await getPlatformExtensionsDir(platformDir));
+  const platformDir = externalDestination || getPlatformRootDir();
+  const extensionDir = externalDestination || getPlatformExtensionsDir(platformDir);
+  const extensionPath = await initExtension(name, extensionDir);
 
   if (!local && !externalDestination) {
     await uploadExtension({ publish: true }, extensionPath);
     await publishExtension(extensionPath);
 
-    const { appId } = await getPlatformConfig(platformDir);
+    const { appId } = getPlatformConfig(platformDir);
     await spinify(installLocalExtension(appId, extensionPath), 'Installing it in your app...', 'OK');
   }
 
   if (!externalDestination) {
     console.log('\nRunning npm install script:');
     await linkLocalExtension(platformDir, extensionPath);
-    await addToExtensionsJs(platformDir, extensionPath);
+    addToExtensionsJs(platformDir, extensionPath);
     console.log(`npm install [${'OK'.bold.green}]`);
   }
 
-  const cdCommand = 'cd ' + path.relative(process.cwd(), extensionPath);
+  const cdCommand = `cd ${path.relative(process.cwd(), extensionPath)}`;
   console.log('\nCongratulations, your new extension is ready!'.green.bold);
   console.log(`You might try doing ${cdCommand.cyan} where you can:`);
   console.log(postRunMessage);
   console.log('Success!'.green.bold);
   console.log('Happy coding!');
 }
+
+export const handler = args => executeAndHandleError(addExtension, args);

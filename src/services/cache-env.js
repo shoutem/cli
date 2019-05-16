@@ -1,10 +1,15 @@
-import * as cache from './cache';
+import cache from './cache';
 import { getHostEnvName } from '../clients/server-env';
 
-export async function getValue(key) {
-  return await cache.getValue(`${getHostEnvName()}.${key}`)
+function getValue(key) {
+  return cache.getValue(`${getHostEnvName()}.${key}`);
 }
 
-export async function setValue(key, value, expirationSeconds) {
-  return await cache.setValue(`${getHostEnvName()}.${key}`, value, expirationSeconds);
+function setValue(key, value, expirationSeconds) {
+  return cache.setValue(`${getHostEnvName()}.${key}`, value, expirationSeconds);
 }
+
+export default {
+  getValue,
+  setValue,
+};

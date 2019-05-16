@@ -20,8 +20,6 @@ export const builder = yargs => yargs
   })
   .usage(`shoutem ${command} [options]\n\n${description}`);
 
-export const handler = args => executeAndHandleError(() => publishOwnPlatform(args));
-
 export async function publishOwnPlatform({ platform }) {
   const developer = await ensureUserIsLoggedIn();
 
@@ -31,3 +29,5 @@ export async function publishOwnPlatform({ platform }) {
   console.log('Success!'.green.bold);
   console.log('Your platform is now public!');
 }
+
+export const handler = args => executeAndHandleError(publishOwnPlatform, args);

@@ -4,9 +4,9 @@ import yargs from 'yargs';
 
 import getHomeDir from './home-dir';
 import autoUpdate from './commands/update-cli';
-import * as analytics from './services/analytics';
 import { isAscii, containsSpace } from './services/validation';
-import { authorizeRequests, getRefreshToken } from './clients/auth-service';
+import analytics from './services/analytics';
+import authService from './clients/auth-service';
 import apiUrls from '../config/services';
 
 require('yargonaut')
@@ -28,10 +28,11 @@ analytics.setArgv(process.argv);
 
 (async () => {
   if (await autoUpdate(cliArgs)) {
-    return null;
+    return;
   }
-  const refreshToken = await getRefreshToken();
-  authorizeRequests(refreshToken);
+
+  const refreshToken = await authService.getRefreshToken();
+  authService.authorizeRequests(refreshToken);
 
   const cli = yargs.usage('Usage: shoutem [command] [-h]')
     .option('version', {

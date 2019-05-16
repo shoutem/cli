@@ -1,21 +1,15 @@
 import inquirer from 'inquirer';
 import _ from 'lodash';
-import { authorizeRequests, getRefreshToken } from '../clients/auth-service';
+import authService from '../clients/auth-service';
 import { getDeveloper, createDeveloper } from '../clients/extension-manager';
 import msg from '../user_messages';
 import urls from '../../config/services';
-import * as logger from '../services/logger';
-import * as cache from '../services/cache-env';
-
-async function resolveCredentials(args) {
-  if (args.credentials) {
-    return await parseCredentials(args.credentials)
-  }
-  return await promptUserCredentials(args);
-}
+import logger from '../services/logger';
+import cache from '../services/cache-env';
 
 function parseCredentials(credentials) {
   const parts = credentials.split(':');
+
   return {
     email: _.get(parts, '[0]'),
     password: _.get(parts, '[1]'),
@@ -41,14 +35,27 @@ function promptUserCredentials(args = {}) {
   return inquirer.prompt(questions);
 }
 
+function resolveCredentials(args) {
+  if (args.credentials) {
+    return parseCredentials(args.credentials);
+  }
+
+  return promptUserCredentials(args);
+}
+
 function promptDeveloperName() {
   /* eslint no-confusing-arrow: 0 */
   console.log('Enter developer name.');
-  return inquirer.prompt({
-    name: 'devName',
-    message: 'Developer name',
-    validate: value => value ? true : 'Developer name cannot be blank.',
-  }).then(answer => answer.devName);
+
+  return inquirer
+    .prompt({
+      name: 'devName',
+      message: 'Developer name',
+      validate(value) {
+        return value ? true : 'Developer name cannot be blank.';
+      },
+    })
+    .then(answer => answer.devName);
 }
 
 /**
@@ -57,10 +64,11 @@ function promptDeveloperName() {
  */
 export async function loginUser(args) {
   const credentials = await resolveCredentials(args);
-  const refreshToken = await getRefreshToken(credentials);
-  await authorizeRequests(refreshToken);
-
+  const refreshToken = await authService.getRefreshToken(credentials);
   let developer = null;
+
+  authService.authorizeRequests(refreshToken);
+
   try {
     developer = await getDeveloper();
   } catch (err) {
@@ -72,6 +80,7 @@ export async function loginUser(args) {
   }
 
   console.log(msg.login.complete(developer));
+
   logger.info('logged in as developer', developer);
 
   return cache.setValue('developer', { ...developer, email: credentials.email });
@@ -79,17 +88,19 @@ export async function loginUser(args) {
 
 /**
  * Asks user for email and password if refreshToken is not already cached
- * @param shouldThrow Should an error be thrown if user is not logged in or should user be asked for credentials
+ * @param shouldThrow Should an error be thrown if user is not logged in
+ * or should user be asked for credentials
  */
 export async function ensureUserIsLoggedIn(shouldThrow = false) {
-  const developer = await cache.getValue('developer');
+  const developer = cache.getValue('developer');
+
   if (developer) {
     return developer;
   }
 
   if (shouldThrow) {
     throw new Error('Not logged in, use `shoutem login` command to login');
-  } else {
-    return await loginUser();
   }
+
+  return loginUser();
 }

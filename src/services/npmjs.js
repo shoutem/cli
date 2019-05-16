@@ -1,9 +1,9 @@
 import request from 'request-promise-native';
 import semver from 'semver';
-import * as cache from './cache';
+import cache from './cache';
 
-export async function getRepoData(npmUrl) {
-  return await request({ uri: npmUrl, json: true });
+export function getRepoData(npmUrl) {
+  return request({ uri: npmUrl, json: true });
 }
 
 async function getNpmjsVersion(npmUrl, tag) {
@@ -12,8 +12,8 @@ async function getNpmjsVersion(npmUrl, tag) {
   return repo['dist-tags'][tag];
 }
 
-export async function getVersion(npmUrl, tag) {
-  return await cache.get({ npmUrl, tag }, 3600 * 48, () => getNpmjsVersion(npmUrl, tag));
+export function getVersion(npmUrl, tag) {
+  return cache.get({ npmUrl, tag }, 3600 * 48, () => getNpmjsVersion(npmUrl, tag));
 }
 
 export async function isLatest(npmUrl, currentVersion) {

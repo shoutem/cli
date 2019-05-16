@@ -27,14 +27,12 @@ export const builder = yargs => yargs
   })
   .usage(`shoutem ${command} [options]\n\n${description}`);
 
-export const handler = args => executeAndHandleError(() => installPlatform(args));
-
 export async function installPlatform({ app, platform }) {
   const developer = await ensureUserIsLoggedIn();
 
   let appConfig;
-  if (await getPlatformRootDir(process.cwd(), { shouldThrow: false })) {
-    appConfig = await getPlatformConfig();
+  if (getPlatformRootDir(process.cwd(), { shouldThrow: false })) {
+    appConfig = getPlatformConfig();
   }
 
   // if app ID is not explicitly passed, then try to get the ID from current directory, otherwise ask the user
@@ -46,3 +44,5 @@ export async function installPlatform({ app, platform }) {
   console.log('Your platform is now installed on your app');
   console.log('Success!'.green.bold);
 }
+
+export const handler = args => executeAndHandleError(installPlatform, args);

@@ -18,8 +18,8 @@ export async function run(cwd, task, taskArgs = null, stdio = 'inherit') {
   const opts = {cwd, stdio };
 
   if (taskArgs) {
-    return await spawn('yarn', ['run', task, '--', ...taskArgs], opts);
+    return spawn('yarn', ['run', task, '--', ...taskArgs], opts);
   } else {
-    return await spawn('yarn', ['run', task], opts);
+    return spawn('yarn', ['run', task], opts);
   }
 }

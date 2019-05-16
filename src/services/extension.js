@@ -1,7 +1,8 @@
 import fs from 'fs';
 import path from 'path';
-import * as analytics from './analytics';
-import {readJsonFile, writeJsonFile} from "./data";
+
+import { readJsonFile, writeJsonFile } from './data';
+import analytics from './analytics';
 
 export function getExtensionCanonicalName(devName, extName, extVersion) {
   const canonicalName = `${devName}.${extName}-${extVersion}`;
@@ -48,32 +49,34 @@ export function ensureInExtensionDir() {
 }
 
 export function loadExtensionJsonCallback(callback) {
-  const root = ensureInExtensionDir();
-
-  readJsonFile(path.join(root, 'extension.json'))
-    .then(data => callback(null, data))
-    .catch(err => callback(err));
+  try {
+    const extJson = loadExtensionJson();
+    callback(null, extJson);
+  } catch (err) {
+    callback(err, extJson);
+  }
 }
 
 /**
  * Persist extension.json file to extension root directory
  */
 export function saveExtensionJsonCallback(extJson, callback) {
-  const root = ensureInExtensionDir();
-  fs.writeFile(path.join(root, 'extension.json'),
-    `${JSON.stringify(extJson, null, 2)}\n`,
-    'utf8',
-    err => callback(err, extJson));
+  try{
+    saveExtensionJson(extJson);
+    callback(null, extJson);
+  } catch (err) {
+    callback(err, extJson);
+  }
 }
 
-export function extensionJsonPath(rootPath) {
+export function extensionJsonPath(rootPath = ensureInExtensionDir()) {
   return path.join(rootPath, 'extension.json');
 }
 
-export async function loadExtensionJson(rootPath = ensureInExtensionDir()) {
-  return await readJsonFile(extensionJsonPath(rootPath));
+export function loadExtensionJson(rootPath = ensureInExtensionDir()) {
+  return readJsonFile(extensionJsonPath(rootPath));
 }
 
-export async function saveExtensionJson(json, rootPath = ensureInExtensionDir()){
-  return await writeJsonFile(json, extensionJsonPath(rootPath));
+export function saveExtensionJson(json, rootPath = ensureInExtensionDir()) {
+  return writeJsonFile(extensionJsonPath(rootPath), json);
 }
