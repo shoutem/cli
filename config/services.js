@@ -4,7 +4,7 @@ const envValues = {
   production: {
     host: 'api.shoutem.com',
     appBuilder: 'https://builder.shoutem.com',
-    analyticsTrackingId: 'UA-807293-5'
+    analyticsTrackingId: 'UA-807293-5',
   },
   dev: {
     host: 'api.dev.sauros.hr',
@@ -21,7 +21,7 @@ const envValues = {
     authService: process.env.SHOUTEM_CLI_AUTH_SERVICE || 'http://localhost:3010',
     extensionManager: process.env.SHOUTEM_CLI_EXTENSION_MANAGER || 'http://localhost:3002',
     legacyService: process.env.SHOUTEM_CLI_LEGACY_SERVICE || 'http://v4.api.shoutem.local',
-  }
+  },
 };
 
 const env = envValues[getHostEnvName()];
@@ -34,5 +34,5 @@ module.exports = {
   legacyService: env.legacyService || `https://v4.${env.host}`,
   cliAppUri: 'http://registry.npmjs.org/@shoutem%2fcli',
   mobileAppUrl: 'https://github.com/shoutem/platform',
-  analyticsTrackingId: env.analyticsTrackingId || 'UA-807293-12'
+  analyticsTrackingId: env.analyticsTrackingId || 'UA-807293-12',
 };
