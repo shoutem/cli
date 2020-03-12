@@ -35,7 +35,7 @@
     "child-process-promise": "2.2.1",
     "cli-spinner": "0.2.8",
     "colors": "1.2.4",
-    "command-exists": "1.0.2",
+    "command-exists": "1.2.8",
     "decamelize": "^1.2.0",
     "decompress": "4.0.0",
     "depcheck": "^0.6.9",
