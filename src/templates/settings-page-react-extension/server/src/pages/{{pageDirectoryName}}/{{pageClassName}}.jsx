@@ -87,7 +87,7 @@ class {{pageClassName}} extends Component {
     const { error, hasChanges, inProgress, company } = this.state;
 
     return (
-      <div className="hello-page settings-page">
+      <div className="hello-extension-settings-page">
         <form onSubmit={this.handleSubmit}>
           <FormGroup>
             <h3>Enter company name</h3>

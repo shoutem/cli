@@ -104,7 +104,8 @@ const authorizationConfig = {
         data: {
           type: 'shoutem.auth.tokens',
           attributes: {
-            tokenType: 'access-token'
+            tokenType: 'access-token',
+            compressionType: 'gzip',
           }
         }
       })

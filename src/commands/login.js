@@ -52,11 +52,27 @@ function promptDeveloperName() {
 }
 
 /**
+ * Checks cache to see if user is already logged in with a given email
+ */
+
+async function userAlreadyLoggedIn(email) {
+  const developer = await cache.getValue('developer');
+
+  return (developer && developer.email === email);
+}
+
+/**
  * Asks user to enter credentials, verifies those credentials with authentication
  * service, and saves the received API token locally for further requests.
  */
 export async function loginUser(args) {
   const credentials = await resolveCredentials(args);
+
+  if (await userAlreadyLoggedIn(credentials.email)) {
+    console.log("Already logged in with given email.");
+    return;
+  }
+
   const refreshToken = await getRefreshToken(credentials);
   await authorizeRequests(refreshToken);
 

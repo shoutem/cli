@@ -74,7 +74,7 @@ class {{pageClassName}} extends Component {
     const { error, hasChanges, inProgress, greeting } = this.state;
 
     return (
-      <div className="hello-page settings-page">
+      <div className="hello-page">
         <form onSubmit={this.handleSubmit}>
           <FormGroup>
             <h3>Choose your greeting</h3>
