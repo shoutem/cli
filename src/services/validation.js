@@ -1,5 +1,5 @@
 export function isValidExtensionName(name) {
-    return /^[a-z]+[a-z0-9\-]*$/.test(name);
+  return /^[a-z]+[a-z0-9\-]*$/.test(name);
 }
 
 export function isAscii(str) {
