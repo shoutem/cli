@@ -59,7 +59,7 @@
     "json-stringify-safe": "5.0.1",
     "jsonapi-serializer": "3.5.3",
     "linklocal": "^2.8.2",
-    "lodash": "4.17.11",
+    "lodash": "4.17.15",
     "lodash-get-or-set": "^1.0.2",
     "mkdirp": "0.5.1",
     "mkdirp-promise": "5.0.1",
