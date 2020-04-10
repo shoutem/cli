@@ -4,7 +4,7 @@ import * as analytics from './analytics';
 import {readJsonFile, writeJsonFile} from "./data";
 
 export function getExtensionCanonicalName(devName, extName, extVersion) {
-  const canonicalName = `${devName}.${extName}-${extVersion}`;
+  const canonicalName = `${devName}.${extName}@${extVersion}`;
 
   analytics.setExtensionCanonicalName(canonicalName);
 
