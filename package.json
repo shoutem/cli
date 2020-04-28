@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.13.0",
+  "version": "0.13.1-rc.10",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -15,8 +15,10 @@
     "hotfix": "npm publish --access public --tag hotfix",
     "lint": "eslint ./",
     "prepublish": "dos2unix src/shoutem.js",
-    "shoutem": "node src/shoutem.js",
-    "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\""
+    "shoutem": "node build/shoutem.js",
+    "dev": "node src/shoutem.js",
+    "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\"",
+    "build": "babel ./src --ignore ./src/templates --out-dir build"
   },
   "author": "",
   "license": "ISC",
