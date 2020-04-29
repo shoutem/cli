@@ -31,7 +31,7 @@ analytics.setArgv(process.argv);
     return null;
   }
   const refreshToken = await getRefreshToken();
-  authorizeRequests(refreshToken);
+  await authorizeRequests(refreshToken);
 
   const cli = yargs.usage('Usage: shoutem [command] [-h]')
       .option('version', {
