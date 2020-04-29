@@ -1,24 +1,24 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.13.1-rc.10",
+  "version": "0.13.1-rc.27",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
     "url": "https://github.com/shoutem/cli"
   },
   "bin": {
-    "shoutem": "./src/shoutem.js"
+    "shoutem": "./build/shoutem.js"
   },
   "scripts": {
-    "beta": "npm publish --access public --tag beta",
     "extlint": "eslint",
-    "hotfix": "npm publish --access public --tag hotfix",
-    "lint": "eslint ./",
-    "prepublish": "dos2unix src/shoutem.js",
+    "lint": "eslint ./ --ignore-pattern build --ignore-pattern templates",
+    "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\"",
     "shoutem": "node build/shoutem.js",
     "dev": "node src/shoutem.js",
-    "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\"",
-    "build": "babel ./src --ignore ./src/templates --out-dir build"
+    "prepublish": "dos2unix src/shoutem.js",
+    "beta": "npm publish --access public --tag beta",
+    "hotfix": "npm publish --access public --tag hotfix",
+    "build": "babel ./src --ignore ./src/templates --out-dir build --source-maps inline --copy-files"
   },
   "author": "",
   "license": "ISC",
