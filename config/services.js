@@ -1,4 +1,4 @@
-const { getHostEnvName } = require('../src/clients/server-env');
+const serverEnv = require(`../${process.env.SHOUTEM_CLI_DIRNAME}/clients/server-env`);
 
 const envValues = {
   production: {
@@ -24,7 +24,8 @@ const envValues = {
   },
 };
 
-const env = envValues[getHostEnvName()];
+const hostEnvName = serverEnv.getHostEnvName();
+const env = envValues[hostEnvName];
 
 module.exports = {
   appBuilder: env.appBuilder || `https://builder.${env.host}`,
