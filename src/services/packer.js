@@ -12,9 +12,7 @@ import { pathExists, copy } from 'fs-extra';
 import decompress from 'decompress';
 import {readJsonFile} from "./data";
 import {loadExtensionJson} from "./extension";
-import {getExtensionCanonicalName} from "../clients/local-extensions";
 import {getPackageJson, savePackageJson} from "./npm";
-import {getDeveloper} from "../clients/extension-manager";
 import {ensureUserIsLoggedIn} from "../commands/login";
 import confirmer from "./confirmer";
 const mv = Promise.promisify(require('mv'));
@@ -61,6 +59,9 @@ export async function shoutemUnpack(tgzFile, destinationDir) {
 
   await npmUnpack(path.join(tmpDir, 'app.tgz'), path.join(destinationDir, 'app'));
   await npmUnpack(path.join(tmpDir, 'server.tgz'), path.join(destinationDir, 'server'));
+  if (await pathExists(path.join(tmpDir, 'cloud.tgz'))) {
+    await npmUnpack(path.join(tmpDir, 'cloud.tgz'), path.join(destinationDir, 'cloud'));
+  }
   await move(path.join(tmpDir, 'extension.json'), destinationDir);
 }
 
@@ -68,18 +69,28 @@ function hasExtensionsJson(dir) {
   return pathExists(path.join(dir, 'extension.json'));
 }
 
+function hasCloudComponent(dir) {
+  return hasPackageJson(path.join(dir, 'cloud'));
+}
+
 async function offerDevNameSync(extensionDir) {
   const { name: extensionName } = await loadExtensionJson(extensionDir);
 
+  const syncCloudComponent = await hasCloudComponent(extensionDir);
+
   const appPackageJson = await getPackageJson(path.join(extensionDir, 'app'));
   const serverPackageJson = await getPackageJson(path.join(extensionDir, 'server'));
+  const cloudPackageJson = syncCloudComponent && await getPackageJson(path.join(extensionDir, 'cloud'));
 
   const { name: appModuleName } = appPackageJson;
   const { name: serverModuleName } = serverPackageJson;
+  const { name: cloudModuleName } = cloudPackageJson || {};
   const { name: developerName } = await ensureUserIsLoggedIn(true);
 
   const targetModuleName = `${developerName}.${extensionName}`;
-  if (targetModuleName === appModuleName && targetModuleName === serverModuleName) {
+  if (targetModuleName === appModuleName &&
+      targetModuleName === serverModuleName &&
+      (!syncCloudComponent || targetModuleName === cloudModuleName)) {
     return;
   }
 
@@ -88,14 +99,19 @@ async function offerDevNameSync(extensionDir) {
   }
 
   appPackageJson.name = targetModuleName;
-  serverPackageJson.name = targetModuleName;
-
   await savePackageJson(path.join(extensionDir, 'app'), appPackageJson);
+
+  serverPackageJson.name = targetModuleName;
   await savePackageJson(path.join(extensionDir, 'server'), serverPackageJson);
+
+  if (syncCloudComponent) {
+    cloudPackageJson.name = targetModuleName;
+    await savePackageJson(path.join(extensionDir, 'cloud'), cloudPackageJson);
+  }
 }
 
 export default async function shoutemPack(dir, options) {
-  const packedDirectories = ['app', 'server'].map(d => path.join(dir, d));
+  const packedDirectories = ['app', 'server', 'cloud'].map(d => path.join(dir, d));
 
   if (!await hasExtensionsJson(dir)) {
     throw new Error(`${dir} cannot be packed because it has no extension.json file.`);
