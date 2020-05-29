@@ -1,0 +1,79 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports.install = install;
+exports.run = run;
+exports.getPackageJson = getPackageJson;
+exports.savePackageJson = savePackageJson;
+exports.addLocalDependency = addLocalDependency;
+exports.linkLocalDependencies = linkLocalDependencies;
+
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+var _bluebird = require('bluebird');
+
+var _bluebird2 = _interopRequireDefault(_bluebird);
+
+var _fsExtra = require('fs-extra');
+
+var _childProcessPromise = require('child-process-promise');
+
+var _data = require('./data');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+const linkLocal = _bluebird2.default.promisify(require('linklocal'));
+
+async function install(cwd = process.cwd()) {
+  await (0, _childProcessPromise.spawn)('npm', ['install'], {
+    cwd,
+    stdio: 'inherit',
+    shell: true,
+    env: _extends({}, process.env, { FORCE_COLOR: true })
+  });
+}
+
+async function run(cwd, task, taskArgs = [], npmOptions = []) {
+  const opts = {
+    cwd,
+    stdio: ['ignore', 'inherit', 'inherit'],
+    shell: true
+  };
+
+  const spawned = taskArgs.length ? (0, _childProcessPromise.spawn)('npm', ['run', task, ...npmOptions, '--', ...taskArgs], opts) : (0, _childProcessPromise.spawn)('npm', ['run', task, ...npmOptions], opts);
+
+  return await spawned;
+}
+
+async function getPackageJson(npmProjectPath) {
+  return await (0, _fsExtra.readJson)(_path2.default.join(npmProjectPath, 'package.json'));
+}
+
+async function savePackageJson(npmProjectPath, pkgJson) {
+  return await (0, _data.writeJsonFile)(pkgJson, _path2.default.join(npmProjectPath, 'package.json'));
+}
+
+async function addLocalDependency(npmProjectPath, npmModulePath) {
+  const { name } = await getPackageJson(npmModulePath);
+  const packageJson = await getPackageJson(npmProjectPath);
+
+  const dependencyValue = 'file:' + _path2.default.relative(npmProjectPath, npmModulePath);
+
+  await savePackageJson(npmProjectPath, _extends({}, packageJson, {
+    dependencies: _extends({}, packageJson.dependencies, {
+      [name]: dependencyValue
+    })
+  }));
+}
+
+async function linkLocalDependencies(npmProjectPath) {
+  return await linkLocal(npmProjectPath);
+}
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9zZXJ2aWNlcy9ucG0uanMiXSwibmFtZXMiOlsiaW5zdGFsbCIsInJ1biIsImdldFBhY2thZ2VKc29uIiwic2F2ZVBhY2thZ2VKc29uIiwiYWRkTG9jYWxEZXBlbmRlbmN5IiwibGlua0xvY2FsRGVwZW5kZW5jaWVzIiwibGlua0xvY2FsIiwiUHJvbWlzZSIsInByb21pc2lmeSIsInJlcXVpcmUiLCJjd2QiLCJwcm9jZXNzIiwic3RkaW8iLCJzaGVsbCIsImVudiIsIkZPUkNFX0NPTE9SIiwidGFzayIsInRhc2tBcmdzIiwibnBtT3B0aW9ucyIsIm9wdHMiLCJzcGF3bmVkIiwibGVuZ3RoIiwibnBtUHJvamVjdFBhdGgiLCJwYXRoIiwiam9pbiIsInBrZ0pzb24iLCJucG1Nb2R1bGVQYXRoIiwibmFtZSIsInBhY2thZ2VKc29uIiwiZGVwZW5kZW5jeVZhbHVlIiwicmVsYXRpdmUiLCJkZXBlbmRlbmNpZXMiXSwibWFwcGluZ3MiOiI7Ozs7Ozs7O1FBT3NCQSxPLEdBQUFBLE87UUFTQUMsRyxHQUFBQSxHO1FBY0FDLGMsR0FBQUEsYztRQUlBQyxlLEdBQUFBLGU7UUFJQUMsa0IsR0FBQUEsa0I7UUFlQUMscUIsR0FBQUEscUI7O0FBckR0Qjs7OztBQUNBOzs7O0FBQ0E7O0FBQ0E7O0FBQ0E7Ozs7QUFDQSxNQUFNQyxZQUFZQyxtQkFBUUMsU0FBUixDQUFrQkMsUUFBUSxXQUFSLENBQWxCLENBQWxCOztBQUVPLGVBQWVULE9BQWYsQ0FBdUJVLE1BQU1DLFFBQVFELEdBQVIsRUFBN0IsRUFBNEM7QUFDakQsUUFBTSxnQ0FBTSxLQUFOLEVBQWEsQ0FBQyxTQUFELENBQWIsRUFBMEI7QUFDOUJBLE9BRDhCO0FBRTlCRSxXQUFPLFNBRnVCO0FBRzlCQyxXQUFPLElBSHVCO0FBSTlCQyxzQkFBVUgsUUFBUUcsR0FBbEIsSUFBdUJDLGFBQWEsSUFBcEM7QUFKOEIsR0FBMUIsQ0FBTjtBQU1EOztBQUVNLGVBQWVkLEdBQWYsQ0FBbUJTLEdBQW5CLEVBQXdCTSxJQUF4QixFQUE4QkMsV0FBVyxFQUF6QyxFQUE2Q0MsYUFBYSxFQUExRCxFQUE4RDtBQUNuRSxRQUFNQyxPQUFPO0FBQ1hULE9BRFc7QUFFWEUsV0FBTyxDQUFDLFFBQUQsRUFBVyxTQUFYLEVBQXNCLFNBQXRCLENBRkk7QUFHWEMsV0FBTztBQUhJLEdBQWI7O0FBTUEsUUFBTU8sVUFBVUgsU0FBU0ksTUFBVCxHQUNkLGdDQUFNLEtBQU4sRUFBYSxDQUFDLEtBQUQsRUFBUUwsSUFBUixFQUFjLEdBQUdFLFVBQWpCLEVBQTZCLElBQTdCLEVBQW1DLEdBQUdELFFBQXRDLENBQWIsRUFBOERFLElBQTlELENBRGMsR0FFZCxnQ0FBTSxLQUFOLEVBQWEsQ0FBQyxLQUFELEVBQVFILElBQVIsRUFBYyxHQUFHRSxVQUFqQixDQUFiLEVBQTJDQyxJQUEzQyxDQUZGOztBQUlBLFNBQU8sTUFBTUMsT0FBYjtBQUNEOztBQUVNLGVBQWVsQixjQUFmLENBQThCb0IsY0FBOUIsRUFBOEM7QUFDbkQsU0FBTyxNQUFNLHVCQUFTQyxlQUFLQyxJQUFMLENBQVVGLGNBQVYsRUFBMEIsY0FBMUIsQ0FBVCxDQUFiO0FBQ0Q7O0FBRU0sZUFBZW5CLGVBQWYsQ0FBK0JtQixjQUEvQixFQUErQ0csT0FBL0MsRUFBd0Q7QUFDN0QsU0FBTyxNQUFNLHlCQUFjQSxPQUFkLEVBQXVCRixlQUFLQyxJQUFMLENBQVVGLGNBQVYsRUFBMEIsY0FBMUIsQ0FBdkIsQ0FBYjtBQUNEOztBQUVNLGVBQWVsQixrQkFBZixDQUFrQ2tCLGNBQWxDLEVBQWtESSxhQUFsRCxFQUFpRTtBQUN0RSxRQUFNLEVBQUVDLElBQUYsS0FBVyxNQUFNekIsZUFBZXdCLGFBQWYsQ0FBdkI7QUFDQSxRQUFNRSxjQUFjLE1BQU0xQixlQUFlb0IsY0FBZixDQUExQjs7QUFFQSxRQUFNTyxrQkFBa0IsVUFBVU4sZUFBS08sUUFBTCxDQUFjUixjQUFkLEVBQThCSSxhQUE5QixDQUFsQzs7QUFFQSxRQUFNdkIsZ0JBQWdCbUIsY0FBaEIsZUFDRE0sV0FEQztBQUVKRywrQkFDS0gsWUFBWUcsWUFEakI7QUFFRSxPQUFDSixJQUFELEdBQVFFO0FBRlY7QUFGSSxLQUFOO0FBT0Q7O0FBRU0sZUFBZXhCLHFCQUFmLENBQXFDaUIsY0FBckMsRUFBcUQ7QUFDMUQsU0FBTyxNQUFNaEIsVUFBVWdCLGNBQVYsQ0FBYjtBQUNEIiwiZmlsZSI6Im5wbS5qcyIsInNvdXJjZXNDb250ZW50IjpbImltcG9ydCBwYXRoIGZyb20gJ3BhdGgnO1xyXG5pbXBvcnQgUHJvbWlzZSBmcm9tICdibHVlYmlyZCc7XHJcbmltcG9ydCB7IHJlYWRKc29uIH0gZnJvbSAnZnMtZXh0cmEnO1xyXG5pbXBvcnQgeyBzcGF3biB9IGZyb20gJ2NoaWxkLXByb2Nlc3MtcHJvbWlzZSc7XHJcbmltcG9ydCB7d3JpdGVKc29uRmlsZX0gZnJvbSBcIi4vZGF0YVwiO1xyXG5jb25zdCBsaW5rTG9jYWwgPSBQcm9taXNlLnByb21pc2lmeShyZXF1aXJlKCdsaW5rbG9jYWwnKSk7XHJcblxyXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gaW5zdGFsbChjd2QgPSBwcm9jZXNzLmN3ZCgpKSB7XHJcbiAgYXdhaXQgc3Bhd24oJ25wbScsIFsnaW5zdGFsbCddLCB7XHJcbiAgICBjd2QsXHJcbiAgICBzdGRpbzogJ2luaGVyaXQnLFxyXG4gICAgc2hlbGw6IHRydWUsXHJcbiAgICBlbnY6IHsgLi4ucHJvY2Vzcy5lbnYsIEZPUkNFX0NPTE9SOiB0cnVlIH1cclxuICB9KTtcclxufVxyXG5cclxuZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHJ1bihjd2QsIHRhc2ssIHRhc2tBcmdzID0gW10sIG5wbU9wdGlvbnMgPSBbXSkge1xyXG4gIGNvbnN0IG9wdHMgPSB7XHJcbiAgICBjd2QsXHJcbiAgICBzdGRpbzogWydpZ25vcmUnLCAnaW5oZXJpdCcsICdpbmhlcml0J10sXHJcbiAgICBzaGVsbDogdHJ1ZVxyXG4gIH07XHJcblxyXG4gIGNvbnN0IHNwYXduZWQgPSB0YXNrQXJncy5sZW5ndGggP1xyXG4gICAgc3Bhd24oJ25wbScsIFsncnVuJywgdGFzaywgLi4ubnBtT3B0aW9ucywgJy0tJywgLi4udGFza0FyZ3NdLCBvcHRzKSA6XHJcbiAgICBzcGF3bignbnBtJywgWydydW4nLCB0YXNrLCAuLi5ucG1PcHRpb25zXSwgb3B0cyk7XHJcblxyXG4gIHJldHVybiBhd2FpdCBzcGF3bmVkO1xyXG59XHJcblxyXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gZ2V0UGFja2FnZUpzb24obnBtUHJvamVjdFBhdGgpIHtcclxuICByZXR1cm4gYXdhaXQgcmVhZEpzb24ocGF0aC5qb2luKG5wbVByb2plY3RQYXRoLCAncGFja2FnZS5qc29uJykpO1xyXG59XHJcblxyXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gc2F2ZVBhY2thZ2VKc29uKG5wbVByb2plY3RQYXRoLCBwa2dKc29uKSB7XHJcbiAgcmV0dXJuIGF3YWl0IHdyaXRlSnNvbkZpbGUocGtnSnNvbiwgcGF0aC5qb2luKG5wbVByb2plY3RQYXRoLCAncGFja2FnZS5qc29uJykpO1xyXG59XHJcblxyXG5leHBvcnQgYXN5bmMgZnVuY3Rpb24gYWRkTG9jYWxEZXBlbmRlbmN5KG5wbVByb2plY3RQYXRoLCBucG1Nb2R1bGVQYXRoKSB7XHJcbiAgY29uc3QgeyBuYW1lIH0gPSBhd2FpdCBnZXRQYWNrYWdlSnNvbihucG1Nb2R1bGVQYXRoKTtcclxuICBjb25zdCBwYWNrYWdlSnNvbiA9IGF3YWl0IGdldFBhY2thZ2VKc29uKG5wbVByb2plY3RQYXRoKTtcclxuXHJcbiAgY29uc3QgZGVwZW5kZW5jeVZhbHVlID0gJ2ZpbGU6JyArIHBhdGgucmVsYXRpdmUobnBtUHJvamVjdFBhdGgsIG5wbU1vZHVsZVBhdGgpO1xyXG5cclxuICBhd2FpdCBzYXZlUGFja2FnZUpzb24obnBtUHJvamVjdFBhdGgsIHtcclxuICAgIC4uLnBhY2thZ2VKc29uLFxyXG4gICAgZGVwZW5kZW5jaWVzOiB7XHJcbiAgICAgIC4uLnBhY2thZ2VKc29uLmRlcGVuZGVuY2llcyxcclxuICAgICAgW25hbWVdOiBkZXBlbmRlbmN5VmFsdWVcclxuICAgIH1cclxuICB9KTtcclxufVxyXG5cclxuZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIGxpbmtMb2NhbERlcGVuZGVuY2llcyhucG1Qcm9qZWN0UGF0aCkge1xyXG4gIHJldHVybiBhd2FpdCBsaW5rTG9jYWwobnBtUHJvamVjdFBhdGgpO1xyXG59XHJcbiJdfQ==

@@ -1,0 +1,11 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+const description = exports.description = 'Manage extensions within the current app';
+const command = exports.command = 'extension <command>';
+const builder = exports.builder = page => {
+    return page.commandDir('extension').usage(`shoutem ${command}\n\n${description}`).strict();
+};
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jbGkvZXh0ZW5zaW9uLmpzIl0sIm5hbWVzIjpbImRlc2NyaXB0aW9uIiwiY29tbWFuZCIsImJ1aWxkZXIiLCJwYWdlIiwiY29tbWFuZERpciIsInVzYWdlIiwic3RyaWN0Il0sIm1hcHBpbmdzIjoiOzs7OztBQUFPLE1BQU1BLG9DQUFjLDBDQUFwQjtBQUNBLE1BQU1DLDRCQUFVLHFCQUFoQjtBQUNBLE1BQU1DLDRCQUFVQyxRQUFRO0FBQzNCLFdBQU9BLEtBQ0ZDLFVBREUsQ0FDUyxXQURULEVBRUZDLEtBRkUsQ0FFSyxXQUFVSixPQUFRLE9BQU1ELFdBQVksRUFGekMsRUFHRk0sTUFIRSxFQUFQO0FBSUgsQ0FMTSIsImZpbGUiOiJleHRlbnNpb24uanMiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgY29uc3QgZGVzY3JpcHRpb24gPSAnTWFuYWdlIGV4dGVuc2lvbnMgd2l0aGluIHRoZSBjdXJyZW50IGFwcCc7XHJcbmV4cG9ydCBjb25zdCBjb21tYW5kID0gJ2V4dGVuc2lvbiA8Y29tbWFuZD4nO1xyXG5leHBvcnQgY29uc3QgYnVpbGRlciA9IHBhZ2UgPT4ge1xyXG4gICAgcmV0dXJuIHBhZ2VcclxuICAgICAgICAuY29tbWFuZERpcignZXh0ZW5zaW9uJylcclxuICAgICAgICAudXNhZ2UoYHNob3V0ZW0gJHtjb21tYW5kfVxcblxcbiR7ZGVzY3JpcHRpb259YClcclxuICAgICAgICAuc3RyaWN0KCk7XHJcbn07XHJcbiJdfQ==

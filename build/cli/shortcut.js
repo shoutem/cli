@@ -1,0 +1,11 @@
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+const description = exports.description = 'Manage application shortcuts';
+const command = exports.command = 'shortcut <command>';
+const builder = exports.builder = shortcut => {
+  return shortcut.commandDir('shortcut').usage(`shoutem ${command}\n\n${description}`).strict();
+};
+//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jbGkvc2hvcnRjdXQuanMiXSwibmFtZXMiOlsiZGVzY3JpcHRpb24iLCJjb21tYW5kIiwiYnVpbGRlciIsInNob3J0Y3V0IiwiY29tbWFuZERpciIsInVzYWdlIiwic3RyaWN0Il0sIm1hcHBpbmdzIjoiOzs7OztBQUFPLE1BQU1BLG9DQUFjLDhCQUFwQjtBQUNBLE1BQU1DLDRCQUFVLG9CQUFoQjtBQUNBLE1BQU1DLDRCQUFVQyxZQUFZO0FBQ2pDLFNBQU9BLFNBQ0pDLFVBREksQ0FDTyxVQURQLEVBRUpDLEtBRkksQ0FFRyxXQUFVSixPQUFRLE9BQU1ELFdBQVksRUFGdkMsRUFHSk0sTUFISSxFQUFQO0FBSUQsQ0FMTSIsImZpbGUiOiJzaG9ydGN1dC5qcyIsInNvdXJjZXNDb250ZW50IjpbImV4cG9ydCBjb25zdCBkZXNjcmlwdGlvbiA9ICdNYW5hZ2UgYXBwbGljYXRpb24gc2hvcnRjdXRzJztcclxuZXhwb3J0IGNvbnN0IGNvbW1hbmQgPSAnc2hvcnRjdXQgPGNvbW1hbmQ+JztcclxuZXhwb3J0IGNvbnN0IGJ1aWxkZXIgPSBzaG9ydGN1dCA9PiB7XHJcbiAgcmV0dXJuIHNob3J0Y3V0XHJcbiAgICAuY29tbWFuZERpcignc2hvcnRjdXQnKVxyXG4gICAgLnVzYWdlKGBzaG91dGVtICR7Y29tbWFuZH1cXG5cXG4ke2Rlc2NyaXB0aW9ufWApXHJcbiAgICAuc3RyaWN0KCk7XHJcbn07XHJcbiJdfQ==
