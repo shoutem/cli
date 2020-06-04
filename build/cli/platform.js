@@ -1,9 +1,0 @@
-'use strict';
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-const description = exports.description = 'Manage platforms';
-const command = exports.command = 'platform <command>';
-const builder = exports.builder = page => page.commandDir('platform').usage(`shoutem ${command}\n\n${description}`).strict();
-//# sourceMappingURL=data:application/json;charset=utf-8;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9jbGkvcGxhdGZvcm0uanMiXSwibmFtZXMiOlsiZGVzY3JpcHRpb24iLCJjb21tYW5kIiwiYnVpbGRlciIsInBhZ2UiLCJjb21tYW5kRGlyIiwidXNhZ2UiLCJzdHJpY3QiXSwibWFwcGluZ3MiOiI7Ozs7O0FBQU8sTUFBTUEsb0NBQWMsa0JBQXBCO0FBQ0EsTUFBTUMsNEJBQVUsb0JBQWhCO0FBQ0EsTUFBTUMsNEJBQVVDLFFBQVFBLEtBQzVCQyxVQUQ0QixDQUNqQixVQURpQixFQUU1QkMsS0FGNEIsQ0FFckIsV0FBVUosT0FBUSxPQUFNRCxXQUFZLEVBRmYsRUFHNUJNLE1BSDRCLEVBQXhCIiwiZmlsZSI6InBsYXRmb3JtLmpzIiwic291cmNlc0NvbnRlbnQiOlsiZXhwb3J0IGNvbnN0IGRlc2NyaXB0aW9uID0gJ01hbmFnZSBwbGF0Zm9ybXMnO1xyXG5leHBvcnQgY29uc3QgY29tbWFuZCA9ICdwbGF0Zm9ybSA8Y29tbWFuZD4nO1xyXG5leHBvcnQgY29uc3QgYnVpbGRlciA9IHBhZ2UgPT4gcGFnZVxyXG4gIC5jb21tYW5kRGlyKCdwbGF0Zm9ybScpXHJcbiAgLnVzYWdlKGBzaG91dGVtICR7Y29tbWFuZH1cXG5cXG4ke2Rlc2NyaXB0aW9ufWApXHJcbiAgLnN0cmljdCgpO1xyXG4iXX0=
