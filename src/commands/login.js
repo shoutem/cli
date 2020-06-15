@@ -43,7 +43,7 @@ function promptUserCredentials(args = {}) {
 
 function promptDeveloperName() {
   /* eslint no-confusing-arrow: 0 */
-  console.log('Enter developer name.');
+  console.log('Enter developer name. It should only contain lower-case letters and dashes, e.g.: my-dev-name');
   return inquirer.prompt({
     name: 'devName',
     message: 'Developer name',

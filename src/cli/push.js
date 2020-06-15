@@ -25,7 +25,7 @@ export const builder = yargs => {
       },
       nocheck: {
         type: 'boolean',
-        description: 'Push without checking for syntax errors'
+        description: 'Push without checking for syntax errors.'
       }
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);

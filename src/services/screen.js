@@ -27,7 +27,7 @@ export async function askScreenCreationQuestions(opts) {
   const screen = await prompt(createScreenCreationQuestions(opts));
   const parentName = screen.name;
 
-  const message = "Shortcut is required for a screen to appear in the app. Create one now?";
+  const message = "A shortcut is required for a screen to appear in the app. Create one now?";
   const { shouldCreateShortcut, ...shortcut } = await askShortcutCreationQuestions({ ...opts, parentName, message });
   if (shouldCreateShortcut) {
     screen.newShortcut = shortcut;

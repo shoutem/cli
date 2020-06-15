@@ -22,7 +22,7 @@ if (!path.isAbsolute(homeDir)) {
 }
 
 if (semver.lt(nodeVer, '6.0.0')) {
-  console.error(`You appear to be using Node v${process.versions.node}, however, Node 6 or later is required`);
+  console.error(`You appear to be using Node v${nodeVer}, however, Node 6 or later is required`);
   process.exit(1);
 }
 

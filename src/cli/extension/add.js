@@ -20,7 +20,7 @@ export const builder = yargs => {
     return yargs
       .options({
         local: {
-          description: 'Extension is only added locally and is not published or installed on the shoutem server',
+          description: 'Extension is only added locally and is not published or installed on the Shoutem Builder',
           type: 'boolean',
           default: false
         }
@@ -39,8 +39,8 @@ const postRunMessage =
   ${'shoutem theme add <themeName>'.cyan}
     add a new theme
 
-  ${'shoutem page add'.cyan} 
-    add a new settings page 
+  ${'shoutem page add'.cyan}
+    add a new settings page
 `;
 
 export const handler = args => executeAndHandleError(() => addExtension(args));
@@ -66,8 +66,7 @@ export async function addExtension({ name, local, externalDestination }) {
 
   const cdCommand = 'cd ' + path.relative(process.cwd(), extensionPath);
   console.log('\nCongratulations, your new extension is ready!'.green.bold);
-  console.log(`You might try doing ${cdCommand.cyan} where you can:`);
+  console.log(`You can now do '${cdCommand.cyan}' where you can:`);
   console.log(postRunMessage);
-  console.log('Success!'.green.bold);
-  console.log('Happy coding!');
+  console.log('Happy coding!\n');
 }

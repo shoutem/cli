@@ -1,4 +1,4 @@
-export const description = 'Manage application shortcuts';
+export const description = 'Manage extension shortcuts';
 export const command = 'shortcut <command>';
 export const builder = shortcut => {
   return shortcut

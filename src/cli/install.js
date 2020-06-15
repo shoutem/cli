@@ -8,7 +8,7 @@ import msg from '../user_messages';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import { handleError } from '../services/error-handler';
 
-export const description = 'Install the current extension to an application.';
+export const description = 'Install the current extension to an app on the Shoutem Builder';
 
 export const command = 'install';
 export const builder = yargs => {

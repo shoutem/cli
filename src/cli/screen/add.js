@@ -4,7 +4,7 @@ import {askScreenCreationQuestions} from "../../services/screen";
 import {instantiateExtensionTemplate} from "../../services/extension-template";
 import {offerChanges} from "../../services/diff";
 
-export const description = 'Add a screen for applications running this extension';
+export const description = 'Add a screen for apps running this extension';
 export const command = 'add [name]';
 
 export const handler = args => executeAndHandleError(async () => {
