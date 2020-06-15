@@ -32,11 +32,11 @@ export const builder = yargs => {
 };
 
 export const handler = args => executeAndHandleError(async () => {
-  if (!await confirmPush('WARNING: you are about tu push using shoutem developer. Are you sure about that?')) {
+  if (!await confirmPush('WARNING: You are about to push using the \'shoutem\' developer account. Are you sure about that?')) {
     console.log('Push aborted'.bold.yellow);
     return null;
   }
-  console.log('WARNING: shoutem push command is deprecated. Use shoutem publish instead'.yellow.bold);
+
   if (!args.paths.length) {
     await uploadExtension(args);
     console.log(msg.push.complete());
@@ -46,4 +46,3 @@ export const handler = args => executeAndHandleError(async () => {
   args.paths = multiglob(args.paths);
   await pushAll(args);
 });
-

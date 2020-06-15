@@ -8,7 +8,6 @@ import decompressUri from './decompress';
 import cliUrls from '../../config/services';
 import { writeJsonFile} from './data';
 import * as npm from './npm';
-import { ensureYarnInstalled } from './yarn';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
 import { pathExists, readJson, readFile, writeFile } from 'fs-extra';
@@ -75,7 +74,6 @@ export async function setPlatformConfig(platformDir, mobileConfig) {
 }
 
 export async function configurePlatform(platformDir) {
-  await ensureYarnInstalled();
   await reactNative.ensureInstalled();
   if (process.platform === 'darwin' && !await commandExists('pod')) {
     throw new Error('Missing `pods` command. Please install cocoapods and run `shoutem configure` in the ' +

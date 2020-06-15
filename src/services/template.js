@@ -5,7 +5,7 @@ import path from 'path';
 import Mustache from 'mustache';
 import { pathExists } from 'fs-extra';
 
-const templatesDirectory = path.join(__dirname, '..', 'templates');
+const templatesDirectory = path.join(__dirname, '../..', 'src/templates');
 
 export function load(pathWithSlashes, templateContext) {
   const p = path.join(templatesDirectory, ...pathWithSlashes.split('/'));
