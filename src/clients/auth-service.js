@@ -30,7 +30,7 @@ export class UnauthorizedError {
 }
 
 const tokensUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
-const appAccessTokenUrl = new URI(services.legacyService).segment('/v1/auth/tokens').toString();
+const appAccessTokenUrl = new URI(services.authService).segment('/v1/tokens').toString();
 
 function getBasicAuthHeaderValue(email, password) {
   return 'Basic ' + new Buffer(`${email}:${password}`).toString('base64');
@@ -66,6 +66,7 @@ export async function createAppAccessToken(appId, refreshToken) {
     }
   };
 
+  console.log("apAccessTokenUrl is:", appAccessTokenUrl);
   const { token } = await post(appAccessTokenUrl, body, {
     headers: {
       Authorization: `Bearer ${refreshToken}`
