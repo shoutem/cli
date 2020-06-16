@@ -29,7 +29,7 @@ export class UnauthorizedError {
   }
 }
 
-const tokensUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
+const tokensUrl = new URI(services.authService).segment('/v1/tokens').toString();
 const appAccessTokenUrl = new URI(services.authService).segment('/v1/tokens').toString();
 
 function getBasicAuthHeaderValue(email, password) {
