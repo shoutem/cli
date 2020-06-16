@@ -3,8 +3,6 @@ import { post } from './json-api-client';
 import services from '../../config/services';
 import * as cache from '../services/cache-env';
 import * as logger from '../services/logger';
-import * as jsonApi from './json-api-client';
-
 
 export class AuthServiceError {
   /*
@@ -31,8 +29,8 @@ export class UnauthorizedError {
   }
 }
 
-const tokensUrl = new URI(services.authService).segment('/v1/tokens').toString();
-const appAccessTokenUrl = new URI(services.authService).segment('/v1/tokens').toString();
+const tokensUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
+const appAccessTokenUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
 
 function getBasicAuthHeaderValue(email, password) {
   return 'Basic ' + new Buffer(`${email}:${password}`).toString('base64');
@@ -68,11 +66,9 @@ export async function createAppAccessToken(appId, refreshToken) {
     }
   };
 
-  const { token } = await jsonApi.post(appAccessTokenUrl, null, {
-    body,
+  const { token } = await post(appAccessTokenUrl, body, {
     headers: {
-      Authorization: `Bearer ${refreshToken}`,
-      Accept: 'application/vnd.api+json',
+      Authorization: `Bearer ${refreshToken}`
     }
   });
 
