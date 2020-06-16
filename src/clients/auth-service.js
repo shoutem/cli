@@ -66,7 +66,6 @@ export async function createAppAccessToken(appId, refreshToken) {
     }
   };
 
-  console.log("apAccessTokenUrl is:", appAccessTokenUrl);
   const { token } = await post(appAccessTokenUrl, body, {
     headers: {
       Authorization: `Bearer ${refreshToken}`
