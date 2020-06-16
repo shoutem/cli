@@ -3,6 +3,8 @@ import { post } from './json-api-client';
 import services from '../../config/services';
 import * as cache from '../services/cache-env';
 import * as logger from '../services/logger';
+import * as jsonApi from './json-api-client';
+
 
 export class AuthServiceError {
   /*
@@ -66,9 +68,11 @@ export async function createAppAccessToken(appId, refreshToken) {
     }
   };
 
-  const { token } = await post(appAccessTokenUrl, body, {
+  const { token } = await jsonApi.post(appAccessTokenUrl, null, {
+    body,
     headers: {
-      Authorization: `Bearer ${refreshToken}`
+      Authorization: `Bearer ${refreshToken}`,
+      Accept: 'application/vnd.api+json',
     }
   });
 
