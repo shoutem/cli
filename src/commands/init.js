@@ -31,7 +31,7 @@ export async function promptExtensionInit(extName) {
     name: 'version',
     message: 'Version',
     default: version,
-    validate: value => semver.valid(value) ? true : 'Version must be valid semver version value',
+    validate: value => semver.valid(value) ? true : 'The version must be a valid semver version value.',
   }, {
     name: 'description',
     message: 'Description',

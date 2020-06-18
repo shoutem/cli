@@ -1,20 +1,20 @@
 import { executeAndHandleError } from '../services/error-handler';
 import {configurePlatform, getPlatformConfig, getPlatformRootDir, setPlatformConfig} from '../services/platform';
 
-export const description = 'Runs the platform\'s configure script to install dependencies, link extensions and their dependencies and run extension build scripts';
+export const description = 'Runs the platform\'s configure script to install dependencies, link extensions and their dependencies and run extension build scripts.';
 export const command = 'configure';
 export const builder = yargs => {
   return yargs
     .options({
       release: {
         alias: 'r',
-        description: '(re)configure the app with latest (re)published configuration from the Shoutem builder',
+        description: '(Re)configures the app with the latest (re)published configuration from the Shoutem builder.',
         type: 'boolean',
         default: false
       },
       production: {
         alias: 'p',
-        description: 'configure the app for production build, these are used when publishing to the App Store or Google Play store',
+        description: 'Configures the app for production build, used when publishing to the App Store or the Google Play store',
         type: 'boolean',
         default: false
       }

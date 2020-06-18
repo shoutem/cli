@@ -17,11 +17,11 @@ export default async function (options) {
     const { packagerProcess } = await startPackager(await getPlatformRootDir());
 
     if (options.local) {
-      console.log('Make sure that the phone running Shoutem app is connected to the same network as this computer'.yellow);
+      console.log('Make sure that the device running the Shoutem app is connected to the same network as this computer.'.yellow);
       if (process.platform === 'win32') {
-        console.log('If Shoutem app on your phone fails to load, try opening the 8081 TCP port manually from your Windows Firewall or disabling the firewall temporarily'.yellow);
+        console.log('If the Shoutem app on your phone fails to load, try opening the 8081 TCP port manually from your Windows Firewall or disabling the firewall temporarily.'.yellow);
       } else {
-        console.log('Make sure that the 8081 TCP port is not blocked on this computer'.yellow);
+        console.log('Make sure that the 8081 TCP port is not blocked on this computer.'.yellow);
       }
       await printMobilizerQR(ip.address(), 8081, options);
     } else {
@@ -32,7 +32,7 @@ export default async function (options) {
     await packagerProcess;
   } catch (err) {
     if (!/^win/.test(process.platform) && !await commandExists('watchman')) {
-      console.log('HINT: You should probably install Facebook\'s `watchman` before running `shoutem run` command'.bold.yellow);
+      console.log('HINT: You should probably install Facebook\'s `watchman` before running `shoutem run` command.'.bold.yellow);
     }
     await tunnel.stop();
     await handleError(err);

@@ -1,4 +1,4 @@
-export const description = 'Manage extensions within the current app';
+export const description = 'Manages extensions within the current app.';
 export const command = 'extension <command>';
 export const builder = page => {
     return page

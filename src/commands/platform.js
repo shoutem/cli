@@ -13,12 +13,12 @@ export async function uploadPlatformArchive(platformArchiveProvider) {
     await platformArchiveProvider.validateShoutemIgnore();
   }
 
-  const archivePath = await spinify(platformArchiveProvider.getArchivePath(), 'Packing the platform');
+  const archivePath = await spinify(platformArchiveProvider.getArchivePath(), 'Packing the platform.');
   if (!fs.pathExists(archivePath)) {
-    throw new Error('Unable to create or download archive');
+    throw new Error('Unable to create or download archive.');
   }
 
-  await spinify(validatePlatformArchive(platformArchiveProvider), 'Validating platform archive');
+  await spinify(validatePlatformArchive(platformArchiveProvider), 'Validating platform archive.');
 
   const { size } = await fs.stat(archivePath);
   const stream = fs.createReadStream(archivePath);
@@ -35,9 +35,9 @@ export async function uploadPlatformArchive(platformArchiveProvider) {
   );
   if (spinner) {
     spinner.stop(true);
-    console.log(`Processing upload... [${'OK'.green.bold}]`);
+    console.log(`Processing upload... [${'OK'.green.bold}].`);
   }
-  console.log(`${msg.platform.uploadingInfo(getHostEnvName())} [${'OK'.green.bold}]`);
+  console.log(`${msg.platform.uploadingInfo(getHostEnvName())} [${'OK'.green.bold}].`);
 
   platformArchiveProvider.cleanUp();
 

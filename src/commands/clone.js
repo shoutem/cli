@@ -41,7 +41,7 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
     await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
     await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), path.join(destinationDir, canonicalName));
   } catch (err) {
-    err.message = `Could not fetch extension ${canonicalName}`;
+    err.message = `Could not fetch extension ${canonicalName}.`;
     throw err;
   }
 }
@@ -72,7 +72,7 @@ async function queryPathExistsAction(destinationDir, oldDirectoryName) {
   const { action } = await inquirer.prompt({
     type: 'list',
     name: 'action',
-    message: `Directory ${oldDirectoryName} already exists`,
+    message: `Directory ${oldDirectoryName} already exists.`,
     choices: [{
       name: 'Overwrite',
       value: 'overwrite'
@@ -97,7 +97,7 @@ async function queryPathExistsAction(destinationDir, oldDirectoryName) {
     message: 'New directory name',
     async validate(dirName) {
       if (dirName.indexOf(' ') > -1) {
-        return 'No spaces are allowed';
+        return 'No spaces are allowed.';
       }
       if (await pathExists(path.join(destinationDir, dirName))) {
         return `Directory ${dirName} already exists.`
@@ -128,13 +128,13 @@ export async function clone(opts, destinationDir) {
   let appDir = path.join(destinationDir, directoryName);
 
   if (opts.force) {
-    await spinify(rmrf(appDir), `Destroying directory ${directoryName}`);
+    await spinify(rmrf(appDir), `Destroying directory ${directoryName}.`);
   }
 
   if (await pathExists(appDir)) {
     const action = await queryPathExistsAction(destinationDir, directoryName);
     if (action.type === 'overwrite') {
-      await spinify(rmrf(appDir), `Destroying directory ${directoryName}`);
+      await spinify(rmrf(appDir), `Destroying directory ${directoryName}.`);
     } else if (action.type === 'abort') {
       console.log('Clone aborted.'.bold.yellow);
       return;
@@ -153,17 +153,17 @@ export async function clone(opts, destinationDir) {
   console.log(`Cloning \`${name}\` to \`${directoryName}\`...`);
 
   if (opts.platform) {
-    await spinify(copy(opts.platform, appDir), 'Copying platform code');
+    await spinify(copy(opts.platform, appDir), 'Copying platform code.');
   } else {
     const platform = await appManager.getApplicationPlatform(opts.appId);
     ensurePlatformCompatibility(platform);
     await downloadApp(opts.appId, appDir, {
-      progress: createProgressHandler({ msg: 'Downloading shoutem platform' }),
+      progress: createProgressHandler({ msg: 'Downloading shoutem platform.' }),
       useCache: !opts.force,
 
       versionCheck: mobileAppVersion => {
         if (!semver.gte(mobileAppVersion, '0.58.9')) {
-          throw new Error('This version of CLI only supports platforms containing mobile app 0.58.9 or higher');
+          throw new Error('This version of CLI only supports platforms containing mobile app 0.58.9 or higher.');
         }
       }
     });

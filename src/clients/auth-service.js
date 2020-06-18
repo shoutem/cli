@@ -22,7 +22,7 @@ export class UnauthorizedError {
     Used when bad username or password is supplied.
   */
   constructor(url, response, statusCode) {
-    this.message = 'Username or password is not valid';
+    this.message = 'Username or password is not valid.';
     this.url = url;
     this.response = response;
     this.statusCode = statusCode;

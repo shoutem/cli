@@ -21,7 +21,7 @@ export function addShortcut(extJson, { name, title, description, screenName, pag
 
 function validateShortcutName(name, existingShortcuts) {
   if (!isVariableName(name)) {
-    return 'Shortcut name must be a valid js variable name';
+    return 'A shortcut name must be a valid JavaScript variable name.';
   }
   if (_.find(existingShortcuts, { name })) {
     return `${name} already exists`;

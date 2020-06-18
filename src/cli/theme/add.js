@@ -2,7 +2,7 @@ import { createTheme } from '../../commands/theme';
 import { handleError } from '../../services/error-handler';
 import { ensureVariableName } from '../../services/cli-parsing';
 
-export const description = 'Add a theme to the current extension';
+export const description = 'Adds a theme to the current extension.';
 export const command = 'add <name>';
 export async function handler(args) {
   try {

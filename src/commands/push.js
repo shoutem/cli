@@ -26,7 +26,7 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
       await extLint(extensionDir);
       console.log(`[${'OK'.green.bold}]`);
     } catch (err) {
-      err.message = 'Syntax errors detected, aborting push! Use `shoutem push --nocheck` to override';
+      err.message = 'Syntax errors detected, aborting push! Use `shoutem push --nocheck` to override, but use with caution!';
       throw err;
     }
   }
@@ -71,7 +71,7 @@ export async function promptPublishableVersion(extJson) {
   while (true) {
     const { name, version } = extJson;
     const canonical = getExtensionCanonicalName(dev.name, name, version);
-    const canExtensionBePublished = await spinify(canPublish(canonical), `Checking if version ${version} can be published`);
+    const canExtensionBePublished = await spinify(canPublish(canonical), `Checking if version ${version} can be published.`);
     if (canExtensionBePublished) {
       return;
     }
