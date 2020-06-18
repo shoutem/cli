@@ -4,7 +4,7 @@ import {ensureInExtensionDir, loadExtensionJson} from "../../services/extension"
 import {instantiateExtensionTemplate} from "../../services/extension-template";
 import {offerChanges} from "../../services/diff";
 
-export const description = 'Adds a app shortcut.';
+export const description = 'Adds a new app shortcut to the extension.';
 export const command = 'add [name]';
 export const handler = args => executeAndHandleError(async () => {
   const extJson = await loadExtensionJson();

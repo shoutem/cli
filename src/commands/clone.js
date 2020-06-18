@@ -30,7 +30,7 @@ export async function pullExtensions(appId, destinationDir) {
   let i = 0;
   for(const inst of installations) {
     i++;
-    await spinify(pullExtension(destinationDir, inst), `Downloading extension ${i}/${n}: ${inst.canonicalName}`);
+    await spinify(pullExtension(destinationDir, inst), `Downloading extension ${i}/${n}: ${inst.canonicalName}...`);
   }
 }
 
@@ -128,13 +128,13 @@ export async function clone(opts, destinationDir) {
   let appDir = path.join(destinationDir, directoryName);
 
   if (opts.force) {
-    await spinify(rmrf(appDir), `Destroying directory ${directoryName}.`);
+    await spinify(rmrf(appDir), `Destroying directory ${directoryName}...`);
   }
 
   if (await pathExists(appDir)) {
     const action = await queryPathExistsAction(destinationDir, directoryName);
     if (action.type === 'overwrite') {
-      await spinify(rmrf(appDir), `Destroying directory ${directoryName}.`);
+      await spinify(rmrf(appDir), `Destroying directory ${directoryName}...`);
     } else if (action.type === 'abort') {
       console.log('Clone aborted.'.bold.yellow);
       return;
@@ -153,7 +153,7 @@ export async function clone(opts, destinationDir) {
   console.log(`Cloning \`${name}\` to \`${directoryName}\`...`);
 
   if (opts.platform) {
-    await spinify(copy(opts.platform, appDir), 'Copying platform code.');
+    await spinify(copy(opts.platform, appDir), 'Copying platform code...');
   } else {
     const platform = await appManager.getApplicationPlatform(opts.appId);
     ensurePlatformCompatibility(platform);

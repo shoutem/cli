@@ -1,7 +1,7 @@
 import forkTerminal from '@shoutem/fork-terminal';
 import path from 'path';
 
-export const description = 'Runs Shoutem app on using Shoutem preview app';
+export const description = 'Runs and previews your local code with Shoutem preview app.';
 export const command = 'run';
 export const builder = yargs => {
   return yargs

@@ -71,7 +71,7 @@ export async function promptPublishableVersion(extJson) {
   while (true) {
     const { name, version } = extJson;
     const canonical = getExtensionCanonicalName(dev.name, name, version);
-    const canExtensionBePublished = await spinify(canPublish(canonical), `Checking if version ${version} can be published.`);
+    const canExtensionBePublished = await spinify(canPublish(canonical), `Checking if version ${version} can be published...`);
     if (canExtensionBePublished) {
       return;
     }
