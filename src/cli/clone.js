@@ -1,7 +1,7 @@
 import { executeAndHandleError } from '../services/error-handler';
 import { clone } from '../commands/clone';
 
-export const description = 'Downloads a shoutem application with all it\'s extensions';
+export const description = 'Downloads a Shoutem app with all it\'s extensions';
 export const command = 'clone [appId]';
 export const builder = yargs => {
   return yargs

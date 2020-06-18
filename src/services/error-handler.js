@@ -44,7 +44,7 @@ export function getErrorMessage(err) {
   }
 
 
-  return 'Unrecognized error. Run `shoutem last-error` for more additional details'
+  return 'Unrecognized error. Run `shoutem last-error` for additional details'
 }
 
 let reportInfoPrinted = false;

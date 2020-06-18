@@ -2,7 +2,7 @@ import shoutemPack from '../services/packer';
 import { ensureInExtensionDir } from '../services/extension';
 import { handleError } from '../services/error-handler';
 
-export const description = 'Pack shoutem extensions for upload';
+export const description = 'Pack a Shoutem extension for upload';
 export const command = 'pack';
 export const builder = yargs => {
   return yargs

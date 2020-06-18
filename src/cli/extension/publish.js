@@ -9,7 +9,7 @@ import {updateExtension, getInstallation, installExtension} from "../../clients/
 import confirmer from "../../services/confirmer";
 import {getExtension} from "../../clients/extension-manager";
 
-export const description = 'Publish an extension from the app in the working directory';
+export const description = 'Publish an extension from the app in the specified or current working directory';
 export const command = 'publish <name>';
 export const builder = yargs => {
   return yargs

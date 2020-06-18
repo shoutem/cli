@@ -22,12 +22,10 @@ export const builder = yargs => {
     .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 export async function handler(args) {
-  if (!await confirmPublish('WARNING: you are about to publish using shoutem developer. Are you sure about that?')) {
+  if (!await confirmPublish('WARNING: You are about to publish using the \'shoutem\' developer account. Are you sure about that?')) {
     console.log('Publish aborted'.bold.yellow);
     return null;
   }
-
-  console.log('WARNING: shoutem publish command is deprecated. Use shoutem extension publish instead'.yellow.bold);
 
   try {
     if (args.paths.length === 0) {
