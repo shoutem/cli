@@ -30,4 +30,4 @@ You can see the changes you've made with your code and how they affect the CLI b
 
 This can also be used for testing before release, unlike the other two methods.
 
-**Once a release is ready, make sure to turn the preinstall script back into a prepare script as users may not have babel-cli installed**
+**NOTE:** Once a release is ready, make sure to turn the preinstall script back into a prepare script as users may not have babel-cli installed.
