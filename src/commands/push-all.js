@@ -22,7 +22,7 @@ export async function pushAll(args) {
   let { pathsToPush } = args.noconfirm || await prompt({
     type: 'checkbox',
     name: 'pathsToPush',
-    message: `Check extensions you want to push to ${getHostEnvName()}?`,
+    message: `Check which extensions you want to push to ${getHostEnvName()}.`,
     choices: extPaths.concat(new Separator()),
     default: extPaths,
     pageSize: 20

@@ -13,13 +13,13 @@ export const command = 'install';
 export const builder = yargs => yargs
   .options({
     app: {
-      description: 'Id of the application to install the new platform to',
+      description: 'Installs new platform into app with given app id.',
       type: 'number',
       requiresArg: true,
       alias: 'a',
     },
     platform: {
-      description: 'Id of platform to install',
+      description: 'Installs platform with given id.',
       type: 'string',
       requiresArg: true,
       alias: 'p',

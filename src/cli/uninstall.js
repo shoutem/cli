@@ -4,14 +4,14 @@ import { getExtensionId } from '../clients/extension-manager';
 import msg from '../user_messages';
 import { handleError } from '../services/error-handler';
 
-export const description = `Uninstall current extension from an app.`;
+export const description = 'Uninstalls the current extension from an app.';
 export const command = 'uninstall';
 export const builder = yargs => {
   return yargs
     .options({
       app: {
         alias: 'a',
-          description: 'uninstall local extension from an app',
+          description: 'Uninstalls local extension from an app.',
           requiresArg: true,
           demand: true
       }

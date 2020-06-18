@@ -7,12 +7,12 @@ import { getAvailablePlatforms } from '../../commands/platform';
 import { publishPlatform } from '../../clients/extension-manager';
 import { executeAndHandleError } from '../../services/error-handler';
 
-export const description = 'Publish a platform';
+export const description = 'Publishes a platform.';
 export const command = 'publish';
 export const builder = yargs => yargs
   .options({
     platform: {
-      description: 'Id of platform to install',
+      description: 'Publishes platform with given id.',
       type: 'string',
       requiresArg: true,
       alias: 'p',

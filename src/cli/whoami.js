@@ -2,7 +2,7 @@ import msg from '../user_messages';
 import { getValue } from '../services/cache-env';
 
 export const command = 'whoami';
-export const description = 'Username of the current user.';
+export const description = 'Displays the current user\'s username.';
 export async function handler() {
   try {
     const dev = await getValue('developer');
