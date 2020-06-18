@@ -5,18 +5,18 @@ import { handleError } from '../services/error-handler';
 import multiglob from '../services/multiglob';
 import confirmPublish from '../commands/confirm-admin-action';
 
-export const description = 'Publish current extension version.';
+export const description = 'Publishes current extension version.';
 export const command = 'publish [paths..]';
 export const builder = yargs => {
   return yargs
     .options({
       nobuild: {
         type: 'boolean',
-        description: 'Push and publish the extension without building it. Use this option carefully!'
+        description: 'Pushes and publishes the extension without building it. Use this option carefully!'
       },
       nopush: {
         type: 'boolean',
-        description: 'Publish the extension without pushing it first. Use this option carefully!'
+        description: 'Publishes the extension without pushing it first. Use this option carefully!'
       }
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);

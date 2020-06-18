@@ -16,7 +16,6 @@ const SHOUTEM_IGNORE_FILE_NAME = '.shoutemignore';
 const ARCHIVE_FORMAT = 'zip';
 
 const DEFAULT_SHOUTEM_IGNORE = `
-# we don't need it
 .git
 # node modules will get installed during the build process of the app
 node_modules

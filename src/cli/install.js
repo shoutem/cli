@@ -8,7 +8,7 @@ import msg from '../user_messages';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import { handleError } from '../services/error-handler';
 
-export const description = 'Install the current extension to an app on the Shoutem Builder';
+export const description = 'Install the current extension to an app on the Shoutem Builder.';
 
 export const command = 'install';
 export const builder = yargs => {
@@ -16,12 +16,12 @@ export const builder = yargs => {
     .options({
       app: {
         alias: 'a',
-        description: 'app id to install current extension to',
+        description: 'Specifies app id to install current extension to.',
         requiresArg: true
       },
       new: {
         alias: 'n',
-        description: 'install to a new app with given name',
+        description: 'Creates new app with the given name and installs the extension to it.',
         type: 'string'
       }})
     .usage(`usage: shoutem ${command} [options]\n\n${description}`);

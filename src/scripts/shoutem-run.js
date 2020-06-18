@@ -8,7 +8,7 @@ const rl = readline.createInterface({
 });
 
 function waitForEnter() {
-  console.log('\nPress ENTER to end this process');
+  console.log('\nPress ENTER to end this process.');
   rl.on('line', () => {
     rl.close();
   });

@@ -34,13 +34,13 @@ analytics.setArgv(process.argv);
   const cli = yargs.usage('Usage: shoutem [command] [-h]')
     .option('version', {
       alias: 'v',
-      description: 'Show version number'
+      description: 'Shows version number.'
     })
     .commandDir('cli')
     .strict()
     .help()
     .epilog(`If you don't have a developer account, you can register at ${apiUrls.appBuilder.bold}.\n\n` +
-      `More detailed reference on how to use CLI can be found on the Developer Portal: ${cliReferenceUrl.bold}`)
+      `A more detailed reference on how to use CLI can be found on the Developer Portal: ${cliReferenceUrl.bold}.`)
     .alias('help', 'h');
 
   const argv = cli.argv;
