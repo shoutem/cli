@@ -1,7 +1,7 @@
 import { loginUser } from '../commands/login';
 import { executeAndHandleError } from '../services/error-handler';
 
-export const description = 'Logs user in and registers as a Shoutem developer on first login with given credentials.\n You can provide credentials in username:password format to skip the interactive menu.';
+export const description = 'Handles Shoutem developer\'s authentication. Users already registered as Shoutem developers are simply logged in and non-developer users are first registered as developers and then logged in. Credentials can be provided in the username:password format as a command argument to skip the interactive menu.';
 export const command = 'login [credentials]';
 
 export function handler(args) {
