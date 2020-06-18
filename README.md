@@ -17,7 +17,7 @@ After making changes to the code, you can run `rm -rf build && npm run build` to
 
 #### 2. Editing global node_modules
 
-While messy and harder to keep track of changes (since you ), this has proven effective. You can make changes in your global `node_modules` directory on your machine in the `src` directory, then re-build the CLI using `npm run build` within the `cli` directory (where the package.json is).
+While messy and harder to keep track of changes (since you can't see the diff directly), this has proven effective. You can make changes in your global `node_modules` directory on your machine in the `src` directory, then re-build the CLI using `npm run build` within the `cli` directory (where the package.json is).
 
 #### 3. Installing via git commit hash
 
