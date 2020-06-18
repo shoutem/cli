@@ -13,8 +13,7 @@
     "build": "babel ./src --ignore ./src/templates --out-dir build --source-maps inline --copy-files",
     "extlint": "eslint",
     "lint": "eslint ./ --ignore-pattern build --ignore-pattern templates",
-    "postinstall": "npm run build",
-    "prepublish": "dos2unix src/shoutem.js",
+    "prepublish": "dos2unix src/shoutem.js && npm run build",
     "shoutem": "node build/shoutem.js",
     "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\""
   },
