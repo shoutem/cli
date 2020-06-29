@@ -17,5 +17,5 @@ export default async function(args) {
     console.log(msg.login.complete(developer));
   }
 
-  console.log(`Home directory: \`${getHomeDir()}\` (customizable through SHOUTEM_CLI_HOME env variable, may require restart of terminal)`);
+  console.log(`Home directory: \`${getHomeDir()}\` (customizable through SHOUTEM_CLI_HOME env variable, may require restart of terminal).`);
 }

@@ -12,31 +12,31 @@ export const builder = yargs => {
     .options({
       nobuild: {
         type: 'boolean',
-        description: 'Push the extension without building it. Use this option carefully!'
+        description: 'Pushes the extension without building it. Use this option carefully!'
       },
       noconfirm: {
         type: 'boolean',
-        description: 'Push extensions without asking for confirmation'
+        description: 'Pushes extensions without asking for confirmation.'
       },
       without: {
         type: 'array',
-        description: 'Directory to skip. Can be passed multiple times for skipping multiple directories. Used only if multiple extensions are pushed.',
+        description: 'Specifies directory to skip. Can be passed multiple times for skipping multiple directories. Used only if multiple extensions are pushed.',
         requiresArg: true,
       },
       nocheck: {
         type: 'boolean',
-        description: 'Push without checking for syntax errors'
+        description: 'Pushes without checking for syntax errors.'
       }
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);
 };
 
 export const handler = args => executeAndHandleError(async () => {
-  if (!await confirmPush('WARNING: you are about tu push using shoutem developer. Are you sure about that?')) {
+  if (!await confirmPush('WARNING: You are about to push using the \'shoutem\' developer account. Are you sure about that?')) {
     console.log('Push aborted'.bold.yellow);
     return null;
   }
-  console.log('WARNING: shoutem push command is deprecated. Use shoutem publish instead'.yellow.bold);
+
   if (!args.paths.length) {
     await uploadExtension(args);
     console.log(msg.push.complete());
@@ -46,4 +46,3 @@ export const handler = args => executeAndHandleError(async () => {
   args.paths = multiglob(args.paths);
   await pushAll(args);
 });
-

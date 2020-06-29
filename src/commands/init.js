@@ -3,6 +3,7 @@ import inquirer from 'inquirer';
 import decamelize from 'decamelize';
 import { pathExists } from 'fs-extra';
 import path from 'path';
+import semver from 'semver';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import msg from '../user_messages';
 import { getPlatforms } from '../clients/extension-manager';
@@ -30,9 +31,7 @@ export async function promptExtensionInit(extName) {
     name: 'version',
     message: 'Version',
     default: version,
-    validate: value => value.match(/^(\d+)\.(\d+)\.(\d+)+$/)
-                        ? true
-                        : 'Version must contain numbers in format X.Y.Z',
+    validate: value => semver.valid(value) ? true : 'The version must be a valid semver version value.',
   }, {
     name: 'description',
     message: 'Description',

@@ -1,20 +1,20 @@
 import forkTerminal from '@shoutem/fork-terminal';
 import path from 'path';
 
-export const description = 'Run shoutem application on using Shoutem preview app';
+export const description = 'Runs and previews your local code with Shoutem preview app.';
 export const command = 'run';
 export const builder = yargs => {
   return yargs
     .options({
       local: {
         alias: 'l',
-        description: 'don\'t use tunneling for Shoutem app, connect directly to packager. Note: ' +
-          'this computer and iphone/android must be connected to the same network and port 8081 must be opened.',
+        description: 'Doesn\'t use tunneling for Shoutem app, connects directly to packager. Note: ' +
+          'this computer and the mobile device must be connected to the same network and port 8081 must be opened.',
         type: 'boolean'
       },
       small: {
         alias: 's',
-        description: 'display smaller ASCII QR code which could be unreadable in some fonts',
+        description: 'Displays smaller ASCII QR code which could be unreadable in some fonts.',
         type: 'boolean'
       }
     })

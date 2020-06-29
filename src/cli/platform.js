@@ -1,4 +1,4 @@
-export const description = 'Manage platforms';
+export const description = 'Manages platforms.';
 export const command = 'platform <command>';
 export const builder = page => page
   .commandDir('platform')

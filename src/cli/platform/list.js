@@ -5,12 +5,12 @@ import { ensureUserIsLoggedIn } from '../../commands/login';
 import { getAvailablePlatforms } from '../../commands/platform';
 import { executeAndHandleError } from '../../services/error-handler';
 
-export const description = 'Lists available platforms';
+export const description = 'Lists available platforms.';
 export const command = 'list';
 export const builder = yargs => yargs
   .options({
     all: {
-      description: 'Lists all available platforms',
+      description: 'Lists all available platforms.',
       type: 'boolean',
       alias: 'a',
     },

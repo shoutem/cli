@@ -1,4 +1,4 @@
-export const description = 'Manage application themes';
+export const description = 'Manages extension themes.';
 export const command = 'theme <command>';
 export const builder = theme => {
   return theme

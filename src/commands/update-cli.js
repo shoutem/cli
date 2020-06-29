@@ -1,6 +1,6 @@
 import { isLatest } from '../services/npmjs';
 import apiUrls from '../../config/services';
-import msg from '../../src/user_messages';
+import msg from '../user_messages';
 import { spawn } from 'child-process-promise';
 import { version } from '../../package.json';
 import confirm from '../services/confirmer';
@@ -27,7 +27,7 @@ export default async function () {
   const updateConfirmed = await confirmUpdate();
 
   if (!updateConfirmed) {
-    console.log('Warning: This is an outdated version of shoutem CLI'.bold.yellow);
+    console.log('Warning: This is an outdated version of the Shoutem CLI.'.bold.yellow);
     console.log('Install the new one with: `npm install -g @shoutem/cli`. You might need to run it with `sudo` prefix.'.yellow);
     return false;
   }
@@ -43,7 +43,7 @@ export default async function () {
     }
   }
 
-  console.log('Update complete');
+  console.log('Update complete.');
   await spawn('shoutem', process.argv.filter((_, index) => index > 1), { stdio: 'inherit' });
 
   return true;
