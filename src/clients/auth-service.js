@@ -22,7 +22,7 @@ export class UnauthorizedError {
     Used when bad username or password is supplied.
   */
   constructor(url, response, statusCode) {
-    this.message = 'Username or password is not valid';
+    this.message = 'Username or password is not valid.';
     this.url = url;
     this.response = response;
     this.statusCode = statusCode;
@@ -30,7 +30,7 @@ export class UnauthorizedError {
 }
 
 const tokensUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
-const appAccessTokenUrl = new URI(services.legacyService).segment('/v1/auth/tokens').toString();
+const appAccessTokenUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
 
 function getBasicAuthHeaderValue(email, password) {
   return 'Basic ' + new Buffer(`${email}:${password}`).toString('base64');

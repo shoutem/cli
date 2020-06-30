@@ -11,7 +11,7 @@ export default {
       missingEnv: () => 'Mobile environment does not exist, try `shoutem env install` first',
       alreadyLatest: version => `Already at latest version ${version}. Use \`shoutem env install -f\` to reinstall.`,
       complete: pkgJson => `Mobile environment updated to version ${pkgJson.version}. ` +
-      'You can now run `shoutem run-ios` or `shoutem run-android`'
+      'You can now run `shoutem run-ios` or `shoutem run-android`.'
     },
     info: {
       downloading: version => `Downloading environment v${version}...`,
@@ -30,18 +30,18 @@ export default {
       'Please, clear the folder and run the initialization process again.'
   },
   install: {
-    complete: () => 'Extension installed',
+    complete: () => 'Extension installed.',
     completeOntoNew: app => `Extension installed onto newly created \`${app}\` application.`,
-    seeNewInBrowser: url => `See it in browser: ${url}`,
-    notExtensionDir: () => 'No extension found. Try `shoutem push` before installing.'
+    seeNewInBrowser: url => `See it in a browser: ${url}.`,
+    notExtensionDir: () => 'No extension found. Try using `shoutem push` before installing.'
   },
   uninstall: {
-    missingExtension: () => 'Extension does not exist. You must `shoutem push` it first.',
+    missingExtension: () => 'The extension does not exist. It should be pushed using `shoutem push` first.',
     missingInstallation: () => 'Extension not installed.',
     complete: () => 'Extension uninstalled.'
   },
   link: {
-    alreadyLinked: () => 'Directory already linked',
+    alreadyLinked: () => 'Directory already linked.',
     complete: () => 'Directory successfully linked. Please, kill the packager before running the app.'
   },
   login: {
@@ -102,32 +102,28 @@ export default {
   use: {
     complete: (serverEnv, developer) => `Using server \`${serverEnv}\`` + (developer ? ` as user ${developer.name}.` : '.'),
     invalidEnv: serverEnv => `${serverEnv} is not a valid option\nRun shoutem use -h for possible options.`,
-    show: serverEnv => `Using server \`${serverEnv}\``,
+    show: serverEnv => `Using server \`${serverEnv}\`.`,
   },
   run: {
     missingId: () => 'Shoutem app id is required for the first run.',
-    info: (platform, config) => `Running ${platform} shoutem app with id ${config.appId}`,
+    info: (platform, config) => `Running ${platform} Shoutem app with id ${config.appId}.`,
     complete: platform => `Finished running ${platform} app.`,
-    missingConfig: () => 'Mobile environment wasn\'t correctly installed. Please run `shoutem env install -f` to reinstall',
-    killPackagerAndAdb: () => 'Could not clean up the build directory. Please check that react-packager and adb are not running'
+    missingConfig: () => 'Mobile environment wasn\'t correctly installed. Please run `shoutem env install -f` to reinstall.',
+    killPackagerAndAdb: () => 'Could not clean up the build directory. Please check that react-packager and adb are not running.'
   },
   show: {
     missingEnv: () => 'No shoutem env was set. Please run shoutem env install.',
-    version: packageJson => `Mobile environment version: ${packageJson.version}`,
-    app: config => `Currently used shoutem app id: ${config.appId}`,
-    missingApp: () => 'No shoutem app is currently used.',
-    missingExtensions: () => 'No local extension is currently linked',
+    version: packageJson => `Mobile environment version: ${packageJson.version}.`,
+    app: config => `Currently used Shoutem app id: ${config.appId}.`,
+    missingApp: () => 'No Shoutem app is currently used.',
+    missingExtensions: () => 'No local extension is currently linked.',
     listExtensions: paths => 'Linked directories:\n' + paths.map(path => `  ${path}`).join('\n'),
   },
   pack: {
-    missingBuildTask: dir => `Skipping build for \`${dir}\` due to missing build task`
-  },
-  yarn: {
-    missing: () => 'Missing yarn command. Please install yarn by running `npm install -g yarn`.',
-    outdated: (minVersion) => `Yarn version outdated. Please update yarn to v${minVersion} or newer by running \`npm install -g yarn\``
+    missingBuildTask: dir => `Skipping build for \`${dir}\` due to missing build task.`
   },
   reactNative: {
-    killPackager: () => 'Use `shoutem run-ios --ignore-packager` or kill the packager process before running the app',
+    killPackager: () => 'Use `shoutem run-ios --ignore-packager` or kill the packager process before running the app.',
     missing: () => 'Missing react-native command. Please install react-native by running \`npm install -g react-native-cli\`.'
   },
   cocoapods: {
@@ -135,12 +131,12 @@ export default {
   },
   ios: {
     notOnMac: () => 'Unfortunately, Apple only lets you develop for iOS on a Mac. However, ' +
-      'you can develop an application, test it on Android and see how it works on iPhone in Shoutem Builder!'
+      'you can develop an application, test it on Android and see how it works on iPhone in the Shoutem Builder!'
   },
   node: {
-    outdated: minVersion => `Your node version is too old. Please update node to version ${minVersion} or newer`
+    outdated: minVersion => `Your node version is too old. Please update node to version ${minVersion} or newer.`
   },
   version: {
-    updateRequired: () => 'WARNING: This is an outdated version of shoutem CLI. Do you want to update it?'
+    updateRequired: () => 'WARNING: This is an outdated version of the Shoutem CLI. Do you want to update it?'
   }
 }

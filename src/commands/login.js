@@ -43,7 +43,7 @@ function promptUserCredentials(args = {}) {
 
 function promptDeveloperName() {
   /* eslint no-confusing-arrow: 0 */
-  console.log('Enter developer name.');
+  console.log('Create a developer name. It should only contain lower-case letters and dashes, e.g.: my-dev-name.');
   return inquirer.prompt({
     name: 'devName',
     message: 'Developer name',
@@ -104,7 +104,7 @@ export async function ensureUserIsLoggedIn(shouldThrow = false) {
   }
 
   if (shouldThrow) {
-    throw new Error('Not logged in, use `shoutem login` command to login');
+    throw new Error('Not logged in, use `shoutem login` command to login.');
   } else {
     return await loginUser();
   }

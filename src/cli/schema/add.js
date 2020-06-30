@@ -6,7 +6,7 @@ import { handleError } from '../../services/error-handler';
 
 const createSchemaAsync = Promise.promisify(createSchema);
 
-export const description = 'Add schema to current extension';
+export const description = 'Adds schema to the current extension.';
 export const command = 'add <name>';
 export async function handler(args) {
   try {

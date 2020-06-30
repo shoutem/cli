@@ -4,7 +4,7 @@ import {askPageCreationQuestions} from "../../services/page";
 import {instantiateExtensionTemplate} from "../../services/extension-template";
 import {offerChanges} from "../../services/diff";
 
-export const description = 'Add a settings page to current extension';
+export const description = 'Adds a settings page to the current extension.';
 export const command = 'add [name]';
 
 export const handler = args => executeAndHandleError(async () => {
