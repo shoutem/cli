@@ -111,7 +111,14 @@ async function offerDevNameSync(extensionDir) {
 }
 
 export default async function shoutemPack(dir, options) {
-  const packedDirectories = ['app', 'server', 'cloud'].map(d => path.join(dir, d));
+  const components = ['app', 'server'];
+  const hasCloud = await hasCloudComponent(dir);
+
+  if (hasCloud) {
+    components.push('cloud');
+  }
+
+  const packedDirectories = components.map(d => path.join(dir, d));
 
   if (!await hasExtensionsJson(dir)) {
     throw new Error(`${dir} cannot be packed because it has no extension.json file.`);
