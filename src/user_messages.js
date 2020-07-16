@@ -1,25 +1,6 @@
 import 'colors';
 
 export default {
-  env: {
-    install: {
-      alreadyExists: () => 'Mobile environment already exists, try `shoutem env update`',
-      complete: pkgJson => `Mobile environment v${pkgJson.version} installation complete. ` +
-        'You can now run `shoutem run-ios` or `shoutem run-android`',
-    },
-    update: {
-      missingEnv: () => 'Mobile environment does not exist, try `shoutem env install` first',
-      alreadyLatest: version => `Already at latest version ${version}. Use \`shoutem env install -f\` to reinstall.`,
-      complete: pkgJson => `Mobile environment updated to version ${pkgJson.version}. ` +
-      'You can now run `shoutem run-ios` or `shoutem run-android`.'
-    },
-    info: {
-      downloading: version => `Downloading environment v${version}...`,
-      downloaded: () => 'Mobile app downloaded, installing dependencies...',
-      dependenciesInstalled: () => 'Dependencies installed, linking native dependencies...',
-      linked: () => 'Native dependencies linked!'
-    }
-  },
   init: {
     missingName: () => 'Extensions must have a name.',
     complete: () => 'Extension initialized.'.green.bold,
