@@ -31,16 +31,22 @@ export default async function () {
 
   if (!updateConfirmed) {
     console.log('Warning: This is an outdated version of the Shoutem CLI.'.bold.yellow);
-    console.log(`Install the new one with: '${packageManager} install -g @shoutem/cli'. You might need to run it with 'sudo' prefix.`.yellow);
+    console.log(`Install the new one with: 'npm install -g @shoutem/cli' or 'yarn global add @shoutem/cli'. You might need to run it with 'sudo' prefix.`.yellow);
     return false;
   }
 
   try {
-    await spawn(packageManager, ['install', '-g', '@shoutem/cli'], { stdio: 'inherit' });
+    if (packageManager === 'npm') {
+      await spawn(packageManager, ['install', '-g', '@shoutem/cli'], { stdio: 'inherit' });
+    }
+    await spawn(packageManager, ['global', 'add', '@shoutem/cli'], { stdio: 'inherit' });
   } catch (err) {
     if (process.platform !== 'win32') {
-      console.log('Current user does not have permissions to update shoutem CLI. Using sudo...');
-      await spawn('sudo', [packageManager, 'install', '-g', '@shoutem/cli'], { stdio: 'inherit' });
+      console.log('Current user does not have permissions to update Shoutem CLI. Using sudo...');
+      if (packageManager === 'npm') {
+        await spawn('sudo', [packageManager, 'install', '-g', '@shoutem/cli'], { stdio: 'inherit' });
+      }
+      await spawn('sudo', [packageManager, 'global', 'add', '@shoutem/cli'], { stdio: 'inherit' });
     } else {
       throw err;
     }
