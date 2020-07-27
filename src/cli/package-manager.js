@@ -10,7 +10,7 @@ const npm = {
   description: 'Sets \'npm\' as your default package manager.',
   async handler() {
     setDefaultPackageManager('npm');
-    console.log(msg.packageManager.complete('npm');
+    console.log(msg.packageManager.complete('npm'));
   }
 };
 
