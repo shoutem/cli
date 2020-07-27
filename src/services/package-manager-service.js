@@ -20,7 +20,13 @@ export async function install(
   });
 }
 
-export async function run(cwd, task, taskArgs = [], packagerOptions = []) {
+export async function run(
+  resolvedPackageManager = packageManager, // use default if none provided
+  cwd,
+  task,
+  taskArgs = [],
+  packagerOptions = []
+) {
   const opts = {
     cwd,
     stdio: ['ignore', 'inherit', 'inherit'],
@@ -28,8 +34,8 @@ export async function run(cwd, task, taskArgs = [], packagerOptions = []) {
   };
 
   const spawned = taskArgs.length ?
-    spawn(packageManager, ['run', task, ...packagerOptions, '--', ...taskArgs], opts) :
-    spawn(packageManager, ['run', task, ...packagerOptions], opts);
+    spawn(resolvedPackageManager, ['run', task, ...packagerOptions, '--', ...taskArgs], opts) :
+    spawn(resolvedPackageManager, ['run', task, ...packagerOptions], opts);
 
   return await spawned;
 }

@@ -84,8 +84,11 @@ export async function configurePlatform(overridePackageManager, platformDir) {
     throw new Error('Missing config.json file');
   }
 
-  await packageManager.install(overridePackageManager, path.join(platformDir, 'scripts'));
-  await packageManager.run(platformDir, 'configure');
+  await packageManager.install(
+    overridePackageManager,
+    path.join(platformDir, 'scripts')
+  );
+  await packageManager.run(overridePackageManager, platformDir, 'configure');
 }
 
 export async function fixPlatform(platformDir, appId) {
