@@ -19,7 +19,7 @@ const yarn = {
   description: 'Sets \'yarn\' as your default package manager.',
   async handler() {
     setDefaultPackageManager('yarn');
-    console.log(msg.packageManager.complete('yarn');
+    console.log(msg.packageManager.complete('yarn'));
   }
 };
 
