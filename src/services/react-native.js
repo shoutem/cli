@@ -3,11 +3,16 @@ import { spawn } from 'child-process-promise';
 import msg from '../user_messages';
 import commandExists from './command-exists';
 import streamMatcher from './stream-matcher';
+import { packageManager } from './package-manager-service';
 
 export async function ensureInstalled() {
   try {
     if (!await commandExists('react-native')) {
-      await spawn('npm', ['install', '-g', 'react-native-cli'], { stdio: 'inherit', shell: true })
+      await spawn(
+        packageManager,
+        ['install', '-g', 'react-native-cli'],
+        { stdio: 'inherit', shell: true }
+      )
     }
   } catch (err) {
     throw new Error(msg.reactNative.missing());

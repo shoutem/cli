@@ -7,7 +7,7 @@ import * as authService from '../clients/auth-service';
 import decompressUri from './decompress';
 import cliUrls from '../../config/services';
 import { writeJsonFile} from './data';
-import * as npm from './npm';
+import * as packageManager from './package-manager-service';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
 import { pathExists, readJson, readFile, writeFile } from 'fs-extra';
@@ -73,7 +73,7 @@ export async function setPlatformConfig(platformDir, mobileConfig) {
   await writeJsonFile(mobileConfig, path.join(platformDir, 'config.json'));
 }
 
-export async function configurePlatform(platformDir) {
+export async function configurePlatform(overridePackageManager, platformDir) {
   await reactNative.ensureInstalled();
   if (process.platform === 'darwin' && !await commandExists('pod')) {
     throw new Error('Missing `pods` command. Please install cocoapods and run `shoutem configure` in the ' +
@@ -84,8 +84,8 @@ export async function configurePlatform(platformDir) {
     throw new Error('Missing config.json file');
   }
 
-  await npm.install(path.join(platformDir, 'scripts'));
-  await npm.run(platformDir, 'configure');
+  await packageManager.install(overridePackageManager, path.join(platformDir, 'scripts'));
+  await packageManager.run(platformDir, 'configure');
 }
 
 export async function fixPlatform(platformDir, appId) {
@@ -145,7 +145,7 @@ async function pullPlatform(version, destination, options) {
 }
 
 export async function addToExtensionsJs(platformDir, extensionPath) {
-  const { name } = await npm.getPackageJson(path.join(extensionPath, 'app'));
+  const { name } = await packageManager.getPackageJson(path.join(extensionPath, 'app'));
 
   const extensionsJsPath = path.join(platformDir, 'extensions.js');
 
@@ -162,7 +162,7 @@ export async function addToExtensionsJs(platformDir, extensionPath) {
 }
 
 export async function linkLocalExtension(platformDir, extensionPath) {
-  await npm.addLocalDependency(platformDir, path.join(extensionPath, 'app'));
-  await npm.linkLocalDependencies(platformDir);
-  await npm.install(platformDir);
+  await packageManager.addLocalDependency(platformDir, path.join(extensionPath, 'app'));
+  await packageManager.linkLocalDependencies(platformDir);
+  await packageManager.install(platformDir);
 }
