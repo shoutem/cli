@@ -167,5 +167,5 @@ export async function addToExtensionsJs(platformDir, extensionPath) {
 export async function linkLocalExtension(platformDir, extensionPath) {
   await packageManager.addLocalDependency(platformDir, path.join(extensionPath, 'app'));
   await packageManager.linkLocalDependencies(platformDir);
-  await packageManager.install(platformDir);
+  await packageManager.install(null, platformDir);
 }
