@@ -5,10 +5,6 @@ import {
   getPlatformRootDir,
   setPlatformConfig,
 } from '../services/platform';
-import {
-  packageManager as defaultPackageManager
-} from '../services/package-manager-service';
-
 
 export const description = 'Runs the platform\'s configure script to install dependencies, link extensions and their dependencies and run extension build scripts.';
 export const command = 'configure';
