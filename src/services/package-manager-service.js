@@ -8,11 +8,8 @@ const linkLocal = Promise.promisify(require('linklocal'));
 
 export const packageManager = getDefaultPackageManager();
 
-export async function install(
-  resolvedPackageManager = packageManager, // use default if none provided
-  cwd = process.cwd()
-) {
-  await spawn(resolvedPackageManager, ['install'], {
+export async function install(cwd = process.cwd()) {
+  await spawn(packageManager, ['install'], {
     cwd,
     stdio: 'inherit',
     shell: true,
@@ -21,7 +18,6 @@ export async function install(
 }
 
 export async function run(
-  resolvedPackageManager = packageManager, // use default if none provided
   cwd,
   task,
   taskArgs = [],
@@ -34,8 +30,8 @@ export async function run(
   };
 
   const spawned = taskArgs.length ?
-    spawn(resolvedPackageManager, ['run', task, ...packagerOptions, '--', ...taskArgs], opts) :
-    spawn(resolvedPackageManager, ['run', task, ...packagerOptions], opts);
+    spawn(packageManager, ['run', task, ...packagerOptions, '--', ...taskArgs], opts) :
+    spawn(packageManager, ['run', task, ...packagerOptions], opts);
 
   return await spawned;
 }

@@ -73,7 +73,7 @@ export async function setPlatformConfig(platformDir, mobileConfig) {
   await writeJsonFile(mobileConfig, path.join(platformDir, 'config.json'));
 }
 
-export async function configurePlatform(overridePackageManager, platformDir) {
+export async function configurePlatform(platformDir) {
   await reactNative.ensureInstalled();
   if (process.platform === 'darwin' && !await commandExists('pod')) {
     throw new Error('Missing `pods` command. Please install cocoapods and run `shoutem configure` in the ' +
@@ -84,11 +84,8 @@ export async function configurePlatform(overridePackageManager, platformDir) {
     throw new Error('Missing config.json file');
   }
 
-  await packageManager.install(
-    overridePackageManager,
-    path.join(platformDir, 'scripts')
-  );
-  await packageManager.run(overridePackageManager, platformDir, 'configure');
+  await packageManager.install(path.join(platformDir, 'scripts'));
+  await packageManager.run(platformDir, 'configure');
 }
 
 export async function fixPlatform(platformDir, appId) {
@@ -167,5 +164,5 @@ export async function addToExtensionsJs(platformDir, extensionPath) {
 export async function linkLocalExtension(platformDir, extensionPath) {
   await packageManager.addLocalDependency(platformDir, path.join(extensionPath, 'app'));
   await packageManager.linkLocalDependencies(platformDir);
-  await packageManager.install(null, platformDir);
+  await packageManager.install(platformDir);
 }

@@ -26,12 +26,6 @@ export const builder = yargs => {
         description: '(Re)configures the app for production build, used when (re)publishing to the App Store or the Google Play store',
         type: 'boolean',
         default: false,
-      },
-      'package-manager': {
-        alias: 'pm',
-        description: 'Overrides current default package manager with the one provided.',
-        type: 'string',
-        default: defaultPackageManager,
       }
     })
     .usage(`shoutem ${command} \n\n${description}`);
@@ -46,6 +40,6 @@ export async function handler(args) {
       production: !!args.production,
     });
 
-    await configurePlatform(args['package-manager'], appDir);
+    await configurePlatform(appDir);
   });
 }

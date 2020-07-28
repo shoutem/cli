@@ -10,5 +10,5 @@ export default async function (extPath) {
     '--ignore-pattern', 'node_modules'
   ];
 
-  return await packageManager.run(null, __dirname, 'extlint', args, ['--silent']);
+  return await packageManager.run(__dirname, 'extlint', args, ['--silent']);
 }
