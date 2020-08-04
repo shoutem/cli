@@ -38,15 +38,17 @@ export default async function () {
   try {
     if (packageManager === 'npm') {
       await spawn(packageManager, ['install', '-g', '@shoutem/cli'], { stdio: 'inherit' });
+    } else {
+      await spawn(packageManager, ['global', 'add', '@shoutem/cli'], { stdio: 'inherit' });
     }
-    await spawn(packageManager, ['global', 'add', '@shoutem/cli'], { stdio: 'inherit' });
   } catch (err) {
     if (process.platform !== 'win32') {
       console.log('Current user does not have permissions to update Shoutem CLI. Using sudo...');
       if (packageManager === 'npm') {
         await spawn('sudo', [packageManager, 'install', '-g', '@shoutem/cli'], { stdio: 'inherit' });
+      } else {
+        await spawn('sudo', [packageManager, 'global', 'add', '@shoutem/cli'], { stdio: 'inherit' });
       }
-      await spawn('sudo', [packageManager, 'global', 'add', '@shoutem/cli'], { stdio: 'inherit' });
     } else {
       throw err;
     }
