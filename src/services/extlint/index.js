@@ -1,5 +1,5 @@
 import path from 'path';
-import * as npm from '../npm';
+import * as packageManager from '../package-manager-service';
 
 export default async function (extPath) {
   const args = [
@@ -10,5 +10,5 @@ export default async function (extPath) {
     '--ignore-pattern', 'node_modules'
   ];
 
-  return await npm.run(__dirname, 'extlint', args, ['--silent']);
+  return await packageManager.run(__dirname, 'extlint', args, ['--silent']);
 }

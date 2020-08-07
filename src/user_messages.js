@@ -33,6 +33,9 @@ export default {
   logout: {
     complete: () => 'Successfully logged out.'
   },
+  packageManager: {
+    complete: (choice) => `Set '${choice}' as default package manager.`
+  },
   page: {
     add: {
       complete: ({ pageName, path }) => `Page ${pageName} is created in \`${ path }\` folder!`

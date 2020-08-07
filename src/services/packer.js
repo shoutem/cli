@@ -10,18 +10,22 @@ import {spinify} from './spinner';
 import move from 'glob-move';
 import { pathExists, copy } from 'fs-extra';
 import decompress from 'decompress';
-import {readJsonFile} from "./data";
-import {loadExtensionJson} from "./extension";
-import {getPackageJson, savePackageJson} from "./npm";
-import {ensureUserIsLoggedIn} from "../commands/login";
-import confirmer from "./confirmer";
+import { readJsonFile } from './data';
+import { loadExtensionJson } from './extension';
+import {
+  packageManager,
+  getPackageJson,
+  savePackageJson,
+} from './package-manager-service';
+import { ensureUserIsLoggedIn } from '../commands/login';
+import confirmer from './confirmer';
 const mv = Promise.promisify(require('mv'));
 
 function hasPackageJson(dir) {
   return pathExists(path.join(dir, 'package.json'));
 }
 
-async function npmPack(dir, destinationDir) {
+async function packageManagerPack(dir, destinationDir) {
   const resultFilename = path.join(destinationDir, `${path.basename(dir)}.tgz`);
   const packageJsonPath = path.join(dir, 'package.json');
 
@@ -32,7 +36,7 @@ async function npmPack(dir, destinationDir) {
   packageJson.version = `${packageJson.version}-build${timestamp}`;
 
   await writeJsonFile(packageJson, packageJsonPath);
-  const { stdout } = await exec('npm pack', { cwd: dir });
+  const { stdout } = await exec(`${packageManager} pack`, { cwd: dir });
   const packageFilename = stdout.replace(/\n$/, '');
   const packagePath = path.join(dir, packageFilename);
 
@@ -43,7 +47,7 @@ async function npmPack(dir, destinationDir) {
   }
 }
 
-export async function npmUnpack(tgzFile, destinationDir) {
+export async function packageManagerUnpack(tgzFile, destinationDir) {
   if (!(await pathExists(tgzFile))) {
     return [];
   }
@@ -55,12 +59,12 @@ export async function npmUnpack(tgzFile, destinationDir) {
 
 export async function shoutemUnpack(tgzFile, destinationDir) {
   const tmpDir = (await tmp.dir()).path;
-  await npmUnpack(tgzFile, tmpDir);
+  await packageManagerUnpack(tgzFile, tmpDir);
 
-  await npmUnpack(path.join(tmpDir, 'app.tgz'), path.join(destinationDir, 'app'));
-  await npmUnpack(path.join(tmpDir, 'server.tgz'), path.join(destinationDir, 'server'));
+  await packageManagerUnpack(path.join(tmpDir, 'app.tgz'), path.join(destinationDir, 'app'));
+  await packageManagerUnpack(path.join(tmpDir, 'server.tgz'), path.join(destinationDir, 'server'));
   if (await pathExists(path.join(tmpDir, 'cloud.tgz'))) {
-    await npmUnpack(path.join(tmpDir, 'cloud.tgz'), path.join(destinationDir, 'cloud'));
+    await packageManagerUnpack(path.join(tmpDir, 'cloud.tgz'), path.join(destinationDir, 'cloud'));
   }
   await move(path.join(tmpDir, 'extension.json'), destinationDir);
 }
@@ -141,7 +145,7 @@ export default async function shoutemPack(dir, options) {
 
   return await spinify(async () => {
     for (const dir of dirsToPack) {
-      await npmPack(dir, packageDir);
+      await packageManagerPack(dir, packageDir);
     }
     const extensionJsonPathSrc = path.join(dir, 'extension.json');
     const extensionJsonPathDest = path.join(packageDir, 'extension.json');
