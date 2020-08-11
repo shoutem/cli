@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.13.4",
+  "version": "0.13.5",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -17,7 +17,6 @@
     "shoutem": "node build/shoutem.js",
     "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\""
   },
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "@shoutem/fetch-token-intercept": "0.3.0",
