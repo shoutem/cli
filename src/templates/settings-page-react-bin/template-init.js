@@ -1,8 +1,12 @@
 import _ from 'lodash';
 import path from 'path';
 import getOrSet from 'lodash-get-or-set';
-import {stringify} from "../../services/data";
-import {getPackageJson, install} from "../../services/npm";
+import { stringify } from '../../services/data';
+import {
+  getPackageJson,
+  install,
+  packageManager,
+} from '../../services/package-manager-service';
 
 const pkgJsonTemplate = {
   "scripts": {
@@ -73,8 +77,8 @@ export async function after(context) {
 
   getOrSet(context, 'postRunActions', [])
     .push(async () => {
-      console.log('Running npm install on the server dir...');
+      console.log(`Running ${packageManager} install on the server dir...`);
       await install(path.join(extensionPath, 'server'));
-      console.log(`npm install... [${'OK'.green.bold}]`)
+      console.log(`${packageManager} install... [${'OK'.green.bold}]`)
     });
 }

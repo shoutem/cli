@@ -58,10 +58,10 @@ export async function addExtension({ name, local, externalDestination }) {
   }
 
   if (!externalDestination) {
-    console.log('\nRunning npm install script:');
+    console.log('\nRunning install script:');
     await linkLocalExtension(platformDir, extensionPath);
     await addToExtensionsJs(platformDir, extensionPath);
-    console.log(`npm install [${'OK'.bold.green}]`);
+    console.log(`extension installation [${'OK'.bold.green}]`);
   }
 
   const cdCommand = 'cd ' + path.relative(process.cwd(), extensionPath);

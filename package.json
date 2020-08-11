@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.13.4",
+  "version": "0.13.5",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -17,7 +17,6 @@
     "shoutem": "node build/shoutem.js",
     "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\""
   },
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "@shoutem/fetch-token-intercept": "0.3.0",
@@ -50,17 +49,15 @@
     "json-stringify-safe": "5.0.1",
     "jsonapi-serializer": "3.5.3",
     "linklocal": "^2.8.1",
-    "lodash": "4.11.2",
+    "lodash": "4.17.19",
     "lodash-get-or-set": "^1.0.2",
     "mkdirp": "0.5.1",
     "mkdirp-promise": "3.0.1",
     "mustache": "2.2.1",
     "mv": "2.1.1",
-    "ngrok": "2.2.24",
     "opn": "^5.1.0",
     "prettyjson": "1.2.1",
     "progress": "2.0.0",
-    "qrcode-terminal": "0.11.0",
     "replace-in-file": "2.5.0",
     "request-promise": "4.1.1",
     "request-promise-native": "1.0.3",
