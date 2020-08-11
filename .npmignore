@@ -1,0 +1,13 @@
+# ignore dependencies
+/node_modules
+
+# ignore all logs
+*.log
+
+# OSX stuff
+.DS_Store
+
+.idea/
+*.tgz
+
+.update-theme
