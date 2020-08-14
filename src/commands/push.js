@@ -1,36 +1,65 @@
 import fs from 'fs-extra';
+import path from 'path';
+import { prompt } from 'inquirer';
+import semver from 'semver';
+import _ from 'lodash';
+
 import * as extensionManager from '../clients/extension-manager';
-import {getHostEnvName} from '../clients/server-env';
 import * as local from '../clients/local-extensions';
+import { getHostEnvName } from '../clients/server-env';
 import {
   ensureInExtensionDir,
   getExtensionCanonicalName,
   loadExtensionJson,
-  saveExtensionJson
+  saveExtensionJson,
 } from '../services/extension';
-import shoutemPack from '../services/packer';
-import msg from '../user_messages';
-import _ from 'lodash';
-import {createProgressHandler} from '../services/progress-bar';
-import {spinify, startSpinner} from '../services/spinner';
 import extLint from '../services/extlint';
-import {ensureUserIsLoggedIn} from "./login";
-import {canPublish} from "../clients/extension-manager";
-import { prompt } from 'inquirer';
-import semver from 'semver';
+import shoutemPack from '../services/packer';
+import { createProgressHandler } from '../services/progress-bar';
+import { spinify, startSpinner } from '../services/spinner';
+import { canPublish } from '../clients/extension-manager';
+import msg from '../user_messages';
+import { ensureUserIsLoggedIn } from './login';
+
+function hasRequiredFiles(dir, extName) {
+  const requiredFiles = [
+    'app/package.json',
+    'app/index.js',
+    'server/package.json',
+  ];
+
+  _.forEach(requiredFiles, (fileName) => {
+    if (!fs.existsSync(path.join(dir, fileName))) {
+      throw new Error(msg.push.missingRequiredFile(fileName, extName));
+      return false;
+    }
+  });
+
+  return true;
+}
 
 export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
+  const extJson = await loadExtensionJson(extensionDir);
+
   if (!opts.nocheck) {
     process.stdout.write('Checking the extension code for syntax errors... ');
+
     try {
+      hasRequiredFiles(extensionDir, extJson.title);
       await extLint(extensionDir);
-      console.log(`[${'OK'.green.bold}]`);
     } catch (err) {
-      err.message = 'Syntax errors detected, aborting push! Use `shoutem push --nocheck` to override, but use with caution!';
-      throw err;
+      if (err.message) {
+        throw err;
+      }
+      else {
+        err.message = 'Syntax errors detected, aborting push! Use `shoutem push --nocheck` to override, but use with caution!';
+        throw err;
+      }
     }
+
+    console.log(`[${'OK'.green.bold}]`);
   }
-  const extJson = await loadExtensionJson(extensionDir);
+
   if (opts.publish) {
     await promptPublishableVersion(extJson);
     await saveExtensionJson(extJson, extensionDir);
@@ -50,6 +79,7 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
     createProgressHandler({ msg: 'Upload progress', total: size, onFinished: () => spinner = startSpinner('Processing upload...') }),
     size
   );
+
   if (spinner) {
     spinner.stop(true);
     console.log(`Processing upload... [${'OK'.green.bold}]`);
@@ -59,6 +89,7 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
   await fs.unlink(packResult.package);
 
   const notPacked = _.difference(packResult.allDirs, packResult.packedDirs);
+
   if (notPacked.length > 0) {
     throw new Error(msg.push.missingPackageJson(notPacked));
   }
@@ -68,13 +99,16 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
 
 export async function promptPublishableVersion(extJson) {
   const dev = await ensureUserIsLoggedIn();
+
   while (true) {
     const { name, version } = extJson;
     const canonical = getExtensionCanonicalName(dev.name, name, version);
     const canExtensionBePublished = await spinify(canPublish(canonical), `Checking if version ${version} can be published...`);
+
     if (canExtensionBePublished) {
       return;
     }
+
     const { newVersion } = await prompt({
       name: 'newVersion',
       default: semver.inc(version, 'patch'),
