@@ -8,9 +8,12 @@ import * as logger from '../services/logger';
 import * as cache from '../services/cache-env';
 
 async function resolveCredentials(args) {
-  if (args.credentials) {
+  const credentials = _.get(args, 'credentials');
+
+  if (credentials) {
     return await parseCredentials(args.credentials)
   }
+
   return await promptUserCredentials(args);
 }
 
