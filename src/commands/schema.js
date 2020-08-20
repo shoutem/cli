@@ -40,7 +40,7 @@ export function saveSchemaToExtJson(schemaName, callback) {
       saveExtensionJsonCallback(extension, done);
     },
   ],
-    callback);
+  callback);
 }
 
 export function createSchema(schemaName, callback) {
@@ -52,11 +52,11 @@ export function createSchema(schemaName, callback) {
 
     done => mkdirp(path.join(root, 'server', 'data-schemas'), done),
 
-    done => {
+    (done) => {
       const template = load('./schema/schema.json.template', { schemaName });
       schemaPath = path.join(root, 'server', 'data-schemas', `${schemaName}.json`);
       fs.writeFile(schemaPath, template, 'utf8', done);
     },
   ],
-    err => callback(err, schemaPath ? path.relative(root, schemaPath) : null));
+  err => callback(err, schemaPath ? path.relative(root, schemaPath) : null));
 }

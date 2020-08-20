@@ -16,7 +16,7 @@ import {
   setPlatformConfig
 } from '../services/platform';
 import { ensureUserIsLoggedIn } from './login';
-import { createProgressHandler } from '../services/progress-bar';
+import createProgressHandler from '../services/progress-bar';
 import { spinify } from '../services/spinner';
 import commandExists from '../services/command-exists';
 import slugify from 'slugify';

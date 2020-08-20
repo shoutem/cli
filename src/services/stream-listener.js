@@ -1,4 +1,4 @@
-export function listenStream(stream, handler, size) {
+export default function listenStream(stream, handler, size) {
   let total = 0;
 
   stream.on('data', ({ length }) => {
@@ -6,7 +6,7 @@ export function listenStream(stream, handler, size) {
     handler({
       total,
       length,
-      percent: size ? (total / size * 100).toFixed(2): null
+      percent: size ? (total / size * 100).toFixed(2) : null,
     });
   });
 }

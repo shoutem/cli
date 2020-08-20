@@ -1,4 +1,4 @@
-import show from '../commands/show.js';
+import show from '../commands/show';
 import { executeAndHandleError } from '../services/error-handler';
 
 export const command = 'show';
@@ -10,7 +10,7 @@ export function builder(yargs) {
       all: {
         type: 'boolean',
         default: false,
-      }
+      },
     })
     .usage(`shoutem ${command}\n\n${description}`);
 }

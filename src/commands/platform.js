@@ -4,7 +4,7 @@ import fs from 'fs-extra';
 import msg from '../user_messages';
 import { getHostEnvName } from '../clients/server-env';
 import { spinify, startSpinner } from '../services/spinner';
-import { createProgressHandler } from '../services/progress-bar';
+import createProgressHandler from '../services/progress-bar';
 import { validatePlatformArchive } from '../services/validation';
 import { uploadPlatform, getPlatforms, getDeveloper } from '../clients/extension-manager';
 

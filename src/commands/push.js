@@ -1,6 +1,6 @@
 import fs from 'fs-extra';
 import * as extensionManager from '../clients/extension-manager';
-import {getHostEnvName} from '../clients/server-env';
+import { getHostEnvName } from '../clients/server-env';
 import * as local from '../clients/local-extensions';
 import {
   ensureInExtensionDir,
@@ -11,11 +11,11 @@ import {
 import shoutemPack from '../services/packer';
 import msg from '../user_messages';
 import _ from 'lodash';
-import {createProgressHandler} from '../services/progress-bar';
-import {spinify, startSpinner} from '../services/spinner';
+import createProgressHandler from '../services/progress-bar';
+import { spinify, startSpinner } from '../services/spinner';
 import extLint from '../services/extlint';
-import {ensureUserIsLoggedIn} from "./login";
-import {canPublish} from "../clients/extension-manager";
+import { ensureUserIsLoggedIn } from "./login";
+import { canPublish } from "../clients/extension-manager";
 import { prompt } from 'inquirer';
 import semver from 'semver';
 

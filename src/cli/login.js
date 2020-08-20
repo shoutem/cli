@@ -5,7 +5,6 @@ export const description = 'Handles Shoutem developer\'s authentication. Users a
 export const command = 'login [credentials]';
 
 export function handler(args) {
-
   return executeAndHandleError(() => loginUser(args));
 }
 

@@ -4,23 +4,18 @@ import { startSpinner } from './spinner';
 function createProgressBar(msg, { total }) {
   return new ProgressBar(
     `   ${msg} [:bar] :percent (remaining :etas)`,
-    {
-      total,
-      clear: true,
-      width: 20,
-      renderThrottle: 50
-    }
+    { total, clear: true, width: 20, renderThrottle: 50 },
   );
 }
 
-export function createProgressHandler({ msg, total, onFinished = () => {} }) {
+export default function createProgressHandler({ msg, total, onFinished = () => {} }) {
   let bar = null;
 
   if (total) {
     bar = createProgressBar(msg, { total });
   }
 
-  return state => {
+  return (state) => {
     // finished!
     if (!state) {
       if (bar) {
@@ -30,19 +25,18 @@ export function createProgressHandler({ msg, total, onFinished = () => {} }) {
       onFinished();
       return;
     }
-    let { length, total } = state;
-    total = total || 0;
+    const { length, total = 0 } = state;
 
     // total length not known until now
     if (bar === null) {
       if (total > 0) {
-        bar = createProgressBar(msg, {total});
+        bar = createProgressBar(msg, { total });
       } else {
         bar = startSpinner(msg);
         bar.tick = () => {};
         bar.terminate = () => { bar.stop() };
       }
-    }
+    };
 
     bar.tick(length);
     if (bar.complete) {

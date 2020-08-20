@@ -1,3 +1,6 @@
+// disabling eslint for regular expressions
+/* eslint-disable */
+
 export function isValidExtensionName(name) {
   return /^[a-z]+[a-z0-9\-]*$/.test(name);
 }

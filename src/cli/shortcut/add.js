@@ -1,8 +1,8 @@
-import {executeAndHandleError} from '../../services/error-handler';
-import {askShortcutCreationQuestions} from "../../services/shortcut";
-import {ensureInExtensionDir, loadExtensionJson} from "../../services/extension";
-import {instantiateExtensionTemplate} from "../../services/extension-template";
-import {offerChanges} from "../../services/diff";
+import { executeAndHandleError } from '../../services/error-handler';
+import { askShortcutCreationQuestions } from '../../services/shortcut';
+import { ensureInExtensionDir, loadExtensionJson } from '../../services/extension';
+import { instantiateExtensionTemplate } from '../../services/extension-template';
+import { offerChanges } from '../../services/diff';
 
 export const description = 'Adds a new app shortcut to the extension.';
 export const command = 'add [name]';
