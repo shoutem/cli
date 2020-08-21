@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import decamelize from "decamelize";
-import { prompt } from "inquirer";
-import {isVariableName} from "./cli-parsing";
-import { askScreenCreationQuestions } from "./screen";
+import decamelize from 'decamelize';
+import { prompt } from 'inquirer';
+import { isVariableName } from './cli-parsing';
+import askScreenCreationQuestions from './screen';
 
 function validatePageName(name, existingPages) {
   if (!isVariableName(name)) {
@@ -69,7 +69,7 @@ function createScreenSelectionQuestions({ screens }) {
   };
 }
 
-export async function askPageCreationQuestions(opts) {
+export default async function askPageCreationQuestions(opts) {
   const page = await prompt(createPageCreationQuestions(opts));
   const parentName = page.name;
 

@@ -1,12 +1,14 @@
-import { isLatest } from '../services/npmjs';
-import apiUrls from '../../config/services';
-import msg from '../user_messages';
 import { spawn } from 'child-process-promise';
+
+import apiUrls from '../../config/services';
 import { version } from '../../package.json';
 import { getDefaultPackageManager } from '../clients/default-package-manager';
-import confirm from '../services/confirmer';
 import * as cache from '../services/cache';
+import confirm from '../services/confirmer';
+import { isLatest } from '../services/npmjs';
 import { spinify } from '../services/spinner';
+import msg from '../user_messages';
+
 import 'colors';
 
 const packageManager = getDefaultPackageManager();
@@ -31,7 +33,7 @@ export default async function () {
 
   if (!updateConfirmed) {
     console.log('Warning: This is an outdated version of the Shoutem CLI.'.bold.yellow);
-    console.log(`Install the new one with: 'npm install -g @shoutem/cli' or 'yarn global add @shoutem/cli'. You might need to run it with 'sudo' prefix.`.yellow);
+    console.log('Install the new one with: \'npm install -g @shoutem/cli\' or \'yarn global add @shoutem/cli\'. You might need to run it with \'sudo\' prefix.'.yellow);
     return false;
   }
 

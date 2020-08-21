@@ -8,8 +8,8 @@ import {
 
 export const description = 'Runs the platform\'s configure script to install dependencies, link extensions and their dependencies and run extension build scripts.';
 export const command = 'configure';
-export const builder = yargs => {
-  return yargs
+export const builder = (yargs) => {
+  yargs
     .options({
       release: {
         alias: 'r',
@@ -22,7 +22,7 @@ export const builder = yargs => {
         description: '(Re)configures the app for production build, used when (re)publishing to the App Store or the Google Play store',
         type: 'boolean',
         default: false,
-      }
+      },
     })
     .usage(`shoutem ${command} \n\n${description}`);
 };

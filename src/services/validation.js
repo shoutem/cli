@@ -12,3 +12,13 @@ export function isAscii(str) {
 export function containsSpace(str) {
   return str.indexOf(' ') > -1;
 }
+
+export function isValidPlatformUrl(url) {
+  // TODO: Implement platform URL validator
+  return false;
+}
+
+export function validatePlatformArchive(archive) {
+  // TODO: Implement platform archive validator
+  return false;
+}

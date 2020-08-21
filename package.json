@@ -44,6 +44,7 @@
     "fs-extra": "3.0.1",
     "glob-move": "1.0.1",
     "glob-promise": "3.1.0",
+    "ignore": "5.1.8",
     "inquirer": "1.0.3",
     "ip": "1.1.5",
     "json-stringify-safe": "5.0.1",

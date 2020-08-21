@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import path from 'path';
 import getOrSet from 'lodash-get-or-set';
-import { stringify } from '../../services/data';
 import {
   getPackageJson,
   install,
@@ -69,7 +68,8 @@ const pkgJsonTemplate = {
 export async function before(context) {
   const { extensionPath } = context;
   const serverPath = path.join(extensionPath, 'server');
-  context.serverJsonString = stringify(_.merge(await getPackageJson(serverPath), pkgJsonTemplate));
+  const serverJson = _.merge(getPackageJson(serverPath), pkgJsonTemplate)
+  context.serverJsonString = `${JSON.stringify(serverJson, null, 2)}\n`;
 }
 
 export async function after(context) {

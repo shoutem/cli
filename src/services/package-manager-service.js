@@ -1,9 +1,9 @@
 import path from 'path';
 import Promise from 'bluebird';
-import { readJson } from 'fs-extra';
+import fs from 'fs-extra';
 import { spawn } from 'child-process-promise';
 import { getDefaultPackageManager } from '../clients/default-package-manager';
-import { writeJsonFile } from './data';
+
 const linkLocal = Promise.promisify(require('linklocal'));
 
 export const packageManager = getDefaultPackageManager();
@@ -13,7 +13,7 @@ export async function install(cwd = process.cwd()) {
     cwd,
     stdio: 'inherit',
     shell: true,
-    env: { ...process.env, FORCE_COLOR: true }
+    env: { ...process.env, FORCE_COLOR: true },
   });
 }
 
@@ -21,44 +21,44 @@ export async function run(
   cwd,
   task,
   taskArgs = [],
-  packagerOptions = []
+  packagerOptions = [],
 ) {
   const opts = {
     cwd,
     stdio: ['ignore', 'inherit', 'inherit'],
-    shell: true
+    shell: true,
   };
 
-  const spawned = taskArgs.length ?
-    spawn(packageManager, ['run', task, ...packagerOptions, '--', ...taskArgs], opts) :
-    spawn(packageManager, ['run', task, ...packagerOptions], opts);
+  const spawned = taskArgs.length
+    ? spawn(packageManager, ['run', task, ...packagerOptions, '--', ...taskArgs], opts)
+    : spawn(packageManager, ['run', task, ...packagerOptions], opts);
 
-  return await spawned;
+  return spawned;
 }
 
-export async function getPackageJson(projectPath) {
-  return await readJson(path.join(projectPath, 'package.json'));
+export function getPackageJson(projectPath) {
+  return fs.readJsonSync(path.join(projectPath, 'package.json'));
 }
 
 export async function savePackageJson(projectPath, pkgJson) {
-  return await writeJsonFile(pkgJson, path.join(projectPath, 'package.json'));
+  return fs.writeJsonSync(path.join(projectPath, 'package.json'), pkgJson);
 }
 
 export async function addLocalDependency(projectPath, modulePath) {
-  const { name } = await getPackageJson(modulePath);
-  const packageJson = await getPackageJson(projectPath);
+  const { name } = getPackageJson(modulePath);
+  const packageJson = getPackageJson(projectPath);
 
-  const dependencyValue = 'file:' + path.relative(projectPath, modulePath);
+  const dependencyValue = `file:${path.relative(projectPath, modulePath)}`;
 
   await savePackageJson(projectPath, {
     ...packageJson,
     dependencies: {
       ...packageJson.dependencies,
-      [name]: dependencyValue
-    }
+      [name]: dependencyValue,
+    },
   });
 }
 
 export async function linkLocalDependencies(projectPath) {
-  return await linkLocal(projectPath);
+  return linkLocal(projectPath);
 }

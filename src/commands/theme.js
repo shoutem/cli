@@ -2,12 +2,12 @@ import _ from 'lodash';
 import inquirer from 'inquirer';
 import request from 'request-promise';
 import { ensureInExtensionDir } from '../services/extension';
-import {instantiateExtensionTemplate} from "../services/extension-template";
-import {offerChanges} from "../services/diff";
+import instantiateExtensionTemplate from '../services/extension-template';
+import { offerChanges } from '../services/diff';
 
 const themeUrls = {
   theme: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem.rubicon-theme/app/themes/Rubicon.js',
-  variables: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem.rubicon-theme/server/primeThemeVariables.json'
+  variables: 'https://raw.githubusercontent.com/shoutem/extensions/master/shoutem.rubicon-theme/server/primeThemeVariables.json',
 };
 
 async function promptThemeDetails(themeName) {
@@ -23,7 +23,7 @@ async function promptThemeDetails(themeName) {
     type: 'input',
   }];
 
-  return await inquirer.prompt(questions)
+  return inquirer.prompt(questions);
 }
 
 async function getThemeVariablesContent(themeName) {
@@ -33,7 +33,7 @@ async function getThemeVariablesContent(themeName) {
   return JSON.stringify(templateJson, null, 2);
 }
 
-export async function createTheme(themeName) {
+export default async function createTheme(themeName) {
   const { title, description } = await promptThemeDetails(_.upperFirst(_.camelCase(themeName)));
 
   const themeContent = await request(themeUrls.theme);
@@ -45,6 +45,6 @@ export async function createTheme(themeName) {
     themeName,
     description,
     themeContent,
-    themeVariablesContent
+    themeVariablesContent,
   }));
 }

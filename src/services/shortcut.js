@@ -2,13 +2,24 @@ import _ from 'lodash';
 import decamelize from 'decamelize';
 import { prompt } from 'inquirer';
 import getOrSet from 'lodash-get-or-set';
-import {isVariableName} from "./cli-parsing";
+import { isVariableName } from './cli-parsing';
 
-export function addShortcut(extJson, { name, title, description, screenName, pagesNames }) {
+export function addShortcut(
+  extJson,
+  {
+    name,
+    title,
+    description,
+    screenName,
+    pagesNames,
+  },
+) {
   const shortcut = { name, title, description };
+
   if (screenName) {
     shortcut.screen = `@.${screenName}`;
   }
+
   if (_.size(pagesNames)) {
     shortcut.adminPages = pagesNames.map(name => ({
       page: `@.${name}`,
@@ -29,7 +40,12 @@ function validateShortcutName(name, existingShortcuts) {
   return true;
 }
 
-function createShortcutCreationQuestions({ shortcuts, parentName, screens, defaultName = 'MyShortcut' }) {
+function createShortcutCreationQuestions({
+  shortcuts,
+  parentName,
+  screens,
+  defaultName = 'MyShortcut',
+}) {
   const when = ({ shouldCreateShortcut }) => shouldCreateShortcut || !parentName;
   const shortcutsWithoutScreen = _.filter(screens, ({ name }) => !_.find(shortcuts, { screen: `@.${name}` }));
   const screensNames = _.map(shortcutsWithoutScreen, 'name');
@@ -57,19 +73,19 @@ function createShortcutCreationQuestions({ shortcuts, parentName, screens, defau
     type: 'input',
     name: 'description',
     message: 'Shortcut description:',
-    default: () => parentName ? `A shortcut for ${parentName}` : null,
+    default: () => (parentName ? `A shortcut for ${parentName}` : null),
     when,
   }, {
     type: 'list',
     name: 'screenName',
     message: 'Which screen would you like to connect with this shortcut?',
-    when: () => !parentName && screensNames.length,
+    when: () => (!parentName && screensNames.length),
     choices: [{ name: 'skip', value: null }, ...screensNames],
   }];
 }
 
-export async function askShortcutCreationQuestions(opts) {
-  return await prompt(createShortcutCreationQuestions(opts));
+export function askShortcutCreationQuestions(opts) {
+  return prompt(createShortcutCreationQuestions(opts));
 }
 
 export function addShortcutForScreen(extJson, screen, shortcut) {
@@ -78,15 +94,17 @@ export function addShortcutForScreen(extJson, screen, shortcut) {
       name: shortcut.name,
       title: shortcut.title,
       description: shortcut.description,
-      screen: `@.${screen.name}`
+      screen: `@.${screen.name}`,
     });
 }
 
 export function linkSettingsPageWithExistingScreen(extJson, page, screenName) {
+  // prefer-const conflicts with our use of 'getOrSet'
+  // eslint-disable-next-line
   let shortcut = _.find(extJson.shortcuts, { screen: `@.${screenName}` });
   if (!shortcut) {
-    throw new Error(`Shortcut for screen ${screenName} does not exist so it cannot be linked with settings pages. ` +
-      `Please create a shortcut using 'shoutem shortcut add' first!`)
+    throw new Error(`Shortcut for screen ${screenName} does not exist so it cannot be linked with settings pages. `
+      + 'Please create a shortcut using \'shoutem shortcut add\' first!');
   }
 
   getOrSet(shortcut, 'adminPages', []).push({

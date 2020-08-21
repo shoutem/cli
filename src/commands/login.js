@@ -7,18 +7,9 @@ import urls from '../../config/services';
 import * as logger from '../services/logger';
 import * as cache from '../services/cache-env';
 
-async function resolveCredentials(args) {
-  const credentials = _.get(args, 'credentials');
-
-  if (credentials) {
-    return await parseCredentials(args.credentials)
-  }
-
-  return await promptUserCredentials(args);
-}
-
 function parseCredentials(credentials) {
   const parts = credentials.split(':');
+
   return {
     email: _.get(parts, '[0]'),
     password: _.get(parts, '[1]'),
@@ -42,6 +33,16 @@ function promptUserCredentials(args = {}) {
   }];
 
   return inquirer.prompt(questions);
+}
+
+async function resolveCredentials(args) {
+  const credentials = _.get(args, 'credentials');
+
+  if (credentials) {
+    return parseCredentials(args.credentials);
+  }
+
+  return promptUserCredentials(args);
 }
 
 function promptDeveloperName() {
@@ -72,7 +73,7 @@ export async function loginUser(args) {
   const credentials = await resolveCredentials(args);
 
   if (await userAlreadyLoggedIn(credentials.email)) {
-    console.log("Already logged in with given email.");
+    console.log('Already logged in with given email.');
     return;
   }
 
@@ -93,12 +94,13 @@ export async function loginUser(args) {
   console.log(msg.login.complete(developer));
   logger.info('logged in as developer', developer);
 
-  return cache.setValue('developer', { ...developer, email: credentials.email });
+  cache.setValue('developer', { ...developer, email: credentials.email });
 }
 
 /**
  * Asks user for email and password if refreshToken is not already cached
- * @param shouldThrow Should an error be thrown if user is not logged in or should user be asked for credentials
+ * @param shouldThrow Should an error be thrown if user is not logged in
+ * or should user be asked for credentials
  */
 export async function ensureUserIsLoggedIn(shouldThrow = false) {
   const developer = await cache.getValue('developer');
@@ -109,6 +111,6 @@ export async function ensureUserIsLoggedIn(shouldThrow = false) {
   if (shouldThrow) {
     throw new Error('Not logged in, use `shoutem login` command to login.');
   } else {
-    return await loginUser();
+    return loginUser();
   }
 }

@@ -9,9 +9,9 @@ export async function handler() {
   if (lastError) {
     console.log(prettyJson.render(lastError, {
       keysColor: 'cyan',
-      numberColor: 'white'
+      numberColor: 'white',
     }));
-    console.log(`\nIf you think this error is caused by bug in the shoutem command, you can report the issue here: ${"https://github.com/shoutem/cli/issues".bold}`.yellow);
+    console.log('\nIf you think this error is caused by a bug in the @shoutem/cli, you can report the issue here: "https://github.com/shoutem/cli/issues"'.yellow);
   } else {
     console.log('No error.'.green);
   }

@@ -1,11 +1,11 @@
 import { prompt } from 'inquirer';
 
-export default async function(message, opts = {}) {
+export default async function (message, opts = {}) {
   const { confirmed } = await prompt({
     type: 'confirm',
-    message: message,
+    message,
     name: 'confirmed',
-    ...opts
+    ...opts,
   });
 
   return confirmed;

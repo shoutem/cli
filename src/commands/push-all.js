@@ -1,13 +1,14 @@
-import { uploadExtension } from '../commands/push';
-import msg from '../user_messages';
-import { pathExists } from 'fs-extra';
-import { handleError } from '../services/error-handler';
 import bluebird from 'bluebird';
-import path from 'path';
+import { pathExists } from 'fs-extra';
 import { prompt, Separator } from 'inquirer';
-import { getHostEnvName } from '../clients/server-env';
+import path from 'path';
 
-export async function pushAll(args) {
+import { getHostEnvName } from '../clients/server-env';
+import { handleError } from '../services/error-handler';
+import msg from '../user_messages';
+import { uploadExtension } from './push';
+
+export default async function pushAll(args) {
   const extPaths = await bluebird.filter(args.paths, f => pathExists(path.join(f, 'extension.json')));
 
   if (extPaths.length === 0) {
@@ -25,13 +26,15 @@ export async function pushAll(args) {
     message: `Check which extensions you want to push to ${getHostEnvName()}.`,
     choices: extPaths.concat(new Separator()),
     default: extPaths,
-    pageSize: 20
+    pageSize: 20,
   });
   pathsToPush = pathsToPush || extPaths;
 
   const pushed = [];
   const notPushed = [];
 
+  // no-await-in-loop vs. unusable await inside array itteraton
+  /* eslint-disable */
   for (const extPath of pathsToPush) {
     try  {
       await uploadExtension(args, extPath);
@@ -42,14 +45,15 @@ export async function pushAll(args) {
       notPushed.push(extPath);
     }
   }
+  /* eslint-enable */
 
   if (pushed.length > 0) {
-    console.log(`Pushed:`);
+    console.log('Pushed:');
     console.log(pushed.map(e => `  ${e}`).join('\n'));
   }
 
   if (notPushed.length > 0) {
-    console.log(`Not pushed:`);
+    console.log('Not pushed:');
     console.log(notPushed.map(e => `  ${e}`).join('\n'));
   }
 

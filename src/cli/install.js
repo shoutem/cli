@@ -1,29 +1,26 @@
+import { createNewApp, ensureApp, installLocalExtension } from '../commands/install';
 import services from '../../config/services';
-import {
-  createNewApp,
-  ensureApp,
-  installLocalExtension,
-} from '../commands/install';
-import msg from '../user_messages';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import { handleError } from '../services/error-handler';
+import msg from '../user_messages';
 
 export const description = 'Install the current extension to an app on the Shoutem Builder.';
 
 export const command = 'install';
-export const builder = yargs => {
-  return yargs
+export const builder = (yargs) => {
+  yargs
     .options({
       app: {
         alias: 'a',
         description: 'Specifies app id to install current extension to.',
-        requiresArg: true
+        requiresArg: true,
       },
       new: {
         alias: 'n',
         description: 'Creates new app with the given name and installs the extension to it.',
-        type: 'string'
-      }})
+        type: 'string',
+      },
+    })
     .usage(`usage: shoutem ${command} [options]\n\n${description}`);
 };
 

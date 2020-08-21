@@ -1,21 +1,21 @@
-import { getLatestApps } from '../clients/legacy-service';
-import { spinify } from './spinner';
 import { prompt } from 'inquirer';
-import * as logger from './logger';
-import * as cache from './cache-env';
 
-export default async function(apps = null) {
-  apps = apps || await spinify(getLatestApps(), 'Fetching applications...');
-  logger.info('appSelector', apps);
+import { getLatestApps } from '../clients/legacy-service';
+import * as logger from './logger';
+import { spinify } from './spinner';
+
+export default async function (apps = null) {
+  const resolvedApps = apps || await spinify(getLatestApps(), 'Fetching applications...');
+  logger.info('appSelector', resolvedApps);
 
   return (await prompt({
     type: 'list',
     name: 'appId',
     message: 'Select your app',
-    choices: apps.map(app => ({
+    choices: resolvedApps.map(app => ({
       name: `${app.name} (${app.id})`,
-      value: app.id
+      value: app.id,
     })),
-    pageSize: 20
+    pageSize: 20,
   })).appId;
 }

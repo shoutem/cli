@@ -6,9 +6,8 @@ import * as logger from '../services/logger';
 const legacyServiceUri = new URI(legacyService);
 
 export async function getLatestApps() {
-  const body = await jsonApi.get(legacyServiceUri.clone()
-    .segment('/v1/apps')
-    .search({ sort: '-modificationTime' })
+  const body = await jsonApi.get(
+    legacyServiceUri.clone().segment('/v1/apps').search({ sort: '-modificationTime' }),
   );
 
   logger.info('getLatestApps', body);
@@ -17,10 +16,15 @@ export async function getLatestApps() {
 
 export async function getApp(appId) {
   const url = legacyServiceUri.clone().segment(`/v1/apps/${appId}`);
-  return await jsonApi.get(url);
+
+  return jsonApi.get(url);
 }
 
 export async function getPublishingProperties(appId) {
-  const url = legacyServiceUri.clone().segment(`/api/applications/publishing_properties.json`).search({nid: appId});
-  return await jsonApi.get(url);
+  const url = legacyServiceUri
+    .clone()
+    .segment('/api/applications/publishing_properties.json')
+    .search({ nid: appId });
+
+  return jsonApi.get(url);
 }

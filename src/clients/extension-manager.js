@@ -1,20 +1,21 @@
+import FormData from 'form-data';
 import URI from 'urijs';
+
 import { extensionManager } from '../../config/services';
 import listenStream from '../services/stream-listener';
 import * as jsonApi from './json-api-client';
-import FormData from 'form-data';
 
 const extensionManagerUri = new URI(extensionManager);
 
 export async function getDeveloper() {
   const url = extensionManagerUri.clone().segment('/v1/devs/me');
-  return await jsonApi.get(url);
+  return jsonApi.get(url);
 }
 
 export async function createDeveloper(devName) {
   const url = extensionManagerUri.clone().segment('/v1/devs');
 
-  return await jsonApi.post(url, {
+  return jsonApi.post(url, {
     data: {
       type: 'shoutem.core.developers',
       attributes: { name: devName },
@@ -44,25 +45,25 @@ export async function uploadExtension(canonicalName, tgzStream, progressHandler,
   return id;
 }
 
+export async function getExtension(canonicalName) {
+  const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}`);
+  return jsonApi.get(url);
+}
+
 export async function getExtensionId(canonicalName) {
   const { id } = await getExtension(canonicalName);
 
   return id;
 }
 
-export async function getExtension(canonicalName) {
-  const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}`);
-  return await jsonApi.get(url);
-}
-
 export async function publishExtension(canonicalName) {
   const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}/publish`);
-  return await jsonApi.post(url);
+  return jsonApi.post(url);
 }
 
 export async function getPlatforms() {
   const url = extensionManagerUri.clone().segment('/v1/platforms');
-  return await jsonApi.get(url);
+  return jsonApi.get(url);
 }
 
 export async function canPublish(canonical) {
@@ -75,4 +76,12 @@ export async function canPublish(canonical) {
     }
     throw e;
   }
+}
+
+export async function uploadPlatform() {
+  // TODO: create uploadPlatform function
+}
+
+export async function publishPlatform() {
+  // TODO: create publishPlatform function
 }

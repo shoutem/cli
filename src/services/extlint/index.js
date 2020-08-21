@@ -7,8 +7,8 @@ export default async function (extPath) {
     path.join(extPath, '**/*.jsx'),
     '--no-eslintrc',
     '--config', path.join(__dirname, 'extension-check-eslint-config.json'),
-    '--ignore-pattern', 'node_modules'
+    '--ignore-pattern', 'node_modules',
   ];
 
-  return await packageManager.run(__dirname, 'extlint', args, ['--silent']);
+  return packageManager.run(__dirname, 'extlint', args, ['--silent']);
 }

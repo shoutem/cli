@@ -1,12 +1,23 @@
 import url from 'url';
 import path from 'path';
 import fs from 'fs-extra';
-import request from 'request';
+import request from 'request-promise';
 import Promise from 'bluebird';
 
 import { getHttpErrorMessage } from './get-http-error-message';
 
 const downloadFile = Promise.promisify(require('download-file'));
+
+export function getRedirectLocation(uri) {
+  return new Promise((resolve, reject) => {
+    const protocol = url.parse(uri).protocol.slice(0, -1);
+    // import/no-dynamic-require conflicts with our use case
+    // eslint-disable-next-line
+    require(protocol).get(uri, (response) => {
+      resolve(response.headers.location);
+    }).on('error', err => reject(err));
+  });
+}
 
 export async function downloadFileFollowRedirect(uri, options) {
   let redirectLocation = null;
@@ -26,15 +37,6 @@ export async function downloadFileFollowRedirect(uri, options) {
       await downloadFileFollowRedirect(redirectLocation, options);
     }
   }
-}
-
-export function getRedirectLocation(uri) {
-  return new Promise((resolve, reject) => {
-    const protocol = url.parse(uri).protocol.slice(0, -1);
-    require(protocol).get(uri, (response) => {
-      resolve(response.headers.location);
-    }).on('error', err => reject(err));
-  });
 }
 
 const defaultRequestHandlers = {
@@ -58,7 +60,6 @@ export function pipeDownload(url, handlers = {}, options = {}) {
     destinations,
   } = { ...defaultRequestHandlers, ...handlers };
 
-  const fileName = options.fileName || url.split('/').pop();
   const progressHandler = options.progress || (() => { });
 
   let req = request(url)
@@ -70,7 +71,7 @@ export function pipeDownload(url, handlers = {}, options = {}) {
       onEnd();
     });
 
-  destinations.forEach(destination => {
+  destinations.forEach((destination) => {
     req = req.pipe(destination);
   });
 
@@ -98,7 +99,7 @@ export function pipeDownloadToFile(url, destinationDir, options = {}) {
   const fileStream = fs.createWriteStream(filePath);
 
   pipeDownloadPromise(url, [fileStream], options);
-  
+
   return new Promise((resolve, reject) => {
     fileStream.on('error', reject);
     fileStream.on('close', resolve);

@@ -1,4 +1,4 @@
-import { createTheme } from '../../commands/theme';
+import createTheme from '../../commands/theme';
 import { handleError } from '../../services/error-handler';
 import { ensureVariableName } from '../../services/cli-parsing';
 

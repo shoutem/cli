@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs-extra';
-import { getLocalStoragePathSync } from '../clients/cli-paths';
+
+import { getLocalStoragePathSync } from './cli-paths';
 
 const defaultPackageManagerFilePath = path.join(
   getLocalStoragePathSync(),

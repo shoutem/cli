@@ -1,17 +1,16 @@
-require('yargonaut')
-  .helpStyle('green.underline')
-  .errorsStyle('red.bold');
-
 import 'colors';
 import 'fetch-everywhere';
 import yargs from 'yargs';
-import { version } from '../package.json';
 import apiUrls from '../config/services';
 import autoUpdate from './commands/update-cli';
 import * as analytics from './services/analytics';
 import { isAscii, containsSpace } from './services/validation';
 import getHomeDir from './home-dir';
 import { authorizeRequests, getRefreshToken } from './clients/auth-service';
+
+require('yargonaut')
+  .helpStyle('green.underline')
+  .errorsStyle('red.bold');
 
 const cliReferenceUrl = 'https://shoutem.github.io/docs/extensions/reference/cli';
 
@@ -27,23 +26,23 @@ analytics.setArgv(process.argv);
 
 (async () => {
   if (await autoUpdate()) {
-    return null;
+    return;
   }
   await authorizeRequests(await getRefreshToken());
 
   const cli = yargs.usage('Usage: shoutem [command] [-h]')
     .option('version', {
       alias: 'v',
-      description: 'Shows version number.'
+      description: 'Shows version number.',
     })
     .commandDir('cli')
     .strict()
     .help()
-    .epilog(`If you don't have a developer account, you can register at ${apiUrls.appBuilder.bold}.\n\n` +
-      `A more detailed reference on how to use CLI can be found on the Developer Portal: ${cliReferenceUrl.bold}.`)
+    .epilog(`If you don't have a developer account, you can register at ${apiUrls.appBuilder.bold}.\n\n`
+      + `A more detailed reference on how to use CLI can be found on the Developer Portal: ${cliReferenceUrl.bold}.`)
     .alias('help', 'h');
 
-  const argv = cli.argv;
+  const { argv } = cli;
   if (argv.version) {
     console.log(require('../package.json').version);
   } else if (argv._.length === 0) {

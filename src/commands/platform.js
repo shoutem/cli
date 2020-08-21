@@ -1,12 +1,13 @@
+import fs from 'fs-extra';
 import _ from 'lodash';
 import semver from 'semver';
-import fs from 'fs-extra';
-import msg from '../user_messages';
+
+import { uploadPlatform, getPlatforms, getDeveloper } from '../clients/extension-manager';
 import { getHostEnvName } from '../clients/server-env';
 import { spinify, startSpinner } from '../services/spinner';
 import createProgressHandler from '../services/progress-bar';
 import { validatePlatformArchive } from '../services/validation';
-import { uploadPlatform, getPlatforms, getDeveloper } from '../clients/extension-manager';
+import msg from '../user_messages';
 
 export async function uploadPlatformArchive(platformArchiveProvider) {
   if (platformArchiveProvider.getType() === 'local') {
@@ -29,6 +30,7 @@ export async function uploadPlatformArchive(platformArchiveProvider) {
     createProgressHandler({
       msg: 'Upload progress',
       total: size,
+      // eslint-disable-next-line
       onFinished: () => spinner = startSpinner('Processing upload...'),
     }),
     size,
@@ -48,9 +50,13 @@ export async function getAvailablePlatforms(limit) {
   const developer = await getDeveloper();
   const allPlatforms = await getPlatforms();
 
-  let ownPlatforms = _.filter(allPlatforms, platform => _.get(platform, ['author', 'name']) === developer.name);
+  let ownPlatforms = _.filter(
+    allPlatforms,
+    platform => _.get(platform, ['author', 'name']) === developer.name,
+  );
 
-  ownPlatforms.sort((p1, p2) => semver.compare(p1.version, p2.version, true) * -1); // highest versions first
+  // highest versions first
+  ownPlatforms.sort((p1, p2) => semver.compare(p1.version, p2.version, true) * -1);
 
   if (_.isNumber(limit)) {
     ownPlatforms = _.slice(ownPlatforms, 0, limit);

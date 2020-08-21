@@ -3,7 +3,7 @@ import semver from 'semver';
 import * as cache from './cache';
 
 export async function getRepoData(npmUrl) {
-  return await request({ uri: npmUrl, json: true });
+  return request({ uri: npmUrl, json: true });
 }
 
 async function getNpmjsVersion(npmUrl, tag) {
@@ -13,7 +13,7 @@ async function getNpmjsVersion(npmUrl, tag) {
 }
 
 export async function getVersion(npmUrl, tag) {
-  return await cache.get({ npmUrl, tag }, 3600 * 48, () => getNpmjsVersion(npmUrl, tag));
+  return cache.get({ npmUrl, tag }, 3600 * 48, () => getNpmjsVersion(npmUrl, tag));
 }
 
 export async function isLatest(npmUrl, currentVersion) {
@@ -21,7 +21,6 @@ export async function isLatest(npmUrl, currentVersion) {
     const latestVersion = await getVersion(npmUrl, 'latest');
     return semver.gte(currentVersion, latestVersion);
   } catch (err) {
-
     // to allow usage of CLI if npmjs is down
     return true;
   }

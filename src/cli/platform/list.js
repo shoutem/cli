@@ -17,13 +17,9 @@ export const builder = yargs => yargs
   })
   .usage(`shoutem ${command} [options]\n\n${description}`);
 
-export const handler = args => executeAndHandleError(() => listPlatforms(args));
-
 export async function listPlatforms({ all }) {
-  const developer = await ensureUserIsLoggedIn();
+  await ensureUserIsLoggedIn();
   const platforms = await spinify(getAvailablePlatforms(all ? null : 20));
-
-  console.log('\nID\t\t\t\tPublished\tAuthor@Version');
 
   _.forEach(platforms, (platform) => {
     const { id, published, version } = platform;
@@ -32,3 +28,5 @@ export async function listPlatforms({ all }) {
     console.log(`${id}\t${published}\t\t${author}@${version}`);
   });
 }
+
+export const handler = args => executeAndHandleError(() => listPlatforms(args));

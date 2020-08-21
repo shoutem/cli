@@ -1,15 +1,31 @@
-import {loadExtensionJson} from "./extension";
-import * as template from "./template";
+import { loadExtensionJson } from './extension';
+import * as template from './template';
 
-export async function instantiateExtensionTemplate(localTemplatePath, context, opts) {
-  if (!context.extJson && context.extensionPath) {
-    context.extJson = await loadExtensionJson(context.extensionPath);
-  }
-
+export default async function instantiateExtensionTemplate(
+  localTemplatePath,
+  context,
+  options,
+) {
   if (!context.extensionPath) {
     throw new Error(`Missing extension path for extension-template ${localTemplatePath}`);
   }
 
-  await template.instantiateTemplatePath(localTemplatePath, context.extensionPath, context, opts);
-  return await template.instantiateTemplatePath('extension-js', context.extensionPath, context, opts);
+  const resolvedContext = { ...context };
+  if (!context.extJson && context.extensionPath) {
+    resolvedContext.extJson = await loadExtensionJson(context.extensionPath);
+  }
+
+  await template.instantiateTemplatePath(
+    localTemplatePath,
+    resolvedContext.extensionPath,
+    resolvedContext,
+    options,
+  );
+
+  return template.instantiateTemplatePath(
+    'extension-js',
+    resolvedContext.extensionPath,
+    resolvedContext,
+    options,
+  );
 }

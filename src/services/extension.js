@@ -1,7 +1,7 @@
-import fs from 'fs';
+import _ from 'lodash';
+import fs from 'fs-extra';
 import path from 'path';
 import * as analytics from './analytics';
-import {readJsonFile, writeJsonFile} from "./data";
 
 export function getExtensionCanonicalName(devName, extName, extVersion) {
   const canonicalName = `${devName}.${extName}@${extVersion}`;
@@ -30,9 +30,13 @@ export function getExtensionRootDir() {
     paths.push(d);
   } while (d !== path.dirname(d));
 
-  for (const p of paths) {
-    if (dirHasExtensionJson(p)) return p;
-  }
+  _.forEach(paths, (path) => {
+    if (dirHasExtensionJson(path)) {
+      return path;
+    }
+
+    return null;
+  });
 
   return null;
 }
@@ -50,7 +54,7 @@ export function ensureInExtensionDir() {
 export function loadExtensionJsonCallback(callback) {
   const root = ensureInExtensionDir();
 
-  readJsonFile(path.join(root, 'extension.json'))
+  fs.readJsonSync(path.join(root, 'extension.json'))
     .then(data => callback(null, data))
     .catch(err => callback(err));
 }
@@ -70,10 +74,10 @@ export function extensionJsonPath(rootPath) {
   return path.join(rootPath, 'extension.json');
 }
 
-export async function loadExtensionJson(rootPath = ensureInExtensionDir()) {
-  return await readJsonFile(extensionJsonPath(rootPath));
+export function loadExtensionJson(rootPath = ensureInExtensionDir()) {
+  return fs.readJsonSync(extensionJsonPath(rootPath));
 }
 
-export async function saveExtensionJson(json, rootPath = ensureInExtensionDir()){
-  return await writeJsonFile(json, extensionJsonPath(rootPath));
+export function saveExtensionJson(json, rootPath = ensureInExtensionDir()) {
+  return fs.writeJsonSync(extensionJsonPath(rootPath), json);
 }

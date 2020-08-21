@@ -1,8 +1,9 @@
 import * as utils from '../services/extension';
-import { ensureInExtensionDir } from '../services/extension';
 import { ensureUserIsLoggedIn } from '../commands/login';
 
-export async function getExtensionCanonicalName(extensionRoot = ensureInExtensionDir()) {
+export default async function getExtensionCanonicalName(
+  extensionRoot = utils.ensureInExtensionDir(),
+) {
   const dev = await ensureUserIsLoggedIn();
   const { name, version } = await utils.loadExtensionJson(extensionRoot);
 

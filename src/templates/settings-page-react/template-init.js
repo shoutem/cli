@@ -1,8 +1,8 @@
 import _ from 'lodash';
 import getOrSet from 'lodash-get-or-set';
-import decamelize from "decamelize";
+import decamelize from 'decamelize';
 import pascalize from 'uppercamelcase';
-import {instantiateExtensionTemplate} from "../../services/extension-template";
+import instantiateExtensionTemplate from '../../services/extension-template';
 
 export function isReactPage({ type, path }) {
   return type === 'react-page' || _.includes(path, 'server/build');
@@ -18,7 +18,7 @@ export async function before(context) {
   }
 
   if (!_.every(pages, isReactPage)) {
-    throw new Error("React pages can't be mixed with non-react settings pages in the same extension");
+    throw new Error('React pages can\'t be mixed with non-react settings pages in the same extension');
   }
 
   pages.push({ name, type: 'react-page' });

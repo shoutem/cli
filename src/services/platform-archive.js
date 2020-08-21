@@ -29,6 +29,38 @@ ios/Pods
 
 `;
 
+export function packItUp(sourcePath, destinationDir, platformFileName, ignores, rootDirectoryName) {
+  return new Promise((resolve, reject) => {
+    const archive = archiver(ARCHIVE_FORMAT);
+
+    archive.on('error', (err) => {
+      reject(err);
+    });
+
+    const output = fs.createWriteStream(path.join(destinationDir, platformFileName));
+    archive.pipe(output);
+
+    output.on('close', () => {
+      resolve();
+    });
+
+    const files = listDirectoryContent(sourcePath, true);
+
+    // create a root directory in archive
+    archive.append(null, { name: `${rootDirectoryName}/` });
+
+    files.forEach((file) => {
+      const ignoreTest = ignores.test(file);
+      if (!ignoreTest.ignored) {
+        archive
+          .append(fs.createReadStream(file), { name: `${rootDirectoryName}/${file}` });
+      }
+    });
+
+    archive.finalize();
+  });
+}
+
 class ArchiveProvider {
   constructor() {
     this.archiveData = {
@@ -47,10 +79,11 @@ class RemoteArchiveProvider extends ArchiveProvider {
   constructor(url) {
     super();
     this.url = url;
+    this.type = 'remote';
   }
 
   getType() {
-    return 'remote';
+    return this.type;
   }
 
   async getArchivePath() {
@@ -95,7 +128,10 @@ class RemoteArchiveProvider extends ArchiveProvider {
       const destinationDir = temporaryDir.path;
       const platformFileName = `platform.${ARCHIVE_FORMAT}`;
 
-      await downloadFileFollowRedirect(this.url, { directory: destinationDir, filename: platformFileName });
+      await downloadFileFollowRedirect(this.url, {
+        directory: destinationDir,
+        filename: platformFileName,
+      });
 
       this.archiveData = {
         path: path.join(destinationDir, platformFileName),
@@ -122,10 +158,11 @@ class LocalArchiveProvider extends ArchiveProvider {
   constructor(path) {
     super();
     this.path = path;
+    this.type = 'local';
   }
 
   getType() {
-    return 'local';
+    return this.type;
   }
 
   async getArchivePath() {
@@ -200,38 +237,6 @@ class LocalArchiveProvider extends ArchiveProvider {
     // no need to remove comments, 'ignores' does that for us
     return ignore().add(shoutemIgnores);
   }
-}
-
-export function packItUp(sourcePath, destinationDir, platformFileName, ignores, rootDirectoryName) {
-  return new Promise((resolve, reject) => {
-    const archive = archiver(ARCHIVE_FORMAT);
-
-    archive.on('error', (err) => {
-      reject(err);
-    });
-
-    const output = fs.createWriteStream(path.join(destinationDir, platformFileName));
-    archive.pipe(output);
-
-    output.on('close', () => {
-      resolve();
-    });
-
-    const files = listDirectoryContent(sourcePath, true);
-
-    // create a root directory in archive
-    archive.append(null, { name: `${rootDirectoryName}/` });
-
-    files.forEach((file) => {
-      const ignoreTest = ignores.test(file);
-      if (!ignoreTest.ignored) {
-        archive
-          .append(fs.createReadStream(file), { name: `${rootDirectoryName}/${file}` });
-      }
-    });
-
-    archive.finalize();
-  });
 }
 
 export async function createPlatformArchiveProvider(url) {

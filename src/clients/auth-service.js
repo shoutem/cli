@@ -1,8 +1,9 @@
 import URI from 'urijs';
-import { post } from './json-api-client';
+
 import services from '../../config/services';
 import * as cache from '../services/cache-env';
 import * as logger from '../services/logger';
+import { post } from './json-api-client';
 
 export class AuthServiceError {
   /*
@@ -33,19 +34,19 @@ const tokensUrl = new URI(services.authService).segment('/v1/auth/tokens').toStr
 const appAccessTokenUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
 
 function getBasicAuthHeaderValue(email, password) {
-  return 'Basic ' + new Buffer(`${email}:${password}`).toString('base64');
+  return `Basic ${Buffer.from(`${email}:${password}`).toString('base64')}`;
 }
 
 export async function createRefreshToken(email, password) {
   try {
     const response = await post(tokensUrl, null, {
       headers: {
-        Authorization: getBasicAuthHeaderValue(email, password)
-      }
+        Authorization: getBasicAuthHeaderValue(email, password),
+      },
     });
     const { token } = response;
-    return token;
 
+    return token;
   } catch (err) {
     if (err.statusCode === 401) {
       throw new UnauthorizedError(err.url, err.response, err.statusCode);
@@ -61,15 +62,15 @@ export async function createAppAccessToken(appId, refreshToken) {
       attributes: {
         tokenType: 'access-token',
         subjectType: 'application',
-        subjectId: appId.toString()
-      }
-    }
+        subjectId: appId.toString(),
+      },
+    },
   };
 
   const { token } = await post(appAccessTokenUrl, body, {
     headers: {
-      Authorization: `Bearer ${refreshToken}`
-    }
+      Authorization: `Bearer ${refreshToken}`,
+    },
   });
 
   return token;
@@ -82,7 +83,7 @@ export async function getRefreshToken({ email, password } = {}) {
     return refreshToken;
   }
 
-  return await cache.getValue('refresh-token');
+  return cache.getValue('refresh-token');
 }
 
 export async function clearTokens() {
@@ -93,12 +94,13 @@ export async function clearTokens() {
 const authorizationConfig = {
   createAccessTokenRequest(refreshToken) {
     logger.info('createAccessTokenRequest', refreshToken);
+    // eslint-disable-next-line
     return new Request(tokensUrl, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${refreshToken}`,
         Accept: 'application/vnd.api+json',
-        'Content-Type': 'application/vnd.api+json'
+        'Content-Type': 'application/vnd.api+json',
       },
       body: JSON.stringify({
         data: {
@@ -106,9 +108,9 @@ const authorizationConfig = {
           attributes: {
             tokenType: 'access-token',
             compressionType: 'gzip',
-          }
-        }
-      })
+          },
+        },
+      }),
     });
   },
   async parseAccessToken(response) {
@@ -134,12 +136,12 @@ const authorizationConfig = {
   isResponseUnauthorized({ status }) {
     return status === 401 || status === 403;
   },
-  shouldWaitForTokenRenewal: true
+  shouldWaitForTokenRenewal: true,
 };
 
 export async function authorizeRequests(refreshToken) {
   if (!refreshToken) {
-    return;
+    return false;
   }
   try {
     const intercept = require('@shoutem/fetch-token-intercept');

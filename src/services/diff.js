@@ -3,7 +3,6 @@ import path from 'path';
 import { diffLines } from 'diff';
 import fs from 'fs-extra';
 import mkdirp from 'mkdirp-promise';
-import confirm from './confirmer';
 
 export async function applyDiffLog(diffLog) {
   await Promise.all(_.map(diffLog, async (newValue, filePath) => {
@@ -48,9 +47,9 @@ export async function offerChanges({ diffLog, postRunActions }) {
         return;
       }
       if (added) {
-        console.log(indentLinesWith(value, `  [+]  `).green)
+        console.log(indentLinesWith(value, '  [+]  ').green);
       } else if (removed) {
-        console.log(indentLinesWith(value, `  [-]  `).red);
+        console.log(indentLinesWith(value, '  [-]  ').red);
       } else if (index > 0 && index < diff.length - 1) {
         console.log('  [ ]  ...');
       }

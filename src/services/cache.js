@@ -1,27 +1,31 @@
+import fs from 'fs-extra';
 import path from 'path';
-import mkdirp from 'mkdirp-promise'
-import { readJsonFile, writeJsonFile } from './data';
+import mkdirp from 'mkdirp-promise';
+
 import { getLocalStoragePath } from '../clients/cli-paths';
 
 async function getCacheFilePath(key) {
   const cacheDir = path.join(await getLocalStoragePath(), 'cache');
   await mkdirp(cacheDir);
+
   return path.join(cacheDir, encodeURIComponent(typeof key === 'string' ? key : JSON.stringify(key)));
 }
 
 export async function getValue(key) {
-  const cached = await readJsonFile(await getCacheFilePath(key)) || {};
+  const cached = await fs.readJson(await getCacheFilePath(key)) || {};
   if (!cached.expiration || cached.expiration > new Date().getTime()) {
     return cached.value;
-  } else {
-    return null;
   }
+
+  return null;
 }
 
 export async function setValue(key, value, expirationSeconds) {
-  const expiration = expirationSeconds ? new Date().getTime() + expirationSeconds * 1000 : null;
+  const expiration = expirationSeconds
+    ? new Date().getTime() + expirationSeconds * 1000
+    : null;
 
-  await writeJsonFile({ expiration, value }, await getCacheFilePath(key));
+  fs.writeJsonSync(await getCacheFilePath(key), { expiration, value });
 
   return value;
 }

@@ -33,10 +33,8 @@ const postRunPublish = platformId => `
   To publish this platform to make it visible on the Builder.
 `;
 
-export const handler = args => executeAndHandleError(() => createPlatform(args));
-
 export async function createPlatform({ url }) {
-  const developer = await ensureUserIsLoggedIn();
+  await ensureUserIsLoggedIn();
 
   const provider = await createPlatformArchiveProvider(url);
   if (provider == null) {
@@ -76,3 +74,5 @@ export async function createPlatform({ url }) {
     }
   }
 }
+
+export const handler = args => executeAndHandleError(() => createPlatform(args));

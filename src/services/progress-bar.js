@@ -4,7 +4,12 @@ import { startSpinner } from './spinner';
 function createProgressBar(msg, { total }) {
   return new ProgressBar(
     `   ${msg} [:bar] :percent (remaining :etas)`,
-    { total, clear: true, width: 20, renderThrottle: 50 },
+    {
+      total,
+      clear: true,
+      width: 20,
+      renderThrottle: 50,
+    },
   );
 }
 
@@ -34,9 +39,9 @@ export default function createProgressHandler({ msg, total, onFinished = () => {
       } else {
         bar = startSpinner(msg);
         bar.tick = () => {};
-        bar.terminate = () => { bar.stop() };
+        bar.terminate = () => { bar.stop(); };
       }
-    };
+    }
 
     bar.tick(length);
     if (bar.complete) {

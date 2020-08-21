@@ -1,6 +1,5 @@
-import { setHostEnvName } from '../clients/server-env';
-import msg from '../user_messages';
 import { setDefaultPackageManager } from '../clients/default-package-manager';
+import msg from '../user_messages';
 
 export const description = 'Sets your default package manager.';
 export const command = 'package-manager <package-manager>';
@@ -11,7 +10,7 @@ const npm = {
   async handler() {
     setDefaultPackageManager('npm');
     console.log(msg.packageManager.complete('npm'));
-  }
+  },
 };
 
 const yarn = {
@@ -20,7 +19,7 @@ const yarn = {
   async handler() {
     setDefaultPackageManager('yarn');
     console.log(msg.packageManager.complete('yarn'));
-  }
+  },
 };
 
 export function builder(packageManager) {

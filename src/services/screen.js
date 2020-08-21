@@ -1,7 +1,7 @@
-import _ from "lodash";
-import { prompt } from "inquirer";
-import {isVariableName} from "./cli-parsing";
-import {askShortcutCreationQuestions} from "./shortcut";
+import _ from 'lodash';
+import { prompt } from 'inquirer';
+import { isVariableName } from './cli-parsing';
+import { askShortcutCreationQuestions } from './shortcut';
 
 function validateScreenName(name, existingScreens) {
   if (!isVariableName(name)) {
@@ -13,7 +13,11 @@ function validateScreenName(name, existingScreens) {
   return true;
 }
 
-function createScreenCreationQuestions({ screens, parentName, defaultName = 'MyScreen' }) {
+function createScreenCreationQuestions({
+  screens,
+  parentName,
+  defaultName = 'MyScreen',
+}) {
   return {
     type: 'input',
     name: 'name',
@@ -23,12 +27,15 @@ function createScreenCreationQuestions({ screens, parentName, defaultName = 'MyS
   };
 }
 
-export async function askScreenCreationQuestions(opts) {
+export default async function askScreenCreationQuestions(opts) {
   const screen = await prompt(createScreenCreationQuestions(opts));
   const parentName = screen.name;
+  const message = 'A shortcut is required for a screen to appear in the app. Create one now?';
+  const {
+    shouldCreateShortcut,
+    ...shortcut
+  } = await askShortcutCreationQuestions({ ...opts, parentName, message });
 
-  const message = "A shortcut is required for a screen to appear in the app. Create one now?";
-  const { shouldCreateShortcut, ...shortcut } = await askShortcutCreationQuestions({ ...opts, parentName, message });
   if (shouldCreateShortcut) {
     screen.newShortcut = shortcut;
   }
