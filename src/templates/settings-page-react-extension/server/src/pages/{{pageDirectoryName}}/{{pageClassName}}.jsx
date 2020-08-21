@@ -1,4 +1,5 @@
 import React, { Component, PropTypes } from 'react';
+import autoBind from 'auto-bind';
 import _ from 'lodash';
 import {
   Button,
@@ -28,9 +29,7 @@ class {{pageClassName}} extends Component {
   constructor(props) {
     super(props);
 
-    this.handleTextChange = this.handleTextChange.bind(this);
-    this.handleSave = this.handleSave.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    autoBind(this);
 
     props.fetchExtension();
 

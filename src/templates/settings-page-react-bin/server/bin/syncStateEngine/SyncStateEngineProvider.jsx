@@ -1,4 +1,5 @@
 import React, { PropTypes, Component, Children } from 'react';
+import autoBind from 'auto-bind';
 import _ from 'lodash';
 import { connect } from 'react-redux';
 import sandbox from '@shoutem/extension-sandbox';
@@ -8,9 +9,7 @@ export class SyncStateEngineProvider extends Component {
   constructor(props) {
     super(props);
 
-    this.handleActions = this.handleActions.bind(this);
-    this.handleSandboxMessage = this.handleSandboxMessage.bind(this);
-    this.checkData = this.checkData.bind(this);
+    autoBind(this);
 
     this.syncStateEngine = this.props.syncStateEngine;
 

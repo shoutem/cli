@@ -45,6 +45,7 @@ const pkgJsonTemplate = {
     "@shoutem/redux-composers": "^0.1.5",
     "@shoutem/redux-io": "^2.3.0",
     "@shoutem/redux-sync-state-engine": "^0.0.2",
+    "auto-bind": "4.0.0",
     "es6-promise": "^4.1.1",
     "fetch-everywhere": "^1.0.5",
     "lodash": "^4.17.4",
