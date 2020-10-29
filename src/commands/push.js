@@ -21,31 +21,36 @@ import { canPublish } from '../clients/extension-manager';
 import msg from '../user_messages';
 import { ensureUserIsLoggedIn } from './login';
 
-function hasRequiredFiles(dir, extName) {
+function ensureRequiredFilesExist(dir, extTitle) {
   const requiredFiles = [
     'app/package.json',
     'app/index.js',
     'server/package.json',
   ];
 
+  process.stdout.write('Checking for required files...');
   _.forEach(requiredFiles, (fileName) => {
     if (!fs.existsSync(path.join(dir, fileName))) {
-      throw new Error(msg.push.missingRequiredFile(fileName, extName));
-      return false;
+      console.log('\n');
+      throw new Error(msg.push.missingRequiredFile(fileName, extTitle));
     }
   });
-
-  return true;
+  console.log(`[${'OK'.green.bold}]`);
 }
 
 export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
   const extJson = await loadExtensionJson(extensionDir);
+  console.log(`Pushing ${extJson.title.cyan}:`);
+
+  try {
+    ensureRequiredFilesExist(extensionDir, extJson.title);
+  } catch (err) {
+    throw err;
+  }
 
   if (!opts.nocheck) {
-    process.stdout.write('Checking the extension code for syntax errors... ');
-
     try {
-      hasRequiredFiles(extensionDir, extJson.title);
+      process.stdout.write('Checking the extension code for syntax errors...');
       await extLint(extensionDir);
     } catch (err) {
       if (err.message) {
@@ -76,8 +81,12 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
   const extensionId = await extensionManager.uploadExtension(
     id,
     stream,
-    createProgressHandler({ msg: 'Upload progress', total: size, onFinished: () => spinner = startSpinner('Processing upload...') }),
-    size
+    createProgressHandler({
+      msg: 'Upload progress',
+      total: size,
+      onFinished: () => spinner = startSpinner('Processing upload...'),
+    }),
+    size,
   );
 
   if (spinner) {

@@ -48,7 +48,7 @@ export default {
   },
   push: {
     complete: () => 'Success!'.green.bold,
-    missingRequiredFile: (file, extTitle) => `Missing ${file}, cannot push ${extTitle.cyan}.`,
+    missingRequiredFile: (fileName, extName) => `Canceling push, extension '${extName}' is missing '${fileName}' file.`,
     missingPackageJson: list => `Warning: directories ${list} couldn't be pushed due to missing package.json.`,
     failureSuggestion: () => 'Warning: Check whether both server and app directory have a valid package.json file.',
     uploadingInfo: (extJson, env) =>
