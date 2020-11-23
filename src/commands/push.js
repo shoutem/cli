@@ -29,12 +29,18 @@ function ensureRequiredFilesExist(dir, extTitle) {
   ];
 
   process.stdout.write('Checking for required files...');
+  const missingFiles = [];
+
   _.forEach(requiredFiles, (fileName) => {
     if (!fs.existsSync(path.join(dir, fileName))) {
-      console.log('\n');
-      throw new Error(msg.push.missingRequiredFile(fileName, extTitle));
+      missingFiles.push(fileName)
     }
   });
+
+  if (missingFiles.length) {
+    console.log('\n');
+    throw new Error(msg.push.missingRequiredFile(missingFiles, extTitle));
+  }
   console.log(`[${'OK'.green.bold}]`);
 }
 
