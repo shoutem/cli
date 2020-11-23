@@ -39,10 +39,8 @@ export function getErrorMessage(err) {
       if (body.errors) {
         return getJsonApiErrorMessage(body.errors);
       }
-    } catch (err){
-    }
+    } catch (err) {}
   }
-
 
   return 'Unrecognized error. Run `shoutem last-error` for additional details.'
 }
@@ -62,7 +60,7 @@ export async function handleError(err) {
       errorJson.message = (err || {}).message;
       await cache.setValue('last-error', errorJson);
       if (!reportInfoPrinted) {
-        console.error(`\nUse ${'shoutem last-error'.cyan} for more info`);
+        console.error(`\nUse ${'shoutem last-error'.cyan} for more information.`);
         reportInfoPrinted = true;
       }
   } catch (err) {
