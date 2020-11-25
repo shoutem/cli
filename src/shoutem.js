@@ -1,4 +1,4 @@
-#!/usr/bin/env node --no-deprecation
+#!/usr/bin/env node
 
 require('colors');
 const path = require('path');
