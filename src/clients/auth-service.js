@@ -33,7 +33,7 @@ const tokensUrl = new URI(services.authService).segment('/v1/auth/tokens').toStr
 const appAccessTokenUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
 
 function getBasicAuthHeaderValue(email, password) {
-  return 'Basic ' + new Buffer(`${email}:${password}`).toString('base64');
+  return 'Basic ' + Buffer.from(`${email}:${password}`).toString('base64');
 }
 
 export async function createRefreshToken(email, password) {
