@@ -49,8 +49,8 @@ export default {
   push: {
     complete: () => 'Success!'.green.bold,
     missingRequiredFile: (missingFiles, extName) => missingFiles.length > 1
-      ? `Canceling push, extension '${extName}' is missing the following files:\n  ${missingFiles.join('\n  ')}`
-      : `Canceling push, extension '${extName}' is missing '${missingFiles[0]}' file.`,
+      ? `Canceling push, extension '${extName}' is missing the following files:\n  ${missingFiles.join('\n  ')}\nYou can ignore the buffer warning, it stems from dependencies.`
+      : `Canceling push, extension '${extName}' is missing '${missingFiles[0]}' file.\nYou can ignore the buffer warning, it stems from dependencies.`,
     missingPackageJson: list => `Warning: directories ${list} couldn't be pushed due to missing package.json.`,
     failureSuggestion: () => 'Warning: Check whether both server and app directory have a valid package.json file.',
     uploadingInfo: (extJson, env) =>
