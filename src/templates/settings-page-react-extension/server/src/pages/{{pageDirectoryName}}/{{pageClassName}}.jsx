@@ -1,5 +1,7 @@
-import React, { Component, PropTypes } from 'react';
+import React, { PureComponent } from 'react';
+import autoBindReact from 'auto-bind/react';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import {
   Button,
   ButtonToolbar,
@@ -8,17 +10,17 @@ import {
   FormGroup,
   HelpBlock,
 } from 'react-bootstrap';
+import { connect } from 'react-redux';
 import { LoaderContainer } from '@shoutem/react-web-ui';
 import {
   fetchExtension,
-  updateExtensionSettings,
   getExtension,
+  updateExtensionSettings,
 } from '@shoutem/redux-api-sdk';
 import { shouldRefresh } from '@shoutem/redux-io';
-import { connect } from 'react-redux';
 import './style.scss';
 
-class {{pageClassName}} extends Component {
+class {{pageClassName}} extends PureComponent {
   static propTypes = {
     extension: PropTypes.object,
     fetchExtension: PropTypes.func,
@@ -28,9 +30,7 @@ class {{pageClassName}} extends Component {
   constructor(props) {
     super(props);
 
-    this.handleTextChange = this.handleTextChange.bind(this);
-    this.handleSave = this.handleSave.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    autoBindReact(this);
 
     props.fetchExtension();
 
@@ -90,8 +90,8 @@ class {{pageClassName}} extends Component {
       <div className="hello-page settings-page">
         <form onSubmit={this.handleSubmit}>
           <FormGroup>
-            <h3>Enter company name</h3>
-            <ControlLabel>Company:</ControlLabel>
+            <h3>{i18next.t(LOCALIZATION.ENTER_COMPANY_NAME)}</h3>
+            <ControlLabel>{i18next.t(LOCALIZATION.COMPANY)}</ControlLabel>
             <FormControl
               type="text"
               className="form-control"
@@ -110,7 +110,7 @@ class {{pageClassName}} extends Component {
             onClick={this.handleSave}
           >
             <LoaderContainer isLoading={inProgress}>
-              Save
+              {i18next.t(LOCALIZATION.SAVE_BUTTON)}
             </LoaderContainer>
           </Button>
         </ButtonToolbar>

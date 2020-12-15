@@ -1,0 +1,7 @@
+{
+  "{{devName}}": {
+    "{{extJson.name}}": {
+      "{{extJson.name}}": "{{pageClassName}}.name"
+    }
+  }
+}

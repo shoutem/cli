@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import decamelize from 'decamelize';
-import {isReactPage} from "../settings-page-react/template-init";
+import {isReactPage} from '../settings-page-react/template-init';
 
 function importStatements(names, path, directoriesNames = names) {
   return names.map((name, i) => `import ${name} from '${path}/${directoriesNames[i]}';`).join('\n');

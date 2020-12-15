@@ -1,6 +1,6 @@
 import getOrSet from 'lodash-get-or-set';
-import {instantiateExtensionTemplate} from "../../services/extension-template";
-import {linkSettingsPageWithExistingScreen} from "../../services/shortcut";
+import {instantiateExtensionTemplate} from '../../services/extension-template';
+import {linkSettingsPageWithExistingScreen} from '../../services/shortcut';
 
 export async function after(context) {
   const { type, extensionScope, extJson, existingScreenName, newScreen, name, title } = context;
