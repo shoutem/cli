@@ -14,6 +14,7 @@ import {
 import { connect } from 'react-redux';
 import { LoaderContainer } from '@shoutem/react-web-ui';
 import { updateShortcutSettings } from '@shoutem/redux-api-sdk';
+import LOCALIZATION from './localization';
 import './style.scss';
 
 class {{pageClassName}} extends Component {
@@ -76,7 +77,7 @@ class {{pageClassName}} extends Component {
     const { error, hasChanges, inProgress, greeting } = this.state;
 
     return (
-      <div className="hello-page settings-page">
+      <div className="settings-page">
         <form onSubmit={this.handleSubmit}>
           <FormGroup>
             <h3>{i18next.t(LOCALIZATION.CHOOSE_YOUR_GREETING)}</h3>
@@ -92,7 +93,7 @@ class {{pageClassName}} extends Component {
             <HelpBlock className="text-error">{error}</HelpBlock>
           }
         </form>
-        <ButtonToolbar>
+        <ButtonToolbar className="save-button">
           <Button
             bsStyle="primary"
             disabled={!hasChanges}

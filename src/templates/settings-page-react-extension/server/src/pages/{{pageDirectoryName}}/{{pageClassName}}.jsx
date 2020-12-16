@@ -1,5 +1,6 @@
 import React, { PureComponent } from 'react';
 import autoBindReact from 'auto-bind/react';
+import i18next from 'i18next';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 import {
@@ -18,6 +19,7 @@ import {
   updateExtensionSettings,
 } from '@shoutem/redux-api-sdk';
 import { shouldRefresh } from '@shoutem/redux-io';
+import LOCALIZATION from './localization';
 import './style.scss';
 
 class {{pageClassName}} extends PureComponent {
@@ -87,7 +89,7 @@ class {{pageClassName}} extends PureComponent {
     const { error, hasChanges, inProgress, company } = this.state;
 
     return (
-      <div className="hello-page settings-page">
+      <div className="settings-page">
         <form onSubmit={this.handleSubmit}>
           <FormGroup>
             <h3>{i18next.t(LOCALIZATION.ENTER_COMPANY_NAME)}</h3>
@@ -103,7 +105,7 @@ class {{pageClassName}} extends PureComponent {
             <HelpBlock className="text-error">{error}</HelpBlock>
           }
         </form>
-        <ButtonToolbar>
+        <ButtonToolbar className="save-button">
           <Button
             bsStyle="primary"
             disabled={!hasChanges}

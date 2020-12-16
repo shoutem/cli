@@ -1,9 +1,9 @@
 {
   "{{developer.name}}": {
     "{{extJson.name}}": {
-      "extension-key.save-button": "Save",
-      "extension-key.enter-company-name": "Enter company name",
-      "extension-key.company": "Company:"
+      "extension-page.save-button": "Save",
+      "extension-page.enter-company-name": "Enter company name",
+      "extension-page.company": "Company:"
     }
   }
 }

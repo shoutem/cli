@@ -5,7 +5,6 @@ import { askPageCreationQuestions } from '../../services/page';
 import { instantiateExtensionTemplate } from '../../services/extension-template';
 import { offerChanges } from '../../services/diff';
 
-
 export const description = 'Adds a settings page to the current extension.';
 export const command = 'add [name]';
 
