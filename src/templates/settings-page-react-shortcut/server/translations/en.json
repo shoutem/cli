@@ -1,8 +1,8 @@
 {
-  "{{devName}}": {
+  "{{developer.name}}": {
     "{{extJson.name}}": {
       "extension-key.save-button": "Save",
-      "extension-key.enter-company-name": "Choose your greeting",
+      "extension-key.choose-your-greeting": "Choose your greeting",
       "extension-key.name": "Name:"
     }
   }
