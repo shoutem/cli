@@ -1,7 +1,7 @@
 import decamelize from 'decamelize';
 import _ from 'lodash';
 import getOrSet from 'lodash-get-or-set';
-import {instantiateExtensionTemplate} from '../../services/extension-template';
+import { instantiateExtensionTemplate } from '../../services/extension-template';
 
 function isHtmlPage({ type, path }) {
    return type === 'html' && !_.includes(path, 'server/build');

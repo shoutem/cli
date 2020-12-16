@@ -2,7 +2,7 @@ import decamelize from 'decamelize';
 import _ from 'lodash';
 import getOrSet from 'lodash-get-or-set';
 import pascalize from 'uppercamelcase';
-import {instantiateExtensionTemplate} from '../../services/extension-template';
+import { instantiateExtensionTemplate } from '../../services/extension-template';
 
 export function isReactPage({ type, path }) {
   return type === 'react-page' || _.includes(path, 'server/build');
