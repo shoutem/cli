@@ -69,7 +69,6 @@ const pkgJsonTemplate = {
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "i18next": "^19.7.0",
-    "react-i18next": "^11.7.3",
     "react-redux": "^5.0.3",
     "react-select": "^1.0.0-rc.5",
     "redux": "^3.6.0",
@@ -77,8 +76,7 @@ const pkgJsonTemplate = {
     "redux-thunk": "^2.2.0",
     "reselect": "^2.5.4",
     "urijs": "^1.18.9",
-    "validator": "^6.2.1",
-    "sendbird": "3.0.117"
+    "validator": "^6.2.1"
   },
   "babel": {
     "presets": [
