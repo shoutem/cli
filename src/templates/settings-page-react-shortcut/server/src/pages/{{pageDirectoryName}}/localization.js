@@ -1,4 +1,4 @@
-const key = 'extension-page';
+const key = 'shortcut-page';
 
 const SAVE_BUTTON = `${key}.save-button`;
 const CHOOSE_YOUR_GREETING = `${key}.choose-your-greeting`;
