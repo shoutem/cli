@@ -1,15 +1,15 @@
-import getOrSet from 'lodash-get-or-set';
 import Promise from 'bluebird';
 import fs from 'fs-extra';
-import path from 'path';
+import getOrSet from 'lodash-get-or-set';
 import Mustache from 'mustache';
-import { pathExists } from 'fs-extra';
+import path from 'path';
 
 const templatesDirectory = path.join(__dirname, '../..', 'src/templates');
 
 export function load(pathWithSlashes, templateContext) {
   const p = path.join(templatesDirectory, ...pathWithSlashes.split('/'));
   const template = fs.readFileSync(p, 'utf8');
+
   return Mustache.render(template, templateContext);
 }
 
@@ -28,6 +28,7 @@ async function instantiateTemplatePathRec(localTemplatePath, destinationPath, co
     await Promise.map(files, file => {
       const src = path.join(localTemplatePath, file);
       const dest = path.join(destinationPath, file);
+
       return instantiateTemplatePathRec(src, dest, context, opts);
     });
   } else if (templatePathState.isFile()) {

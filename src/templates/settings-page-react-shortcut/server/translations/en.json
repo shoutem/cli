@@ -1,0 +1,9 @@
+{
+  "{{developer.name}}": {
+    "{{extJson.name}}": {
+      "shortcut-page.save-button": "Save",
+      "shortcut-page.choose-your-greeting": "Choose your greeting",
+      "shortcut-page.name": "Name:"
+    }
+  }
+}

@@ -1,8 +1,8 @@
 import _ from 'lodash';
-import decamelize from "decamelize";
-import { prompt } from "inquirer";
-import {isVariableName} from "./cli-parsing";
-import { askScreenCreationQuestions } from "./screen";
+import decamelize from 'decamelize';
+import { prompt } from 'inquirer';
+import { isVariableName } from './cli-parsing';
+import { askScreenCreationQuestions } from './screen';
 
 function validatePageName(name, existingPages) {
   if (!isVariableName(name)) {

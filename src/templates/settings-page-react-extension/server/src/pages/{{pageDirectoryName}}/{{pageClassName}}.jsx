@@ -1,5 +1,8 @@
-import React, { Component, PropTypes } from 'react';
+import React, { PureComponent } from 'react';
+import autoBindReact from 'auto-bind/react';
+import i18next from 'i18next';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 import {
   Button,
   ButtonToolbar,
@@ -8,17 +11,18 @@ import {
   FormGroup,
   HelpBlock,
 } from 'react-bootstrap';
+import { connect } from 'react-redux';
 import { LoaderContainer } from '@shoutem/react-web-ui';
 import {
   fetchExtension,
-  updateExtensionSettings,
   getExtension,
+  updateExtensionSettings,
 } from '@shoutem/redux-api-sdk';
 import { shouldRefresh } from '@shoutem/redux-io';
-import { connect } from 'react-redux';
+import LOCALIZATION from './localization';
 import './style.scss';
 
-class {{pageClassName}} extends Component {
+class {{pageClassName}} extends PureComponent {
   static propTypes = {
     extension: PropTypes.object,
     fetchExtension: PropTypes.func,
@@ -28,9 +32,7 @@ class {{pageClassName}} extends Component {
   constructor(props) {
     super(props);
 
-    this.handleTextChange = this.handleTextChange.bind(this);
-    this.handleSave = this.handleSave.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    autoBindReact(this);
 
     props.fetchExtension();
 
@@ -87,11 +89,11 @@ class {{pageClassName}} extends Component {
     const { error, hasChanges, inProgress, company } = this.state;
 
     return (
-      <div className="hello-page settings-page">
+      <div className="settings-page">
         <form onSubmit={this.handleSubmit}>
           <FormGroup>
-            <h3>Enter company name</h3>
-            <ControlLabel>Company:</ControlLabel>
+            <h3>{i18next.t(LOCALIZATION.ENTER_COMPANY_NAME)}</h3>
+            <ControlLabel>{i18next.t(LOCALIZATION.COMPANY)}</ControlLabel>
             <FormControl
               type="text"
               className="form-control"
@@ -103,14 +105,14 @@ class {{pageClassName}} extends Component {
             <HelpBlock className="text-error">{error}</HelpBlock>
           }
         </form>
-        <ButtonToolbar>
+        <ButtonToolbar className="save-button">
           <Button
             bsStyle="primary"
             disabled={!hasChanges}
             onClick={this.handleSave}
           >
             <LoaderContainer isLoading={inProgress}>
-              Save
+              {i18next.t(LOCALIZATION.SAVE_BUTTON)}
             </LoaderContainer>
           </Button>
         </ButtonToolbar>

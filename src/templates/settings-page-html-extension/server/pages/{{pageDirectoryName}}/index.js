@@ -11,7 +11,6 @@ function onShoutemReady(event) {
   $(document).ready(function() {
     shoutem.api.init(config.context);
     onPageReady(config);
-
   });
 };
 
