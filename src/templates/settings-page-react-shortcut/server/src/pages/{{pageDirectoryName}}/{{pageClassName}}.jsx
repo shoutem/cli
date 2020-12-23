@@ -17,7 +17,7 @@ import { updateShortcutSettings } from '@shoutem/redux-api-sdk';
 import LOCALIZATION from './localization';
 import './style.scss';
 
-class {{pageClassName}} extends Component {
+class {{pageClassName}} extends PureComponent {
   static propTypes = {
     shortcut: PropTypes.object,
     updateShortcutSettings: PropTypes.func,
