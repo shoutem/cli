@@ -19,5 +19,5 @@ export async function createPage(opts, extensionPath) {
   const changes = await instantiateExtensionTemplate('settings-page', { ...opts, extensionPath, developer });
   await offerChanges(changes);
   console.log('Success'.green.bold);
-  console.log('Remember to create \'server/translations/en.json\' add your translation strings to it.\nYou can use example.json to check the format.');
+  console.log('Remember to create \'server/translations/en.json\' add your translation strings to it.\nYou can use \'server/translations/example.json\' to check the format.');
 }
