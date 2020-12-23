@@ -11,6 +11,6 @@ export async function instantiateExtensionTemplate(localTemplatePath, context, o
   }
 
   await template.instantiateTemplatePath(localTemplatePath, context.extensionPath, context, opts);
-  
+
   return await template.instantiateTemplatePath('extension-js', context.extensionPath, context, opts);
 }
