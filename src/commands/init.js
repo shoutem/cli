@@ -1,17 +1,16 @@
 import _ from 'lodash';
 import inquirer from 'inquirer';
 import decamelize from 'decamelize';
-import { pathExists } from 'fs-extra';
+import fs from 'fs-extra';
 import path from 'path';
 import semver from 'semver';
-import { ensureUserIsLoggedIn } from '../commands/login';
 import msg from '../user_messages';
 import { getPlatforms } from '../clients/extension-manager';
 import * as utils from '../services/extension';
-import {instantiateExtensionTemplate} from "../services/extension-template";
-import {offerChanges} from "../services/diff";
-import {stringify} from "../services/data";
-
+import { instantiateExtensionTemplate } from '../services/extension-template';
+import { offerChanges } from '../services/diff';
+import { stringify } from '../services/data';
+import { ensureUserIsLoggedIn } from './login';
 
 function generateNoPatchSemver(version) {
   const [a, b] = version.split('.');
@@ -54,7 +53,7 @@ export async function initExtension(extName, extensionPath = process.cwd()) {
   utils.getExtensionCanonicalName(developer.name, extJson.name, extJson.version);
 
   const dirname = `${developer.name}.${extJson.name}`;
-  if (await pathExists(path.join(process.cwd(), dirname))) {
+  if (fs.existsSync(path.join(process.cwd(), dirname))) {
     throw new Error(`Folder ${dirname} already exists.`);
   }
 

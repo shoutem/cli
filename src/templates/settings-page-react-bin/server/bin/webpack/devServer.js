@@ -12,6 +12,7 @@ function resolveDevServer() {
     port: 4790,
     compress: isProduction,
     inline: !isProduction,
+    disableHostCheck: true,
     hot: !isProduction,
     host: '0.0.0.0',
     https: true,
