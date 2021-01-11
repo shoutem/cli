@@ -102,7 +102,6 @@
     "plugins": [
       "transform-object-rest-spread"
     ],
-    "ignore": false,
     "only": [
       "config",
       "src"
