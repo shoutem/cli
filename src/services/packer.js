@@ -150,22 +150,22 @@ export default async function shoutemPack(dir, options) {
     const extensionJsonPathDest = path.join(packageDir, 'extension.json');
     fs.copySync(extensionJsonPathSrc, extensionJsonPathDest);
 
-    const destinationDirectory = options.packToTempDir ? tmpDir : dir;
-    const fileName = 'extension.tgz';
+    const destinationDirectory = path.join(options.packToTempDir ? tmpDir : dir, 'extension.tgz');
     tar.create(
       {
         gzip: true,
-        file: fileName,
-        prefix: destinationDirectory,
+        file: destinationDirectory,
         sync: true,
       },
       [packageDir],
     );
 
+    fs.copySync(destinationDirectory, '/Users/vlad/Desktop');
+
     return ({
       packedDirs: dirsToPack,
       allDirs: packedDirectories,
-      package: path.join(destinationDirectory, fileName),
+      package: destinationDirectory,
     });
   }, 'Packing extension...', 'OK');
 }
