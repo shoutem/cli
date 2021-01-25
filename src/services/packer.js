@@ -156,20 +156,21 @@ export default async function shoutemPack(dir, options) {
     } catch (error) {
       console.log('Failed to packageDir to temp', error);
     }
-    tar.create(
+
+    tar.c(
       {
         gzip: true,
         file: destinationDirectory,
-        sync: true,
       },
       [packageDir],
-    );
-
-    try {
-      fs.copySync(destinationDirectory, '/Users/vlad/Remote_Repositories/temp/destDir');
-    } catch (error) {
-      console.log('Failed to destinationDirectory to temp', error);
-    }
+    )
+      .then(() => {
+        try {
+          fs.copySync(destinationDirectory, '/Users/vlad/Remote_Repositories/temp/destDir');
+        } catch (error) {
+          console.log('Failed to destinationDirectory to temp', error);
+        }
+      });
 
     return ({
       packedDirs: dirsToPack,
