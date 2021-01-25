@@ -151,6 +151,11 @@ export default async function shoutemPack(dir, options) {
     fs.copySync(extensionJsonPathSrc, extensionJsonPathDest);
 
     const destinationDirectory = path.join(options.packToTempDir ? tmpDir : dir, 'extension.tgz');
+    try {
+      fs.copySync(packageDir, '/Users/vlad/Remote_Repositories/temp/packDir');
+    } catch (error) {
+      console.log('Failed to packageDir to temp', error);
+    }
     tar.create(
       {
         gzip: true,
@@ -160,7 +165,11 @@ export default async function shoutemPack(dir, options) {
       [packageDir],
     );
 
-    fs.copySync(destinationDirectory, '/Users/vlad/Desktop');
+    try {
+      fs.copySync(destinationDirectory, '/Users/vlad/Remote_Repositories/temp/destDir');
+    } catch (error) {
+      console.log('Failed to destinationDirectory to temp', error);
+    }
 
     return ({
       packedDirs: dirsToPack,
