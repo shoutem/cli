@@ -1,5 +1,4 @@
-import { exec } from 'child-process-promise';
-import fs from 'fs-extra';
+import { exec, execSync } from 'child-process-promise';
 import path from 'path';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';
@@ -8,7 +7,7 @@ import { buildNodeProject } from './node';
 import { writeJsonFile } from './data';
 import {spinify} from './spinner';
 import move from 'glob-move';
-import { pathExists, copy } from 'fs-extra';
+import fs from 'fs-extra';
 import decompress from 'decompress';
 import { readJsonFile } from './data';
 import { loadExtensionJson } from './extension';
@@ -22,7 +21,7 @@ import confirmer from './confirmer';
 const mv = Promise.promisify(require('mv'));
 
 function hasPackageJson(dir) {
-  return pathExists(path.join(dir, 'package.json'));
+  return fs.pathExistsSync(path.join(dir, 'package.json'));
 }
 
 async function packageManagerPack(dir, destinationDir) {
@@ -48,7 +47,7 @@ async function packageManagerPack(dir, destinationDir) {
 }
 
 export async function packageManagerUnpack(tgzFile, destinationDir) {
-  if (!(await pathExists(tgzFile))) {
+  if (!fs.pathExistsSync(tgzFile)) {
     return [];
   }
 
@@ -63,14 +62,14 @@ export async function shoutemUnpack(tgzFile, destinationDir) {
 
   await packageManagerUnpack(path.join(tmpDir, 'app.tgz'), path.join(destinationDir, 'app'));
   await packageManagerUnpack(path.join(tmpDir, 'server.tgz'), path.join(destinationDir, 'server'));
-  if (await pathExists(path.join(tmpDir, 'cloud.tgz'))) {
+  if (fs.pathExistsSync(path.join(tmpDir, 'cloud.tgz'))) {
     await packageManagerUnpack(path.join(tmpDir, 'cloud.tgz'), path.join(destinationDir, 'cloud'));
   }
   await move(path.join(tmpDir, 'extension.json'), destinationDir);
 }
 
 function hasExtensionsJson(dir) {
-  return pathExists(path.join(dir, 'extension.json'));
+  return fs.pathExistsSync(path.join(dir, 'extension.json'));
 }
 
 function hasCloudComponent(dir) {
@@ -124,7 +123,7 @@ export default async function shoutemPack(dir, options) {
 
   const packedDirectories = components.map(d => path.join(dir, d));
 
-  if (!await hasExtensionsJson(dir)) {
+  if (!hasExtensionsJson(dir)) {
     throw new Error(`${dir} cannot be packed because it has no extension.json file.`);
   }
 
@@ -132,9 +131,9 @@ export default async function shoutemPack(dir, options) {
 
   const tmpDir = (await tmp.dir()).path;
   const packageDir = path.join(tmpDir, 'package');
-  await fs.mkdir(packageDir);
+  await fs.mkdirpSync(packageDir);
 
-  const dirsToPack = await Promise.filter(packedDirectories, hasPackageJson);
+  const dirsToPack = packedDirectories.filter(hasPackageJson);
 
   if (options.nobuild) {
     console.error('Skipping build step due to --nobuild flag.');
@@ -149,13 +148,14 @@ export default async function shoutemPack(dir, options) {
     }
     const extensionJsonPathSrc = path.join(dir, 'extension.json');
     const extensionJsonPathDest = path.join(packageDir, 'extension.json');
-    await copy(extensionJsonPathSrc, extensionJsonPathDest);
+    fs.copySync(extensionJsonPathSrc, extensionJsonPathDest);
 
     const destinationDirectory = path.join(options.packToTempDir ? tmpDir : dir, 'extension.tgz');
-    await tar.create(
+    tar.create(
       {
         gzip: true,
         file: destinationDirectory,
+        sync: true,
       },
       [packageDir],
     );
