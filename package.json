@@ -14,8 +14,7 @@
     "extlint": "eslint",
     "lint": "eslint ./ --ignore-pattern build --ignore-pattern templates",
     "prepare": "npm run build",
-    "shoutem": "node build/shoutem.js",
-    "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\""
+    "shoutem": "node build/shoutem.js"
   },
   "license": "ISC",
   "dependencies": {
@@ -69,7 +68,7 @@
     "tmp-promise": "1.0.2",
     "universal-analytics": "0.4.13",
     "uppercamelcase": "^3.0.0",
-    "urijs": "1.18.0",
+    "urijs": "1.19.5",
     "uuid": "3.0.1",
     "yargonaut": "1.1.2",
     "yargs": "6.6.0"
@@ -82,9 +81,7 @@
     "eslint-config-airbnb": "8.0.0",
     "eslint-plugin-import": "1.9.2",
     "eslint-plugin-jsx-a11y": "1.5.3",
-    "eslint-plugin-mocha": "2.2.0",
     "eslint-plugin-react": "5.2.2",
-    "mocha": "2.4.5",
     "nock": "8.0.0",
     "sinon": "1.17.4"
   },
