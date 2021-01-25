@@ -159,7 +159,7 @@ export default async function shoutemPack(dir, options) {
         prefix: destinationDirectory,
         sync: true,
       },
-      packageDir,
+      [packageDir],
     );
 
     return ({
