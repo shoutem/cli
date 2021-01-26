@@ -1,6 +1,5 @@
 require('yargonaut')
-  .optionStyle('green.underline')
-  .helpStyle('green.underline')
+  .style('green.underline')
   .errorsStyle('red.bold');
 
 import 'colors';
