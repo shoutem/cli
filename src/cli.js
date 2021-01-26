@@ -1,4 +1,5 @@
 require('yargonaut')
+  .optionStyle('green.underline');
   .helpStyle('green.underline')
   .errorsStyle('red.bold');
 
@@ -32,10 +33,6 @@ analytics.setArgv(process.argv);
   await authorizeRequests(await getRefreshToken());
 
   const cli = yargs.usage('Usage: shoutem [command] [-h]')
-    .option('version', {
-      alias: 'v',
-      description: 'Shows version number.'
-    })
     .commandDir('cli')
     .strict()
     .help()
