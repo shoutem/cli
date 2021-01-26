@@ -2,7 +2,7 @@ import { exec, execSync } from 'child-process-promise';
 import path from 'path';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';
-import tar from 'tar';
+import targz from 'tar.gz';
 import { buildNodeProject } from './node';
 import { writeJsonFile } from './data';
 import {spinify} from './spinner';
@@ -151,32 +151,7 @@ export default async function shoutemPack(dir, options) {
     fs.copySync(extensionJsonPathSrc, extensionJsonPathDest);
 
     const destinationDirectory = path.join(options.packToTempDir ? tmpDir : dir, 'extension.tgz');
-    try {
-      fs.copySync(packageDir, '/Users/vlad/Remote_Repositories/temp/packDir');
-    } catch (error) {
-      console.log('Failed to packageDir to temp', error);
-    }
-
-    try {
-      console.log('Creating .tgz archive.');
-      await tar.c(
-        {
-          gzip: true,
-          file: destinationDirectory,
-        },
-        [packageDir],
-      );
-      console.log('Created .tgz archive.');
-    } catch (error) {
-      console.log('Failed to archive.\n', error);
-      console.log('\n');
-    }
-
-    try {
-      fs.copySync(destinationDirectory, '/Users/vlad/Remote_Repositories/temp/packDir');
-    } catch (error) {
-      console.log('Failed to destinationDirectory to temp.');
-    }
+    await targz().compress(packageDir, destinationDirectory);
 
     return ({
       packedDirs: dirsToPack,
