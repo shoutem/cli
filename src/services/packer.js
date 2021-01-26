@@ -157,20 +157,26 @@ export default async function shoutemPack(dir, options) {
       console.log('Failed to packageDir to temp', error);
     }
 
-    tar.c(
-      {
-        gzip: true,
-        file: destinationDirectory,
-      },
-      [packageDir],
-    )
-      .then(() => {
-        try {
-          fs.copySync(destinationDirectory, '/Users/vlad/Remote_Repositories/temp/destDir');
-        } catch (error) {
-          console.log('Failed to destinationDirectory to temp', error);
-        }
-      });
+    try {
+      console.log('Creating .tgz archive.');
+      await tar.c(
+        {
+          gzip: true,
+          file: destinationDirectory,
+        },
+        [packageDir],
+      );
+      console.log('Created .tgz archive.');
+    } catch (error) {
+      console.log('Failed to archive.\n', error);
+      console.log('\n');
+    }
+
+    try {
+      fs.copySync(destinationDirectory, '/Users/vlad/Remote_Repositories/temp/packDir');
+    } catch (error) {
+      console.log('Failed to destinationDirectory to temp.');
+    }
 
     return ({
       packedDirs: dirsToPack,
