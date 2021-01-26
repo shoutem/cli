@@ -1,7 +1,3 @@
-require('yargonaut')
-  .style('green.underline')
-  .errorsStyle('red.bold');
-
 import 'colors';
 import 'fetch-everywhere';
 import yargs from 'yargs';
@@ -32,6 +28,10 @@ analytics.setArgv(process.argv);
   await authorizeRequests(await getRefreshToken());
 
   const cli = yargs.usage('Usage: shoutem [command] [-h]')
+    .option('version', {
+      alias: 'v',
+      description: 'Shows version number.'
+    })
     .commandDir('cli')
     .strict()
     .help()

@@ -70,7 +70,6 @@
     "uppercamelcase": "^3.0.0",
     "urijs": "1.19.5",
     "uuid": "3.0.1",
-    "yargonaut": "1.1.2",
     "yargs": "16.2.0"
   },
   "devDependencies": {
