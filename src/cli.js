@@ -1,5 +1,5 @@
 require('yargonaut')
-  .optionStyle('green.underline');
+  .optionStyle('green.underline')
   .helpStyle('green.underline')
   .errorsStyle('red.bold');
 
