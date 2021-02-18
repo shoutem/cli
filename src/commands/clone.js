@@ -12,8 +12,11 @@ import { getApp } from '../clients/legacy-service';
 import { pathExists, copy } from 'fs-extra';
 import selectApp from '../services/app-selector';
 import {
-  downloadApp, fixPlatform, configurePlatform, createPlatformConfig,
-  setPlatformConfig
+  downloadApp,
+  fixPlatform,
+  configurePlatform,
+  createPlatformConfig,
+  setPlatformConfig,
 } from '../services/platform';
 import { ensureUserIsLoggedIn } from './login';
 import { createProgressHandler } from '../services/progress-bar';
@@ -157,19 +160,26 @@ export async function clone(opts, destinationDir) {
   } else {
     const platform = await appManager.getApplicationPlatform(opts.appId);
     ensurePlatformCompatibility(platform);
-    await downloadApp(opts.appId, appDir, {
-      progress: createProgressHandler({ msg: 'Downloading shoutem platform.' }),
-      useCache: !opts.force,
-
-      versionCheck: mobileAppVersion => {
-        if (!semver.gte(mobileAppVersion, '0.58.9')) {
-          throw new Error('This version of CLI only supports platforms containing mobile app 0.58.9 or higher.');
-        }
+    console.time('Platform download');
+    await downloadApp(
+      opts.appId,
+      appDir,
+      {
+        progress: createProgressHandler({ msg: 'Downloading shoutem platform.' }),
+        useCache: !opts.force,
+        versionCheck: mobileAppVersion => {
+          if (!semver.gte(mobileAppVersion, '0.58.9')) {
+            throw new Error('This version of @shoutem/cli only supports platforms containing mobile app 0.58.9 or higher.');
+          }
+        },
       }
-    });
+    );
+    console.timeEnd('Platform download');
   }
 
+  console.time('Extensions download');
   await pullExtensions(opts.appId, path.join(appDir, 'extensions'));
+  console.timeEnd('Extensions download');
 
   await fixPlatform(appDir, opts.appId);
 
