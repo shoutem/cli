@@ -37,13 +37,13 @@ export async function pullExtensions(appId, destinationDir) {
 async function pullExtension(destinationDir, { extension, canonicalName }) {
   let pullSuccessful = false;
   let pullError;
-  for (i = 0; pullSuccessful || i < 4; i++) {
+  for (let i = 0; i < 4; i++) {
     try {
       const url = await getExtensionUrl(extension);
       const tgzDir = (await tmp.dir()).path;
       await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
       await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), path.join(destinationDir, canonicalName));
-      pullSuccessful = true;
+      return;
     } catch (error) {
       pullError = error;
       console.log(`Failed to download extension ${canonicalName}, try ${i + 1}/5`);
