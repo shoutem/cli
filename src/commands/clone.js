@@ -43,7 +43,7 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
       await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
       await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), path.join(destinationDir, canonicalName));
       pullSuccessful = true;
-    } catch {
+    } catch () {
       console.log(`Failed to download extension ${canonicalName}, try ${i + 1}/5`);
     }
   }
