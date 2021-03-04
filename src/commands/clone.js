@@ -35,22 +35,20 @@ export async function pullExtensions(appId, destinationDir) {
 }
 
 async function pullExtension(destinationDir, { extension, canonicalName }) {
-  let pullSuccessful = false;
-  let pullError;
+  let pullError = {};
   for (let i = 0; i < 4; i++) {
     try {
       const url = await getExtensionUrl(extension);
       const tgzDir = (await tmp.dir()).path;
       await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
       await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), path.join(destinationDir, canonicalName));
-      return;
     } catch (error) {
       pullError = error;
       console.log(`Failed to download extension ${canonicalName}, try ${i + 1}/5`);
     }
   }
 
-  if (!pullSuccessful) {
+  if (!_.isEmpty(pullError)) {
     pullError.message = `Could not fetch extension ${canonicalName}.`;
     throw new Error(pullError);
   }
