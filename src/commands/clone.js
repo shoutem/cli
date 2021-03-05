@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import _ from 'lodash';
 import mkdirp from 'mkdirp-promise';
 import tmp from 'tmp-promise';
 import rmrf from 'rmfr';
