@@ -13,8 +13,11 @@ import { getApp } from '../clients/legacy-service';
 import { pathExists, copy } from 'fs-extra';
 import selectApp from '../services/app-selector';
 import {
-  downloadApp, fixPlatform, configurePlatform, createPlatformConfig,
-  setPlatformConfig
+  downloadApp,
+  fixPlatform,
+  configurePlatform,
+  createPlatformConfig,
+  setPlatformConfig,
 } from '../services/platform';
 import { ensureUserIsLoggedIn } from './login';
 import { createProgressHandler } from '../services/progress-bar';
@@ -29,29 +32,36 @@ export async function pullExtensions(appId, destinationDir) {
   const installations = await appManager.getInstallations(appId);
   const n = installations.length;
   let i = 0;
-  for(const inst of installations) {
+  for (const inst of installations) {
     i++;
-    await spinify(pullExtension(destinationDir, inst), `Downloading extension ${i}/${n}: ${inst.canonicalName}...`);
+    await spinify(
+      pullExtension(destinationDir, inst),
+      `Downloading extension ${i}/${n}: ${inst.canonicalName}...`
+    );
   }
 }
 
 async function pullExtension(destinationDir, { extension, canonicalName }) {
   let pullError = {};
-  let pullSuccessful = false;
-  for (let i = 0; !pullSuccessful || i < 4; i++) {
+  for (let i = 0; i < 5; i++) {
     try {
       const url = await getExtensionUrl(extension);
       const tgzDir = (await tmp.dir()).path;
       await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
-      await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), path.join(destinationDir, canonicalName));
-      pullSuccessful = true;
+      await shoutemUnpack(
+        path.join(tgzDir, 'extension.tgz'),
+        path.join(destinationDir, canonicalName)
+      );
+
+      return;
     } catch (error) {
-      pullError = error;
-      console.log(`Failed to download extension ${canonicalName}, try ${i + 1}/5`);
+      if (error.code !== 'ENOTEMPTY') {
+        pullError = error;
+      }
     }
   }
 
-  if (!pullSuccessful) {
+  if (!_.isEmpty(pullError)) {
     pullError.message = `Could not fetch extension ${canonicalName}.`;
     throw pullError;
   }
@@ -59,18 +69,21 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
 
 async function getExtensionUrl(extId) {
   const resp = await getExtension(extId);
-  const { location: { extension } } = resp;
+  const {
+    location: { extension },
+  } = resp;
 
- return `${removeTrailingSlash(extension.package)}/extension.tgz`;
+  return `${removeTrailingSlash(extension.package)}/extension.tgz`;
 }
 
 function removeTrailingSlash(str) {
-  return str.replace(/\/$/, "");
+  return str.replace(/\/$/, '');
 }
 
 function ensurePlatformCompatibility(platform) {
-  const msg = `Your app is using Shoutem Platform ${platform.version}`+
-    `, but cloning is supported only on Shoutem Platform 1.1.2 or later.\n`+
+  const msg =
+    `Your app is using Shoutem Platform ${platform.version}` +
+    `, but cloning is supported only on Shoutem Platform 1.1.2 or later.\n` +
     `Please, update the Platform through Settings -> Shoutem Platform -> Install page on the Builder or install older (and unsupported) version of ` +
     `the Shoutem CLI by running 'npm install -g @shoutem/cli@0.0.152'`;
 
@@ -84,16 +97,20 @@ async function queryPathExistsAction(destinationDir, oldDirectoryName) {
     type: 'list',
     name: 'action',
     message: `Directory ${oldDirectoryName} already exists.`,
-    choices: [{
-      name: 'Overwrite',
-      value: 'overwrite'
-    }, {
-      name: 'Abort',
-      value: 'abort',
-    }, {
-      name: 'Different app directory name',
-      value: 'rename'
-    }]
+    choices: [
+      {
+        name: 'Overwrite',
+        value: 'overwrite',
+      },
+      {
+        name: 'Abort',
+        value: 'abort',
+      },
+      {
+        name: 'Different app directory name',
+        value: 'rename',
+      },
+    ],
   });
 
   if (action === 'overwrite') {
@@ -111,26 +128,26 @@ async function queryPathExistsAction(destinationDir, oldDirectoryName) {
         return 'No spaces are allowed.';
       }
       if (await pathExists(path.join(destinationDir, dirName))) {
-        return `Directory ${dirName} already exists.`
+        return `Directory ${dirName} already exists.`;
       }
       return true;
-    }
+    },
   });
 
   return {
     type: 'rename',
     newDirectoryName,
-    newAppDir: path.join(destinationDir, newDirectoryName)
+    newAppDir: path.join(destinationDir, newDirectoryName),
   };
 }
 
 export async function clone(opts, destinationDir) {
-  if (!await commandExists('git')) {
+  if (!(await commandExists('git'))) {
     throw new Error('Missing `git` command');
   }
   await ensureUserIsLoggedIn();
 
-  opts.appId = opts.appId || await selectApp();
+  opts.appId = opts.appId || (await selectApp());
 
   const { name } = await getApp(opts.appId);
 
@@ -174,9 +191,11 @@ export async function clone(opts, destinationDir) {
 
       versionCheck: mobileAppVersion => {
         if (!semver.gte(mobileAppVersion, '0.58.9')) {
-          throw new Error('This version of CLI only supports platforms containing mobile app 0.58.9 or higher.');
+          throw new Error(
+            'This version of CLI only supports platforms containing mobile app 0.58.9 or higher.'
+          );
         }
-      }
+      },
     });
   }
 
@@ -185,7 +204,7 @@ export async function clone(opts, destinationDir) {
   await fixPlatform(appDir, opts.appId);
 
   const config = await createPlatformConfig(appDir, {
-    appId: opts.appId
+    appId: opts.appId,
   });
   await setPlatformConfig(appDir, config);
 
@@ -205,7 +224,10 @@ export async function clone(opts, destinationDir) {
   console.log('    Have an Android simulator running or a device connected');
   console.log('    react-native run-android');
 
-  if (!/^win/.test(process.platform) && !await commandExists('watchman')) {
-    console.log('HINT: You should probably install Facebook\'s `watchman` before running react-native commands'.bold.yellow);
+  if (!/^win/.test(process.platform) && !(await commandExists('watchman'))) {
+    console.log(
+      "HINT: You should probably install Facebook's `watchman` before running react-native commands"
+        .bold.yellow
+    );
   }
 }
