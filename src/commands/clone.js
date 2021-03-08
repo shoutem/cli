@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import _ from 'lodash';
 import mkdirp from 'mkdirp-promise';
 import tmp from 'tmp-promise';
 import rmrf from 'rmfr';
@@ -35,14 +36,24 @@ export async function pullExtensions(appId, destinationDir) {
 }
 
 async function pullExtension(destinationDir, { extension, canonicalName }) {
-  try {
-    const url = await getExtensionUrl(extension);
-    const tgzDir = (await tmp.dir()).path;
-    await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
-    await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), path.join(destinationDir, canonicalName));
-  } catch (err) {
-    err.message = `Could not fetch extension ${canonicalName}.`;
-    throw err;
+  let pullError = {};
+  let pullSuccessful = false;
+  for (let i = 0; !pullSuccessful || i < 4; i++) {
+    try {
+      const url = await getExtensionUrl(extension);
+      const tgzDir = (await tmp.dir()).path;
+      await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
+      await shoutemUnpack(path.join(tgzDir, 'extension.tgz'), path.join(destinationDir, canonicalName));
+      pullSuccessful = true;
+    } catch (error) {
+      pullError = error;
+      console.log(`Failed to download extension ${canonicalName}, try ${i + 1}/5`);
+    }
+  }
+
+  if (!pullSuccessful) {
+    pullError.message = `Could not fetch extension ${canonicalName}.`;
+    throw pullError;
   }
 }
 
