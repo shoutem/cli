@@ -42,7 +42,7 @@ export async function pullExtensions(appId, destinationDir) {
 }
 
 async function pullExtension(destinationDir, { extension, canonicalName }) {
-  let pullError = {};
+  let pullError = null;
   for (let i = 0; i < 4; i++) {
     try {
       const url = await getExtensionUrl(extension);
@@ -53,6 +53,7 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
         path.join(destinationDir, canonicalName)
       );
 
+      pullError = null;
       return;
     } catch (error) {
       if (error.code !== 'ENOTEMPTY') {
