@@ -43,7 +43,7 @@ export async function pullExtensions(appId, destinationDir) {
 
 async function pullExtension(destinationDir, { extension, canonicalName }) {
   let pullError = {};
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < 4; i++) {
     try {
       const url = await getExtensionUrl(extension);
       const tgzDir = (await tmp.dir()).path;
