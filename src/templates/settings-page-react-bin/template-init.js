@@ -10,7 +10,7 @@ import {
 
 const pkgJsonTemplate = {
   "scripts": {
-    "lint": "eslint --no-eslintrc -c .eslintrc src/**/*.{js,jsx}",
+    "lint": "eslint --no-eslintrc src/**/*.{js,jsx}",
     "clean": "rimraf ./build/*",
     "build": "npm run clean && cross-env NODE_ENV=production webpack --config ./bin/webpack/webpack.config.js",
     "dev": "webpack-dev-server --config ./bin/webpack/webpack.config.js"
@@ -56,28 +56,21 @@ const pkgJsonTemplate = {
     "@shoutem/extension-sandbox": "^0.1.4",
     "@shoutem/react-web-ui": "0.12.4",
     "@shoutem/redux-api-sdk": "^2.0.0",
-    "@shoutem/redux-composers": "^0.1.6",
     "@shoutem/redux-io": "^3.2.1",
     "@shoutem/redux-sync-state-engine": "^0.0.2",
     "auto-bind": "^4.0.0",
     "es6-promise": "^4.1.1",
     "fetch-everywhere": "^1.0.5",
     "lodash": "^4.17.4",
-    "moment": "^2.16.0",
-    "normalize-url": "^1.6.0",
     "prop-types": "^15.7.2",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
     "i18next": "^19.7.0",
     "react-i18next": "^11.7.3",
     "react-redux": "^5.0.3",
-    "react-select": "^1.0.0-rc.5",
     "redux": "^3.6.0",
-    "redux-form": "^5.2.5",
     "redux-thunk": "^2.2.0",
-    "reselect": "^2.5.4",
-    "urijs": "^1.18.9",
-    "validator": "^6.2.1"
+    "urijs": "^1.18.9"
   },
   "babel": {
     "presets": [
