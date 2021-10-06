@@ -1,5 +1,6 @@
 {
-  "extends": "airbnb",
+  "parser": "babel-eslint",
+  "extends": "@shoutem/base",
   "env": {
     "mocha": true
   },
