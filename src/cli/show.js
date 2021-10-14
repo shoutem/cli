@@ -10,7 +10,7 @@ export function builder(yargs) {
       all: {
         type: 'boolean',
         default: false,
-      }
+      },
     })
     .usage(`shoutem ${command}\n\n${description}`);
 }

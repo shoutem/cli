@@ -28,17 +28,17 @@ import 'colors';
 
 const downloadFile = Promise.promisify(require('download-file'));
 
-export async function pullExtensions(appId, destinationDir) {
-  const installations = await appManager.getInstallations(appId);
-  const n = installations.length;
-  let i = 0;
-  for (const inst of installations) {
-    i++;
-    await spinify(
-      pullExtension(destinationDir, inst),
-      `Downloading extension ${i}/${n}: ${inst.canonicalName}...`
-    );
-  }
+function removeTrailingSlash(str) {
+  return str.replace(/\/$/, '');
+}
+
+async function getExtensionUrl(extId) {
+  const resp = await getExtension(extId);
+  const {
+    location: { extension },
+  } = resp;
+
+  return `${removeTrailingSlash(extension.package)}/extension.tgz`;
 }
 
 async function pullExtension(destinationDir, { extension, canonicalName }) {
@@ -50,7 +50,7 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
       await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
       await shoutemUnpack(
         path.join(tgzDir, 'extension.tgz'),
-        path.join(destinationDir, canonicalName)
+        path.join(destinationDir, canonicalName),
       );
 
       pullError = null;
@@ -68,17 +68,17 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
   }
 }
 
-async function getExtensionUrl(extId) {
-  const resp = await getExtension(extId);
-  const {
-    location: { extension },
-  } = resp;
-
-  return `${removeTrailingSlash(extension.package)}/extension.tgz`;
-}
-
-function removeTrailingSlash(str) {
-  return str.replace(/\/$/, '');
+export async function pullExtensions(appId, destinationDir) {
+  const installations = await appManager.getInstallations(appId);
+  const n = installations.length;
+  let i = 0;
+  for (const inst of installations) {
+    i++;
+    await spinify(
+      pullExtension(destinationDir, inst),
+      `Downloading extension ${i}/${n}: ${inst.canonicalName}...`,
+    );
+  }
 }
 
 function ensurePlatformCompatibility(platform) {
@@ -152,7 +152,9 @@ export async function clone(opts, destinationDir) {
 
   const { name } = await getApp(opts.appId);
 
-  let directoryName = slugify(opts.dir || name, { remove: /[$*_+~.()'"!\-:@]/g });
+  let directoryName = slugify(opts.dir || name, {
+    remove: /[$*_+~.()'"!\-:@]/g,
+  });
   console.log('cloning to', directoryName);
   let appDir = path.join(destinationDir, directoryName);
 
@@ -174,7 +176,9 @@ export async function clone(opts, destinationDir) {
   }
 
   if (appDir.indexOf(' ') >= 0) {
-    throw new Error("Path to the directory you are cloning to can't contain spaces.");
+    throw new Error(
+      "Path to the directory you are cloning to can't contain spaces.",
+    );
   }
 
   await mkdirp(appDir);
@@ -193,7 +197,7 @@ export async function clone(opts, destinationDir) {
       versionCheck: mobileAppVersion => {
         if (!semver.gte(mobileAppVersion, '0.58.9')) {
           throw new Error(
-            'This version of CLI only supports platforms containing mobile app 0.58.9 or higher.'
+            'This version of CLI only supports platforms containing mobile app 0.58.9 or higher.',
           );
         }
       },
@@ -228,7 +232,7 @@ export async function clone(opts, destinationDir) {
   if (!/^win/.test(process.platform) && !(await commandExists('watchman'))) {
     console.log(
       "HINT: You should probably install Facebook's `watchman` before running react-native commands"
-        .bold.yellow
+        .bold.yellow,
     );
   }
 }

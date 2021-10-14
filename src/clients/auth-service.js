@@ -29,23 +29,26 @@ export class UnauthorizedError {
   }
 }
 
-const tokensUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
-const appAccessTokenUrl = new URI(services.authService).segment('/v1/auth/tokens').toString();
+const tokensUrl = new URI(services.authService)
+  .segment('/v1/auth/tokens')
+  .toString();
+const appAccessTokenUrl = new URI(services.authService)
+  .segment('/v1/auth/tokens')
+  .toString();
 
 function getBasicAuthHeaderValue(email, password) {
-  return 'Basic ' + Buffer.from(`${email}:${password}`).toString('base64');
+  return `Basic ${Buffer.from(`${email}:${password}`).toString('base64')}`;
 }
 
 export async function createRefreshToken(email, password) {
   try {
     const response = await post(tokensUrl, null, {
       headers: {
-        Authorization: getBasicAuthHeaderValue(email, password)
-      }
+        Authorization: getBasicAuthHeaderValue(email, password),
+      },
     });
     const { token } = response;
     return token;
-
   } catch (err) {
     if (err.statusCode === 401) {
       throw new UnauthorizedError(err.url, err.response, err.statusCode);
@@ -61,15 +64,15 @@ export async function createAppAccessToken(appId, refreshToken) {
       attributes: {
         tokenType: 'access-token',
         subjectType: 'application',
-        subjectId: appId.toString()
-      }
-    }
+        subjectId: appId.toString(),
+      },
+    },
   };
 
   const { token } = await post(appAccessTokenUrl, body, {
     headers: {
-      Authorization: `Bearer ${refreshToken}`
-    }
+      Authorization: `Bearer ${refreshToken}`,
+    },
   });
 
   return token;
@@ -77,7 +80,10 @@ export async function createAppAccessToken(appId, refreshToken) {
 
 export async function getRefreshToken({ email, password } = {}) {
   if (email && password) {
-    const refreshToken = await cache.setValue('refresh-token', await createRefreshToken(email, password));
+    const refreshToken = await cache.setValue(
+      'refresh-token',
+      await createRefreshToken(email, password),
+    );
     await cache.setValue('access-token', null);
     return refreshToken;
   }
@@ -98,7 +104,7 @@ const authorizationConfig = {
       headers: {
         Authorization: `Bearer ${refreshToken}`,
         Accept: 'application/vnd.api+json',
-        'Content-Type': 'application/vnd.api+json'
+        'Content-Type': 'application/vnd.api+json',
       },
       body: JSON.stringify({
         data: {
@@ -106,22 +112,34 @@ const authorizationConfig = {
           attributes: {
             tokenType: 'access-token',
             compressionType: 'gzip',
-          }
-        }
-      })
+          },
+        },
+      }),
     });
   },
   async parseAccessToken(response) {
     if (response.ok) {
-      const { data: { attributes: { token } } } = await response.json();
+      const {
+        data: {
+          attributes: { token },
+        },
+      } = await response.json();
       await cache.setValue('access-token', token);
       return token;
     }
     logger.info('parseAccessToken', response);
-    throw new AuthServiceError('Could not get access token', tokensUrl, response, 'ACCESS_TOKEN_FAILURE');
+    throw new AuthServiceError(
+      'Could not get access token',
+      tokensUrl,
+      response,
+      'ACCESS_TOKEN_FAILURE',
+    );
   },
   shouldIntercept(request) {
-    return !request.headers.get('Authorization') && new URI(request.url).host() !== 'github.com';
+    return (
+      !request.headers.get('Authorization') &&
+      new URI(request.url).host() !== 'github.com'
+    );
   },
   shouldInvalidateAccessToken() {
     return false;
@@ -134,23 +152,28 @@ const authorizationConfig = {
   isResponseUnauthorized({ status }) {
     return status === 401 || status === 403;
   },
-  shouldWaitForTokenRenewal: true
+  shouldWaitForTokenRenewal: true,
 };
 
 export async function authorizeRequests(refreshToken) {
   if (!refreshToken) {
-    return;
+    return false;
   }
+
   try {
     const intercept = require('@shoutem/fetch-token-intercept');
+
     intercept.configure(authorizationConfig);
     intercept.authorize(refreshToken, await cache.getValue('access-token'));
+
     return true;
   } catch (err) {
     logger.info(err);
+
     if (err.statusCode !== 401) {
       throw err;
     }
+
     return false;
   }
 }

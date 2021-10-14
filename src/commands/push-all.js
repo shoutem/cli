@@ -8,7 +8,9 @@ import { prompt, Separator } from 'inquirer';
 import { getHostEnvName } from '../clients/server-env';
 
 export async function pushAll(args) {
-  const extPaths = await bluebird.filter(args.paths, f => pathExists(path.join(f, 'extension.json')));
+  const extPaths = await bluebird.filter(args.paths, f =>
+    pathExists(path.join(f, 'extension.json')),
+  );
 
   if (extPaths.length === 0) {
     console.log('No extensions found in current directory.');
@@ -19,21 +21,23 @@ export async function pushAll(args) {
     return { pushed: extPaths, notPushed: [] };
   }
 
-  let { pathsToPush } = args.noconfirm || await prompt({
-    type: 'checkbox',
-    name: 'pathsToPush',
-    message: `Check which extensions you want to push to ${getHostEnvName()}.`,
-    choices: extPaths.concat(new Separator()),
-    default: extPaths,
-    pageSize: 20
-  });
+  let { pathsToPush } =
+    args.noconfirm ||
+    (await prompt({
+      type: 'checkbox',
+      name: 'pathsToPush',
+      message: `Check which extensions you want to push to ${getHostEnvName()}.`,
+      choices: extPaths.concat(new Separator()),
+      default: extPaths,
+      pageSize: 20,
+    }));
   pathsToPush = pathsToPush || extPaths;
 
   const pushed = [];
   const notPushed = [];
 
   for (const extPath of pathsToPush) {
-    try  {
+    try {
       await uploadExtension(args, extPath);
       console.log(msg.push.complete());
       pushed.push(extPath);

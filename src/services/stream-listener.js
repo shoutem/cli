@@ -6,7 +6,7 @@ export function listenStream(stream, handler, size) {
     handler({
       total,
       length,
-      percent: size ? (total / size * 100).toFixed(2): null
+      percent: size ? ((total / size) * 100).toFixed(2) : null,
     });
   });
 }

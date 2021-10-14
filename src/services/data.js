@@ -1,4 +1,4 @@
-import fs from "fs-extra";
+import fs from 'fs-extra';
 
 export async function readJsonFile(filePath) {
   try {
@@ -12,12 +12,12 @@ export async function readJsonFile(filePath) {
   }
 }
 
+export function stringify(json) {
+  return `${JSON.stringify(json, null, 2)}\n`;
+}
+
 export async function writeJsonFile(json, filePath) {
   const str = stringify(json);
   await fs.writeFile(filePath, str, 'utf8');
   return str;
-}
-
-export function stringify(json) {
-  return `${JSON.stringify(json, null, 2)}\n`;
 }

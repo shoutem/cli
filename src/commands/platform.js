@@ -6,19 +6,29 @@ import { getHostEnvName } from '../clients/server-env';
 import { spinify, startSpinner } from '../services/spinner';
 import { createProgressHandler } from '../services/progress-bar';
 import { validatePlatformArchive } from '../services/validation';
-import { uploadPlatform, getPlatforms, getDeveloper } from '../clients/extension-manager';
+import {
+  uploadPlatform,
+  getPlatforms,
+  getDeveloper,
+} from '../clients/extension-manager';
 
 export async function uploadPlatformArchive(platformArchiveProvider) {
   if (platformArchiveProvider.getType() === 'local') {
     await platformArchiveProvider.validateShoutemIgnore();
   }
 
-  const archivePath = await spinify(platformArchiveProvider.getArchivePath(), 'Packing the platform...');
+  const archivePath = await spinify(
+    platformArchiveProvider.getArchivePath(),
+    'Packing the platform...',
+  );
   if (!fs.pathExists(archivePath)) {
     throw new Error('Unable to create or download archive.');
   }
 
-  await spinify(validatePlatformArchive(platformArchiveProvider), 'Validating platform archive...');
+  await spinify(
+    validatePlatformArchive(platformArchiveProvider),
+    'Validating platform archive...',
+  );
 
   const { size } = await fs.stat(archivePath);
   const stream = fs.createReadStream(archivePath);
@@ -29,7 +39,7 @@ export async function uploadPlatformArchive(platformArchiveProvider) {
     createProgressHandler({
       msg: 'Upload progress',
       total: size,
-      onFinished: () => spinner = startSpinner('Processing upload...'),
+      onFinished: () => (spinner = startSpinner('Processing upload...')),
     }),
     size,
   );
@@ -37,7 +47,9 @@ export async function uploadPlatformArchive(platformArchiveProvider) {
     spinner.stop(true);
     console.log(`Processing upload... [${'OK'.green.bold}].`);
   }
-  console.log(`${msg.platform.uploadingInfo(getHostEnvName())} [${'OK'.green.bold}].`);
+  console.log(
+    `${msg.platform.uploadingInfo(getHostEnvName())} [${'OK'.green.bold}].`,
+  );
 
   platformArchiveProvider.cleanUp();
 
@@ -48,9 +60,14 @@ export async function getAvailablePlatforms(limit) {
   const developer = await getDeveloper();
   const allPlatforms = await getPlatforms();
 
-  let ownPlatforms = _.filter(allPlatforms, platform => _.get(platform, ['author', 'name']) === developer.name);
+  let ownPlatforms = _.filter(
+    allPlatforms,
+    platform => _.get(platform, ['author', 'name']) === developer.name,
+  );
 
-  ownPlatforms.sort((p1, p2) => semver.compare(p1.version, p2.version, true) * -1); // highest versions first
+  ownPlatforms.sort(
+    (p1, p2) => semver.compare(p1.version, p2.version, true) * -1,
+  ); // highest versions first
 
   if (_.isNumber(limit)) {
     ownPlatforms = _.slice(ownPlatforms, 0, limit);
