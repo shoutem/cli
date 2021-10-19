@@ -46,7 +46,7 @@ function ensureRequiredFilesExist(dir, extTitle) {
 
 export async function uploadExtension(opts = {}, extensionDir = ensureInExtensionDir()) {
   const extJson = await loadExtensionJson(extensionDir);
-  console.log(`Pushing ${extJson.title.cyan}:`);
+  console.log(`Uploading ${extJson.title.cyan}:`);
 
   try {
     ensureRequiredFilesExist(extensionDir, extJson.title);

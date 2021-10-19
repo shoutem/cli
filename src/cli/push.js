@@ -43,6 +43,7 @@ export const handler = args => executeAndHandleError(async () => {
     return;
   }
 
+  console.warn('DEPRECATED: \'shoutem push\' is deprecated and will be removed with the next major version of the Shoutem CLI. Shoutem now supports release candidate versioning, which allows developers to \'shoutem publish\' 1.0.0-rc.0 versioned extensions which are labeled as "Beta" versions in the Shoutem Builder.');
   args.paths = multiglob(args.paths);
   await pushAll(args);
 });
