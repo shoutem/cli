@@ -63,7 +63,7 @@ export async function uploadExtension(opts = {}, extensionDir = ensureInExtensio
         throw err;
       }
       else {
-        err.message = 'Syntax errors detected, aborting push! Use `shoutem push --nocheck` to override, but use with caution!';
+        err.message = 'Syntax errors detected, aborting upload! Use `shoutem publish --nocheck` to override, but use with caution!';
         throw err;
       }
     }
