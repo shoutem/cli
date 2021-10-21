@@ -6,6 +6,4 @@ const platformMessages = {
   platformUrlDescription,
 };
 
-export {
-  platformMessages,
-};
+export { platformMessages };

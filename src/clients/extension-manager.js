@@ -22,7 +22,12 @@ export async function createDeveloper(devName) {
   });
 }
 
-export async function uploadExtension(canonicalName, tgzStream, progressHandler, size) {
+export async function uploadExtension(
+  canonicalName,
+  tgzStream,
+  progressHandler,
+  size,
+) {
   // a temporary workaround, forces access token to refresh
   await getDeveloper();
 
@@ -30,7 +35,9 @@ export async function uploadExtension(canonicalName, tgzStream, progressHandler,
     listenStream(tgzStream, progressHandler, size);
   }
 
-  const uri = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}`);
+  const uri = extensionManagerUri
+    .clone()
+    .segment(`/v1/extensions/${canonicalName}`);
   const form = new FormData();
   form.append('extension', tgzStream, {
     contentType: 'application/gzip',
@@ -44,19 +51,23 @@ export async function uploadExtension(canonicalName, tgzStream, progressHandler,
   return id;
 }
 
+export async function getExtension(canonicalName) {
+  const url = extensionManagerUri
+    .clone()
+    .segment(`/v1/extensions/${canonicalName}`);
+  return await jsonApi.get(url);
+}
+
 export async function getExtensionId(canonicalName) {
   const { id } = await getExtension(canonicalName);
 
   return id;
 }
 
-export async function getExtension(canonicalName) {
-  const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}`);
-  return await jsonApi.get(url);
-}
-
 export async function publishExtension(canonicalName) {
-  const url = extensionManagerUri.clone().segment(`/v1/extensions/${canonicalName}/publish`);
+  const url = extensionManagerUri
+    .clone()
+    .segment(`/v1/extensions/${canonicalName}/publish`);
   return await jsonApi.post(url);
 }
 

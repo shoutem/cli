@@ -4,8 +4,12 @@ import { getLocalStoragePathSync } from '../clients/cli-paths';
 
 const defaultPackageManagerFilePath = path.join(
   getLocalStoragePathSync(),
-  'default-package-manager'
+  'default-package-manager',
 );
+
+export function setDefaultPackageManager(name) {
+  fs.writeFileSync(defaultPackageManagerFilePath, name);
+}
 
 export function getDefaultPackageManager() {
   try {
@@ -14,8 +18,4 @@ export function getDefaultPackageManager() {
     setDefaultPackageManager('npm');
     return 'npm';
   }
-}
-
-export function setDefaultPackageManager(name) {
-  fs.writeFileSync(defaultPackageManagerFilePath, name);
 }

@@ -26,7 +26,9 @@ export const httpErrorCodeMessages = {
 export function getHttpErrorMessage(errorCode) {
   const code = parseInt(errorCode, 10);
   const infoLink = `https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#${code}`;
-  const message = httpErrorCodeMessages[code] || `see ${infoLink} for more info about this error`;
+  const message =
+    httpErrorCodeMessages[code] ||
+    `see ${infoLink} for more info about this error`;
 
   return `Error ${code} (${message})`;
 }

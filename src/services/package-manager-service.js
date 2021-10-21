@@ -13,25 +13,24 @@ export async function install(cwd = process.cwd()) {
     cwd,
     stdio: 'inherit',
     shell: true,
-    env: { ...process.env, FORCE_COLOR: true }
+    env: { ...process.env, FORCE_COLOR: true },
   });
 }
 
-export async function run(
-  cwd,
-  task,
-  taskArgs = [],
-  packagerOptions = []
-) {
+export async function run(cwd, task, taskArgs = [], packagerOptions = []) {
   const opts = {
     cwd,
     stdio: ['ignore', 'inherit', 'inherit'],
-    shell: true
+    shell: true,
   };
 
-  const spawned = taskArgs.length ?
-    spawn(packageManager, ['run', task, ...packagerOptions, '--', ...taskArgs], opts) :
-    spawn(packageManager, ['run', task, ...packagerOptions], opts);
+  const spawned = taskArgs.length
+    ? spawn(
+        packageManager,
+        ['run', task, ...packagerOptions, '--', ...taskArgs],
+        opts,
+      )
+    : spawn(packageManager, ['run', task, ...packagerOptions], opts);
 
   return await spawned;
 }
@@ -48,14 +47,14 @@ export async function addLocalDependency(projectPath, modulePath) {
   const { name } = await getPackageJson(modulePath);
   const packageJson = await getPackageJson(projectPath);
 
-  const dependencyValue = 'file:' + path.relative(projectPath, modulePath);
+  const dependencyValue = `file:${path.relative(projectPath, modulePath)}`;
 
   await savePackageJson(projectPath, {
     ...packageJson,
     dependencies: {
       ...packageJson.dependencies,
-      [name]: dependencyValue
-    }
+      [name]: dependencyValue,
+    },
   });
 }
 

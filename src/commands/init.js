@@ -22,19 +22,26 @@ export async function promptExtensionInit(extName) {
   const title = _.upperFirst(decamelize(extName, ' '));
   const version = '0.0.1';
 
-  const questions = [{
-    name: 'title',
-    message: 'Title',
-    default: title,
-  }, {
-    name: 'version',
-    message: 'Version',
-    default: version,
-    validate: value => semver.valid(value) ? true : 'The version must be a valid semver version value.',
-  }, {
-    name: 'description',
-    message: 'Description',
-  }];
+  const questions = [
+    {
+      name: 'title',
+      message: 'Title',
+      default: title,
+    },
+    {
+      name: 'version',
+      message: 'Version',
+      default: version,
+      validate: value =>
+        semver.valid(value)
+          ? true
+          : 'The version must be a valid semver version value.',
+    },
+    {
+      name: 'description',
+      message: 'Description',
+    },
+  ];
 
   console.log(msg.init.requestInfo());
   const answer = await inquirer.prompt(questions);
@@ -43,14 +50,22 @@ export async function promptExtensionInit(extName) {
     .filter(({ published }) => published)
     .map(({ version }) => version);
 
-  return { name, ...answer, platform: generateNoPatchSemver(_.first(platformVersions)) };
+  return {
+    name,
+    ...answer,
+    platform: generateNoPatchSemver(_.first(platformVersions)),
+  };
 }
 
 export async function initExtension(extName, extensionPath = process.cwd()) {
   const developer = await ensureUserIsLoggedIn();
   const extJson = await promptExtensionInit(extName);
 
-  utils.getExtensionCanonicalName(developer.name, extJson.name, extJson.version);
+  utils.getExtensionCanonicalName(
+    developer.name,
+    extJson.name,
+    extJson.version,
+  );
 
   const dirname = `${developer.name}.${extJson.name}`;
   if (fs.existsSync(path.join(process.cwd(), dirname))) {
@@ -63,12 +78,14 @@ export async function initExtension(extName, extensionPath = process.cwd()) {
     description: extJson.description,
   });
 
-  await offerChanges(await instantiateExtensionTemplate('init', {
-    extensionPath,
-    devName: developer.name,
-    extJson,
-    packageJsonString,
-  }));
+  await offerChanges(
+    await instantiateExtensionTemplate('init', {
+      extensionPath,
+      devName: developer.name,
+      extJson,
+      packageJsonString,
+    }),
+  );
 
   return path.join(extensionPath, dirname);
 }

@@ -5,5 +5,10 @@ import { instantiateTemplatePath } from './template';
  * This file is used to export extension's themes and screens.
  */
 export async function generateExtensionJs(extensionPath) {
-  return await instantiateTemplatePath('extension-js', extensionPath, {}, { overwrite: () => true });
+  return await instantiateTemplatePath(
+    'extension-js',
+    extensionPath,
+    {},
+    { overwrite: () => true },
+  );
 }

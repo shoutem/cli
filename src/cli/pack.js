@@ -9,8 +9,8 @@ export const builder = yargs => {
     .options({
       nobuild: {
         type: 'boolean',
-          description: 'Packs the extension without building it.'
-      }
+        description: 'Packs the extension without building it.',
+      },
     })
     .usage(`shoutem ${command} [options]\n\n${description}`);
 };
@@ -20,7 +20,7 @@ export async function handler(args) {
   try {
     const result = await shoutemPack(extensionDir, args);
     console.log(result.package);
-  } catch(err) {
+  } catch (err) {
     await handleError(err);
   }
 }

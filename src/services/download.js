@@ -8,6 +8,17 @@ import { getHttpErrorMessage } from './get-http-error-message';
 
 const downloadFile = Promise.promisify(require('download-file'));
 
+export function getRedirectLocation(uri) {
+  return new Promise((resolve, reject) => {
+    const protocol = url.parse(uri).protocol.slice(0, -1);
+    require(protocol)
+      .get(uri, response => {
+        resolve(response.headers.location);
+      })
+      .on('error', err => reject(err));
+  });
+}
+
 export async function downloadFileFollowRedirect(uri, options) {
   let redirectLocation = null;
 
@@ -28,38 +39,26 @@ export async function downloadFileFollowRedirect(uri, options) {
   }
 }
 
-export function getRedirectLocation(uri) {
-  return new Promise((resolve, reject) => {
-    const protocol = url.parse(uri).protocol.slice(0, -1);
-    require(protocol).get(uri, (response) => {
-      resolve(response.headers.location);
-    }).on('error', err => reject(err));
-  });
-}
-
 const defaultRequestHandlers = {
-  onResponse: (response) => {
+  onResponse: response => {
     if (response.statusCode !== 200) {
       throw new Error(`Invalid status code; ${response.statusCode}`);
     }
   },
-  onError: (err) => {
+  onError: err => {
     throw err;
   },
-  onEnd: () => { },
+  onEnd: () => {},
   destinations: [],
 };
 
 export function pipeDownload(url, handlers = {}, options = {}) {
-  const {
-    onError,
-    onEnd,
-    onResponse,
-    destinations,
-  } = { ...defaultRequestHandlers, ...handlers };
+  const { onError, onEnd, onResponse, destinations } = {
+    ...defaultRequestHandlers,
+    ...handlers,
+  };
 
-  const fileName = options.fileName || url.split('/').pop();
-  const progressHandler = options.progress || (() => { });
+  const progressHandler = options.progress || (() => {});
 
   let req = request(url)
     .on('error', onError)
@@ -98,7 +97,7 @@ export function pipeDownloadToFile(url, destinationDir, options = {}) {
   const fileStream = fs.createWriteStream(filePath);
 
   pipeDownloadPromise(url, [fileStream], options);
-  
+
   return new Promise((resolve, reject) => {
     fileStream.on('error', reject);
     fileStream.on('close', resolve);
