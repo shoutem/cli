@@ -19,11 +19,11 @@ export default {
       `Extension installed onto newly created \`${app}\` application.`,
     seeNewInBrowser: url => `See it in a browser: ${url}.`,
     notExtensionDir: () =>
-      'No extension found. Try using `shoutem push` before installing.',
+      'No extension found. Try using `shoutem publish` before installing.',
   },
   uninstall: {
     missingExtension: () =>
-      'The extension does not exist. It should be pushed using `shoutem push` first.',
+      'The extension does not exist. It should be published using `shoutem publish` first.',
     missingInstallation: () => 'Extension not installed.',
     complete: () => 'Extension uninstalled.',
   },
@@ -51,6 +51,8 @@ export default {
     },
   },
   publish: {
+    alreadyPublished: extJson => 
+      `Version ${extJson.version.cyan} of ${extJson.name.cyan} has already been published.`,
     complete: extJson =>
       `Version ${extJson.version.cyan} of ${extJson.name.cyan} extension was published!`,
     failed: detail => `Publish failed: ${detail}`,
@@ -61,12 +63,12 @@ export default {
     complete: () => 'Success!'.green.bold,
     missingRequiredFile: (missingFiles, extName) =>
       missingFiles.length > 1
-        ? `Canceling push, extension '${extName}' is missing the following files:\n  ${missingFiles.join(
+        ? `Canceling upload, extension '${extName}' is missing the following files:\n  ${missingFiles.join(
             '\n  ',
           )}\nYou can ignore the buffer warning, it stems from dependencies.`
-        : `Canceling push, extension '${extName}' is missing '${missingFiles[0]}' file.\nYou can ignore the buffer warning, it stems from dependencies.`,
+        : `Canceling upload, extension '${extName}' is missing '${missingFiles[0]}' file.\nYou can ignore the buffer warning, it stems from dependencies.`,
     missingPackageJson: list =>
-      `Warning: directories ${list} couldn't be pushed due to missing package.json.`,
+      `Warning: directories ${list} couldn't be uploaded due to missing package.json.`,
     failureSuggestion: () =>
       'Warning: Check whether both server and app directory have a valid package.json file.',
     uploadingInfo: (extJson, env) =>

@@ -1,15 +1,20 @@
+import bluebird from 'bluebird';
+import { pathExists } from 'fs-extra';
+import { prompt, Separator } from 'inquirer';
+import path from 'path';
+import { canPublish } from '../clients/extension-manager';
+import { getHostEnvName } from '../clients/server-env';
+import { handleError } from '../services/error-handler';
+import { getExtensionCanonicalName, loadExtensionJson } from '../services/extension';
+import { spinify, startSpinner } from '../services/spinner';
 import { uploadExtension } from '../commands/push';
 import msg from '../user_messages';
-import { pathExists } from 'fs-extra';
-import { handleError } from '../services/error-handler';
-import bluebird from 'bluebird';
-import path from 'path';
-import { prompt, Separator } from 'inquirer';
-import { getHostEnvName } from '../clients/server-env';
+import { ensureUserIsLoggedIn } from './login';
 
 export async function pushAll(args) {
-  const extPaths = await bluebird.filter(args.paths, f =>
-    pathExists(path.join(f, 'extension.json')),
+  const dev = await ensureUserIsLoggedIn();
+  const extPaths = await bluebird.filter(args.paths, f => 
+    pathExists(path.join(f, 'extension.json'))
   );
 
   if (extPaths.length === 0) {
@@ -37,23 +42,37 @@ export async function pushAll(args) {
   const notPushed = [];
 
   for (const extPath of pathsToPush) {
-    try {
-      await uploadExtension(args, extPath);
-      console.log(msg.push.complete());
-      pushed.push(extPath);
-    } catch (err) {
-      await handleError(err);
+    const extJson = await loadExtensionJson(extPath);
+    const { name, version } = extJson;
+
+    const canonical = getExtensionCanonicalName(dev.name, name, version);
+    const canExtensionBePublished = await spinify(
+      canPublish(canonical), 
+      `Checking if version ${version} can be published...`,
+    );
+
+    if (canExtensionBePublished) {
+      try {
+        await uploadExtension(args, extPath);
+        console.log(msg.push.complete());
+        pushed.push(extPath);
+      } catch (err) {
+        await handleError(err);
+        notPushed.push(extPath);
+      }
+    } else {
+      console.log(msg.publish.alreadyPublished(extJson));
       notPushed.push(extPath);
     }
   }
 
   if (pushed.length > 0) {
-    console.log(`Pushed:`);
+    console.log(`Uploaded:`);
     console.log(pushed.map(e => `  ${e}`).join('\n'));
   }
 
   if (notPushed.length > 0) {
-    console.log(`Not pushed:`);
+    console.log(`Not uploaded:`);
     console.log(notPushed.map(e => `  ${e}`).join('\n'));
   }
 
