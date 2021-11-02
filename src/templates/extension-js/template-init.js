@@ -1,9 +1,11 @@
 import _ from 'lodash';
 import decamelize from 'decamelize';
-import {isReactPage} from '../settings-page-react/template-init';
+import { isReactPage } from '../settings-page-react/template-init';
 
 function importStatements(names, path, directoriesNames = names) {
-  return names.map((name, i) => `import ${name} from '${path}/${directoriesNames[i]}';`).join('\n');
+  return names
+    .map((name, i) => `import ${name} from '${path}/${directoriesNames[i]}';`)
+    .join('\n');
 }
 
 function indentedNamesList(names) {
@@ -25,10 +27,15 @@ export async function before(context) {
   const themesImports = importStatements(themesNamesList, './themes');
   const themesNames = indentedNamesList(themesNamesList);
 
-
   const pagesNamesList = _.map(_.filter(extJson.pages, isReactPage), 'name');
-  const pagesDirectoriesList = pagesNamesList.map(name => decamelize(name, '-'));
-  const pagesImports = importStatements(pagesNamesList, './pages', pagesDirectoriesList);
+  const pagesDirectoriesList = pagesNamesList.map(name =>
+    decamelize(name, '-'),
+  );
+  const pagesImports = importStatements(
+    pagesNamesList,
+    './pages',
+    pagesDirectoriesList,
+  );
   const pagesNames = indentedNamesList(pagesNamesList);
 
   const extJsonString = JSON.stringify(extJson, null, 2);

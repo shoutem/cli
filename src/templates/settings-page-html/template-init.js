@@ -4,7 +4,7 @@ import getOrSet from 'lodash-get-or-set';
 import { instantiateExtensionTemplate } from '../../services/extension-template';
 
 function isHtmlPage({ type, path }) {
-   return type === 'html' && !_.includes(path, 'server/build');
+  return type === 'html' && !_.includes(path, 'server/build');
 }
 
 export async function before(context) {
@@ -12,7 +12,9 @@ export async function before(context) {
   const pages = getOrSet(extJson, 'pages', []);
 
   if (!_.every(pages, isHtmlPage)) {
-    throw new Error('Html pages can\'t be mixed with non-html settings pages in the same extension');
+    throw new Error(
+      "Html pages can't be mixed with non-html settings pages in the same extension",
+    );
   }
 
   if (_.find(pages, { name })) {
@@ -26,11 +28,11 @@ export async function before(context) {
   pages.push({
     name: pageName,
     path: `server/pages/${pageDirectoryName}/index.html`,
-    type: 'html'
+    type: 'html',
   });
 
   if (extensionScope) {
-    await instantiateExtensionTemplate('settings-page-html-extension', context)
+    await instantiateExtensionTemplate('settings-page-html-extension', context);
   } else {
     await instantiateExtensionTemplate('settings-page-html-shortcut', context);
   }

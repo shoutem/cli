@@ -13,6 +13,7 @@ export function load(pathWithSlashes, templateContext) {
   return Mustache.render(template, templateContext);
 }
 
+// eslint-disable-next-line consistent-return
 async function instantiateTemplatePathRec(
   localTemplatePath,
   destinationPath,
@@ -20,7 +21,7 @@ async function instantiateTemplatePathRec(
   opts,
 ) {
   if (localTemplatePath.endsWith('template-init.js')) {
-    return;
+    return null;
   }
 
   const resolvedDestinationPath = Mustache.render(destinationPath, context);
@@ -35,8 +36,7 @@ async function instantiateTemplatePathRec(
       const src = path.join(localTemplatePath, file);
       const dest = path.join(resolvedDestinationPath, file);
 
-      instantiateTemplatePathRec(src, dest, context, opts);
-      return;
+      return instantiateTemplatePathRec(src, dest, context, opts);
     });
   } else if (templatePathState.isFile()) {
     const templateContent = await fs.readFile(templatePath, 'utf8');
