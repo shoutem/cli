@@ -6,6 +6,7 @@ export default async function(extPath) {
     path.join(extPath, '**/*.js'),
     path.join(extPath, '**/*.jsx'),
     '--no-eslintrc',
+    '--no-error-on-unmatched-pattern',
     '--config',
     path.join(__dirname, 'extension-check-eslint-config.json'),
     '--ignore-pattern',
