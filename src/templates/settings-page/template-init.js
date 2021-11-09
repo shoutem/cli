@@ -3,10 +3,18 @@ import { instantiateExtensionTemplate } from '../../services/extension-template'
 import { linkSettingsPageWithExistingScreen } from '../../services/shortcut';
 
 export async function after(context) {
-  const { type, extensionScope, extJson, existingScreenName, newScreen, name, title } = context;
+  const {
+    type,
+    extensionScope,
+    extJson,
+    existingScreenName,
+    newScreen,
+    name,
+    title,
+  } = context;
 
   if (type === 'react') {
-    await instantiateExtensionTemplate('settings-page-react', context)
+    await instantiateExtensionTemplate('settings-page-react', context);
   } else if (type === 'html') {
     await instantiateExtensionTemplate('settings-page-html', context);
   } else if (type === 'blank') {
@@ -16,8 +24,7 @@ export async function after(context) {
   }
 
   if (extensionScope) {
-    getOrSet(extJson, 'settingsPages', [])
-      .push({ page: `@.${name}`, title });
+    getOrSet(extJson, 'settingsPages', []).push({ page: `@.${name}`, title });
 
     return;
   }

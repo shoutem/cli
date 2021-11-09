@@ -18,7 +18,9 @@ export async function before(context) {
   }
 
   if (!_.every(pages, isReactPage)) {
-    throw new Error('React pages can\'t be mixed with non-react settings pages in the same extension');
+    throw new Error(
+      "React pages can't be mixed with non-react settings pages in the same extension",
+    );
   }
 
   pages.push({ name, type: 'react-page' });
@@ -30,7 +32,10 @@ export async function before(context) {
 
 export async function after(context) {
   if (context.extensionScope) {
-    await instantiateExtensionTemplate('settings-page-react-extension', context);
+    await instantiateExtensionTemplate(
+      'settings-page-react-extension',
+      context,
+    );
   } else {
     await instantiateExtensionTemplate('settings-page-react-shortcut', context);
   }

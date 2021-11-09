@@ -1,3 +1,4 @@
+/* eslint prettier/prettier: 0 */
 import _ from 'lodash';
 import path from 'path';
 import getOrSet from 'lodash-get-or-set';
