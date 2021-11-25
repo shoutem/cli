@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.14.0-rc.1",
+  "version": "0.14.0-rc.7",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
