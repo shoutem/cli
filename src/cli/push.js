@@ -44,13 +44,15 @@ export const handler = args =>
       return;
     }
 
+    console.warn('DEPRECATED:'.bold.yellow);
+    console.warn('\'shoutem push\' is deprecated and will be removed with the next major version of the Shoutem CLI. Shoutem now supports release candidate versioning, which allows developers to \'shoutem publish\', for example, 1.0.0-rc.0 versioned extensions which are labeled as "Beta" versions in the Shoutem Builder. App owners who update to RC versions also have the option to revert to the last "stable" (non-rc) version.'.yellow);
+
     if (!args.paths.length) {
       await uploadExtension(args);
       console.log(msg.push.complete());
       return;
     }
-  console.warn('DEPRECATED:'.bold.yellow);
-  console.warn('\'shoutem push\' is deprecated and will be removed with the next major version of the Shoutem CLI. Shoutem now supports release candidate versioning, which allows developers to \'shoutem publish\', for example, 1.0.0-rc.0 versioned extensions which are labeled as "Beta" versions in the Shoutem Builder. App owners who update to RC versions also have the option to revert to the last "stable" (non-rc) version.'.yellow);
+
   args.paths = multiglob(args.paths);
   await pushAll(args);
 });
