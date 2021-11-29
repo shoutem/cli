@@ -29,6 +29,47 @@ ios/Pods
 
 `;
 
+export function packItUp(
+  sourcePath,
+  destinationDir,
+  platformFileName,
+  ignores,
+  rootDirectoryName,
+) {
+  return new Promise((resolve, reject) => {
+    const archive = archiver(ARCHIVE_FORMAT);
+
+    archive.on('error', err => {
+      reject(err);
+    });
+
+    const output = fs.createWriteStream(
+      path.join(destinationDir, platformFileName),
+    );
+    archive.pipe(output);
+
+    output.on('close', () => {
+      resolve();
+    });
+
+    const files = listDirectoryContent(sourcePath, true);
+
+    // create a root directory in archive
+    archive.append(null, { name: `${rootDirectoryName}/` });
+
+    files.forEach(file => {
+      const ignoreTest = ignores.test(file);
+      if (!ignoreTest.ignored) {
+        archive.append(fs.createReadStream(file), {
+          name: `${rootDirectoryName}/${file}`,
+        });
+      }
+    });
+
+    archive.finalize();
+  });
+}
+
 class ArchiveProvider {
   constructor() {
     this.archiveData = {
@@ -65,14 +106,22 @@ class RemoteArchiveProvider extends ArchiveProvider {
     await decompress(data.path, extractDirectory);
 
     const zipContent = fs.readdirSync(extractDirectory);
-    if (_.size(zipContent) !== 1
-      || !_.first(zipContent)
-      || !fs.lstatSync(path.join(extractDirectory, _.first(zipContent))).isDirectory()
+    if (
+      _.size(zipContent) !== 1 ||
+      !_.first(zipContent) ||
+      !fs
+        .lstatSync(path.join(extractDirectory, _.first(zipContent)))
+        .isDirectory()
     ) {
       throw new Error('Platform archive must contain a single directory');
     }
 
-    const platformJsonPath = path.join(extractDirectory, _.first(zipContent), 'platform', 'platform.json');
+    const platformJsonPath = path.join(
+      extractDirectory,
+      _.first(zipContent),
+      'platform',
+      'platform.json',
+    );
     if (!fs.pathExists(platformJsonPath)) {
       throw new Error('Platform archive is missing platform/platform.json');
     }
@@ -95,7 +144,10 @@ class RemoteArchiveProvider extends ArchiveProvider {
       const destinationDir = temporaryDir.path;
       const platformFileName = `platform.${ARCHIVE_FORMAT}`;
 
-      await downloadFileFollowRedirect(this.url, { directory: destinationDir, filename: platformFileName });
+      await downloadFileFollowRedirect(this.url, {
+        directory: destinationDir,
+        filename: platformFileName,
+      });
 
       this.archiveData = {
         path: path.join(destinationDir, platformFileName),
@@ -134,7 +186,9 @@ class LocalArchiveProvider extends ArchiveProvider {
   }
 
   async getPlatformJsonPath() {
-    const platformJsonFile = fs.readFileSync(path.join(this.path, 'platform', 'platform.json'));
+    const platformJsonFile = fs.readFileSync(
+      path.join(this.path, 'platform', 'platform.json'),
+    );
     return platformJsonFile;
   }
 
@@ -157,7 +211,13 @@ class LocalArchiveProvider extends ArchiveProvider {
       const platformJson = await this.getPlatformJson();
       const rootDirectoryName = `platform-${platformJson.version}`;
 
-      await packItUp(this.path, destinationDir, platformFileName, ignores, rootDirectoryName);
+      await packItUp(
+        this.path,
+        destinationDir,
+        platformFileName,
+        ignores,
+        rootDirectoryName,
+      );
 
       this.archiveData = {
         path: path.join(destinationDir, platformFileName),
@@ -185,10 +245,14 @@ class LocalArchiveProvider extends ArchiveProvider {
     const ignoreExists = await fs.pathExists(ignoreFilePath);
     if (!ignoreExists) {
       console.log('WARNING: missing or empty .shoutemignore file!');
-      if (await confirmer('Do you want to create a default .shoutemignore file?')) {
+      if (
+        await confirmer('Do you want to create a default .shoutemignore file?')
+      ) {
         await fs.writeFile(ignoreFilePath, DEFAULT_SHOUTEM_IGNORE);
       } else {
-        console.log('WARNING: Packing everything up, please make sure your folder does not contain any unneeded files');
+        console.log(
+          'WARNING: Packing everything up, please make sure your folder does not contain any unneeded files',
+        );
       }
     }
   }
@@ -202,44 +266,14 @@ class LocalArchiveProvider extends ArchiveProvider {
   }
 }
 
-export function packItUp(sourcePath, destinationDir, platformFileName, ignores, rootDirectoryName) {
-  return new Promise((resolve, reject) => {
-    const archive = archiver(ARCHIVE_FORMAT);
-
-    archive.on('error', (err) => {
-      reject(err);
-    });
-
-    const output = fs.createWriteStream(path.join(destinationDir, platformFileName));
-    archive.pipe(output);
-
-    output.on('close', () => {
-      resolve();
-    });
-
-    const files = listDirectoryContent(sourcePath, true);
-
-    // create a root directory in archive
-    archive.append(null, { name: `${rootDirectoryName}/` });
-
-    files.forEach((file) => {
-      const ignoreTest = ignores.test(file);
-      if (!ignoreTest.ignored) {
-        archive
-          .append(fs.createReadStream(file), { name: `${rootDirectoryName}/${file}` });
-      }
-    });
-
-    archive.finalize();
-  });
-}
-
 export async function createPlatformArchiveProvider(url) {
   if (!_.isEmpty(url) && isValidPlatformUrl(url)) {
     return new RemoteArchiveProvider(url);
   }
 
-  const platformDir = await getPlatformRootDir(process.cwd(), { shouldThrow: false });
+  const platformDir = await getPlatformRootDir(process.cwd(), {
+    shouldThrow: false,
+  });
   if (platformDir != null) {
     return new LocalArchiveProvider(platformDir);
   }

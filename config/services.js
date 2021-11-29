@@ -16,11 +16,16 @@ const envValues = {
   },
   local: {
     host: process.env.SHOUTEM_CLI_HOST || 'shoutem.local',
-    appBuilder: process.env.SHOUTEM_CLI_APP_BUILDER || 'http://builder.shoutem.local:3000',
+    appBuilder:
+      process.env.SHOUTEM_CLI_APP_BUILDER ||
+      'http://builder.shoutem.local:3000',
     appManager: process.env.SHOUTEM_CLI_APP_MANAGER || 'http://localhost:3003',
-    authService: process.env.SHOUTEM_CLI_AUTH_SERVICE || 'http://localhost:3010',
-    extensionManager: process.env.SHOUTEM_CLI_EXTENSION_MANAGER || 'http://localhost:3002',
-    legacyService: process.env.SHOUTEM_CLI_LEGACY_SERVICE || 'http://v4.api.shoutem.local',
+    authService:
+      process.env.SHOUTEM_CLI_AUTH_SERVICE || 'http://localhost:3010',
+    extensionManager:
+      process.env.SHOUTEM_CLI_EXTENSION_MANAGER || 'http://localhost:3002',
+    legacyService:
+      process.env.SHOUTEM_CLI_LEGACY_SERVICE || 'http://v4.api.shoutem.local',
   },
 };
 

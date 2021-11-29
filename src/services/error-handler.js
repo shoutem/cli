@@ -6,7 +6,9 @@ import * as spinner from './spinner';
 import 'exit-code';
 
 function getJsonApiErrorMessage(errors) {
-  const generalDetail = _.upperFirst(_.get(errors, '[0].detail') || _.get(errors, '[0].title'));
+  const generalDetail = _.upperFirst(
+    _.get(errors, '[0].detail') || _.get(errors, '[0].title'),
+  );
   const specificDetail = _.upperFirst(_.get(errors, '[0].meta.trace.detail'));
 
   if (generalDetail && specificDetail && generalDetail !== specificDetail) {
@@ -33,16 +35,18 @@ export function getErrorMessage(err) {
     return getJsonApiErrorMessage(err.body.errors);
   }
 
-  if (typeof(_.get(err, 'response.body')) === 'string') {
+  if (typeof _.get(err, 'response.body') === 'string') {
     try {
       const body = JSON.parse(_.get(err, 'response.body'));
       if (body.errors) {
         return getJsonApiErrorMessage(body.errors);
       }
-    } catch (err) {}
+    } catch (err) {
+      // ignore error
+    }
   }
 
-  return 'Unrecognized error. Run `shoutem last-error` for additional details.'
+  return 'Unrecognized error. Run `shoutem last-error` for additional details.';
 }
 
 let reportInfoPrinted = false;
@@ -52,19 +56,19 @@ export async function handleError(err) {
     if (err) {
       process.exitCode = err.code || -1;
     }
-      spinner.stopAll();
-      console.error(getErrorMessage(err).red.bold);
+    spinner.stopAll();
+    console.error(getErrorMessage(err).red.bold);
 
-      const errorJson = JSON.parse(stringify(err));
-      errorJson.stack = (err || {}).stack;
-      errorJson.message = (err || {}).message;
-      await cache.setValue('last-error', errorJson);
-      if (!reportInfoPrinted) {
-        console.error(`\nUse ${'shoutem last-error'.cyan} for more information.`);
-        reportInfoPrinted = true;
-      }
+    const errorJson = JSON.parse(stringify(err));
+    errorJson.stack = (err || {}).stack;
+    errorJson.message = (err || {}).message;
+    await cache.setValue('last-error', errorJson);
+    if (!reportInfoPrinted) {
+      console.error(`\nUse ${'shoutem last-error'.cyan} for more information.`);
+      reportInfoPrinted = true;
+    }
   } catch (err) {
-      console.log(err);
+    console.log(err);
   }
 }
 

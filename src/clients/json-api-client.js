@@ -2,7 +2,7 @@ import { Deserializer } from 'jsonapi-serializer';
 import * as logger from '../services/logger';
 
 const deserializer = new Deserializer({
-  keyForAttribute: 'camelCase'
+  keyForAttribute: 'camelCase',
 });
 
 export class JsonApiError {
@@ -16,7 +16,7 @@ export class JsonApiError {
 }
 
 export async function execute(method, url, opts = {}) {
-  url = url.toString();
+  const resolvedUrl = url.toString();
 
   const jsonApiHeaders = {
     Accept: 'application/vnd.api+json',
@@ -25,16 +25,16 @@ export async function execute(method, url, opts = {}) {
     jsonApiHeaders['Content-Type'] = 'application/vnd.api+json';
   }
 
-  const req = new Request(url, {
+  const req = new Request(resolvedUrl, {
     ...opts,
-    method: method,
+    method,
     headers: {
       ...jsonApiHeaders,
-      ...opts.headers
-    }
+      ...opts.headers,
+    },
   });
 
-  logger.info(`${method} ${url}`, req);
+  logger.info(`${method} ${resolvedUrl}`, req);
   const response = await fetch(req);
   const textResponse = await response.text();
 
@@ -65,7 +65,7 @@ export function put(url, jsonBody = null, opts) {
   if (jsonBody) {
     return execute('put', url, {
       ...opts,
-      body: JSON.stringify(jsonBody)
+      body: JSON.stringify(jsonBody),
     });
   }
 
@@ -76,7 +76,7 @@ export function patch(url, jsonBody = null, opts) {
   if (jsonBody) {
     return execute('patch', url, {
       ...opts,
-      body: JSON.stringify(jsonBody)
+      body: JSON.stringify(jsonBody),
     });
   }
 
@@ -91,7 +91,7 @@ export function post(url, jsonBody = null, opts = {}) {
   if (jsonBody) {
     return execute('post', url, {
       ...opts,
-      body: JSON.stringify(jsonBody)
+      body: JSON.stringify(jsonBody),
     });
   }
 

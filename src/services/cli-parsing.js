@@ -13,7 +13,7 @@ export function isVariableName(str) {
 }
 
 export function ensureVariableName(str) {
-  if (!varNameRegex.test(str)){
+  if (!varNameRegex.test(str)) {
     throw new Error(`${str} is not a valid name`);
   }
 }

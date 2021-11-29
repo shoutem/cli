@@ -14,12 +14,13 @@ export function readLinesInFile(path) {
 }
 
 export function listDirectoryContent(dir, relative = false) {
-  let filepaths = fs.readdirSync(dir)
-    .reduce((files, file) => {
-      const name = path.join(dir, file);
-      const isDirectory = fs.statSync(name).isDirectory();
-      return isDirectory ? [...files, ...listDirectoryContent(name)] : [...files, name];
-    }, []);
+  let filepaths = fs.readdirSync(dir).reduce((files, file) => {
+    const name = path.join(dir, file);
+    const isDirectory = fs.statSync(name).isDirectory();
+    return isDirectory
+      ? [...files, ...listDirectoryContent(name)]
+      : [...files, name];
+  }, []);
 
   if (relative) {
     // +1 because the directory names and with a slash which we don't want

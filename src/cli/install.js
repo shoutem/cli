@@ -8,7 +8,8 @@ import msg from '../user_messages';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import { handleError } from '../services/error-handler';
 
-export const description = 'Install the current extension to an app on the Shoutem Builder.';
+export const description =
+  'Install the current extension to an app on the Shoutem Builder.';
 
 export const command = 'install';
 export const builder = yargs => {
@@ -17,13 +18,15 @@ export const builder = yargs => {
       app: {
         alias: 'a',
         description: 'Specifies app id to install current extension to.',
-        requiresArg: true
+        requiresArg: true,
       },
       new: {
         alias: 'n',
-        description: 'Creates new app with the given name and installs the extension to it.',
-        type: 'string'
-      }})
+        description:
+          'Creates new app with the given name and installs the extension to it.',
+        type: 'string',
+      },
+    })
     .usage(`usage: shoutem ${command} [options]\n\n${description}`);
 };
 
@@ -35,7 +38,7 @@ export async function handler(options) {
     let appId;
     if (appCreationRequested) {
       if (options.app) {
-        throw new Error('`app` and `new` flags can\'t be used together');
+        throw new Error("`app` and `new` flags can't be used together");
       }
       appId = (await createNewApp(options.new || 'My Blank App')).id;
     } else if (options.app) {

@@ -13,15 +13,6 @@ import { platformMessages } from '../const';
 
 export const description = 'Creates a new platform.';
 export const command = 'create';
-export const builder = yargs => yargs
-  .options({
-    url: {
-      description: platformMessages.platformUrlDescription,
-      type: 'string',
-      default: '',
-    },
-  })
-  .usage(`shoutem ${command} [options]\n\n${description}`);
 
 const postRunInstall = platformId => `
   ${`shoutem platform install --app [app ID] --platform ${platformId}`.cyan}
@@ -33,10 +24,8 @@ const postRunPublish = platformId => `
   To publish this platform to make it visible on the Builder.
 `;
 
-export const handler = args => executeAndHandleError(() => createPlatform(args));
-
 export async function createPlatform({ url }) {
-  const developer = await ensureUserIsLoggedIn();
+  await ensureUserIsLoggedIn();
 
   const provider = await createPlatformArchiveProvider(url);
   if (provider == null) {
@@ -45,7 +34,10 @@ export async function createPlatform({ url }) {
 
   const platformResponse = await uploadPlatformArchive(provider);
 
-  console.log(`\nCongratulations, your new platform with ID ${platformResponse.id} is ready!`.green.bold);
+  console.log(
+    `\nCongratulations, your new platform with ID ${platformResponse.id} is ready!`
+      .green.bold,
+  );
 
   let published = false;
   let installed = false;
@@ -56,12 +48,20 @@ export async function createPlatform({ url }) {
 
   const { appId } = await getPlatformConfig();
   if (!_.isNil(appId)) {
-    if (await confirmer(`Do you want to install the new platform to app ${appId}?`)) {
-      await spinify(installPlatform({ app: appId, platform: platformResponse.id }));
+    if (
+      await confirmer(
+        `Do you want to install the new platform to app ${appId}?`,
+      )
+    ) {
+      await spinify(
+        installPlatform({ app: appId, platform: platformResponse.id }),
+      );
       installed = true;
     }
 
-    console.log(`\nYou can manage your platforms for this app any time at https://builder.shoutem.com/app/${appId}/settings/platform.`);
+    console.log(
+      `\nYou can manage your platforms for this app any time at https://builder.shoutem.com/app/${appId}/settings/platform.`,
+    );
   }
 
   if (!published || !installed) {
@@ -76,3 +76,17 @@ export async function createPlatform({ url }) {
     }
   }
 }
+
+export const builder = yargs =>
+  yargs
+    .options({
+      url: {
+        description: platformMessages.platformUrlDescription,
+        type: 'string',
+        default: '',
+      },
+    })
+    .usage(`shoutem ${command} [options]\n\n${description}`);
+
+export const handler = args =>
+  executeAndHandleError(() => createPlatform(args));

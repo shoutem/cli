@@ -11,7 +11,7 @@ const production = {
   async handler() {
     await setHostEnvName('production');
     console.log(msg.use.complete('production', await getValue('developer')));
-  }
+  },
 };
 
 const dev = {
@@ -20,16 +20,17 @@ const dev = {
   async handler() {
     await setHostEnvName('dev');
     console.log(msg.use.complete('dev', await getValue('developer')));
-  }
+  },
 };
 
 const local = {
   command: 'local',
-  description: 'Switches to the local environment, using endpoints set in OS environment variables.',
+  description:
+    'Switches to the local environment, using endpoints set in OS environment variables.',
   async handler() {
     await setHostEnvName('local');
     console.log(msg.use.complete('local', await getValue('developer')));
-  }
+  },
 };
 
 const qa = {
@@ -38,7 +39,7 @@ const qa = {
   async handler() {
     await setHostEnvName('qa');
     console.log(msg.use.complete('qa', await getValue('developer')));
-  }
+  },
 };
 
 export function builder(use) {

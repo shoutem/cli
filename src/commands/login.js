@@ -7,16 +7,6 @@ import urls from '../../config/services';
 import * as logger from '../services/logger';
 import * as cache from '../services/cache-env';
 
-async function resolveCredentials(args) {
-  const credentials = _.get(args, 'credentials');
-
-  if (credentials) {
-    return await parseCredentials(args.credentials)
-  }
-
-  return await promptUserCredentials(args);
-}
-
 function parseCredentials(credentials) {
   const parts = credentials.split(':');
   return {
@@ -30,28 +20,45 @@ function promptUserCredentials(args = {}) {
     console.log(msg.login.credentialsPrompt(urls.appBuilder));
   }
 
-  const questions = [{
-    name: 'email',
-    message: 'Email',
-    when: () => !args.email,
-  }, {
-    name: 'password',
-    message: 'Password',
-    type: 'password',
-    when: () => !args.password,
-  }];
+  const questions = [
+    {
+      name: 'email',
+      message: 'Email',
+      when: () => !args.email,
+    },
+    {
+      name: 'password',
+      message: 'Password',
+      type: 'password',
+      when: () => !args.password,
+    },
+  ];
 
   return inquirer.prompt(questions);
 }
 
+async function resolveCredentials(args) {
+  const credentials = _.get(args, 'credentials');
+
+  if (credentials) {
+    return await parseCredentials(args.credentials);
+  }
+
+  return await promptUserCredentials(args);
+}
+
 function promptDeveloperName() {
   /* eslint no-confusing-arrow: 0 */
-  console.log('Create a developer name. It should only contain lower-case letters and dashes, e.g.: my-dev-name.');
-  return inquirer.prompt({
-    name: 'devName',
-    message: 'Developer name',
-    validate: value => value ? true : 'Developer name cannot be blank.',
-  }).then(answer => answer.devName);
+  console.log(
+    'Create a developer name. It should only contain lower-case letters and dashes, e.g.: my-dev-name.',
+  );
+  return inquirer
+    .prompt({
+      name: 'devName',
+      message: 'Developer name',
+      validate: value => (value ? true : 'Developer name cannot be blank.'),
+    })
+    .then(answer => answer.devName);
 }
 
 /**
@@ -61,7 +68,7 @@ function promptDeveloperName() {
 async function userAlreadyLoggedIn(email) {
   const developer = await cache.getValue('developer');
 
-  return (developer && developer.email === email);
+  return developer && developer.email === email;
 }
 
 /**
@@ -72,7 +79,7 @@ export async function loginUser(args) {
   const credentials = await resolveCredentials(args);
 
   if (await userAlreadyLoggedIn(credentials.email)) {
-    console.log("Already logged in with given email.");
+    console.log('Already logged in with given email.');
     return;
   }
 
@@ -93,7 +100,10 @@ export async function loginUser(args) {
   console.log(msg.login.complete(developer));
   logger.info('logged in as developer', developer);
 
-  return cache.setValue('developer', { ...developer, email: credentials.email });
+  await cache.setValue('developer', {
+    ...developer,
+    email: credentials.email,
+  });
 }
 
 /**
@@ -109,6 +119,7 @@ export async function ensureUserIsLoggedIn(shouldThrow = false) {
   if (shouldThrow) {
     throw new Error('Not logged in, use `shoutem login` command to login.');
   } else {
+    // eslint-disable-next-line consistent-return
     return await loginUser();
   }
 }

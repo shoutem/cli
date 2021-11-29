@@ -6,6 +6,14 @@ import { getValue } from './cache-env';
 import { analyticsTrackingId } from '../../config/services';
 import * as logger from './logger';
 
+const reportData = {
+  commandName: null,
+  extensionCanonicalName: null,
+  appId: null,
+  argv: [],
+  reportSent: false,
+};
+
 async function getClientId() {
   return await cache.get('ga-client-id', null, () => uuid());
 }
@@ -16,7 +24,7 @@ async function getAnalyticsVisitor() {
   const visitor = analytics(analyticsTrackingId, clientId);
   reportData.clientId = clientId;
 
-  const { email } = await getValue('developer') || {};
+  const { email } = (await getValue('developer')) || {};
   if (email) {
     visitor.set('userId', email);
     reportData.userId = email;
@@ -40,7 +48,7 @@ async function reportEvent({ category, action, label }) {
         label,
         clientId: reportData.clientId,
         userId: reportData.userId,
-        isDeveloper: reportData.isDeveloper
+        isDeveloper: reportData.isDeveloper,
       });
     }
   });
@@ -50,47 +58,8 @@ async function reportCliCommand(commandName, canonicalNameOrAppId) {
   await reportEvent({
     category: 'CLI',
     action: commandName,
-    label: canonicalNameOrAppId
+    label: canonicalNameOrAppId,
   });
-}
-
-const reportData = {
-  commandName: null,
-  extensionCanonicalName: null,
-  appId: null,
-  argv: [],
-  reportSent: false
-};
-
-export function setCommandName(name) {
-  reportData.commandName = name;
-
-  if (reportData.extensionCanonicalName || reportData.appId) {
-    finishReport()
-      .catch(console.err);
-  }
-}
-
-export function setAppId(appId) {
-  reportData.appId = appId;
-
-  if (reportData.commandName) {
-    finishReport()
-      .catch(console.error);
-  }
-}
-
-export function setExtensionCanonicalName(name) {
-  reportData.extensionCanonicalName = name;
-
-  if (reportData.commandName) {
-    finishReport()
-      .catch(console.error);
-  }
-}
-
-export function setArgv(argv) {
-  reportData.argv = _.drop(argv, 2);
 }
 
 async function finishReport() {
@@ -101,4 +70,32 @@ async function finishReport() {
     await reportCliCommand(commandName, label);
     reportData.reportSent = true;
   }
+}
+
+export function setCommandName(name) {
+  reportData.commandName = name;
+
+  if (reportData.extensionCanonicalName || reportData.appId) {
+    finishReport().catch(console.err);
+  }
+}
+
+export function setAppId(appId) {
+  reportData.appId = appId;
+
+  if (reportData.commandName) {
+    finishReport().catch(console.error);
+  }
+}
+
+export function setExtensionCanonicalName(name) {
+  reportData.extensionCanonicalName = name;
+
+  if (reportData.commandName) {
+    finishReport().catch(console.error);
+  }
+}
+
+export function setArgv(argv) {
+  reportData.argv = _.drop(argv, 2);
 }
