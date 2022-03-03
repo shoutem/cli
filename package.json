@@ -78,7 +78,7 @@
     "tmp-promise": "1.0.2",
     "universal-analytics": "0.4.13",
     "uppercamelcase": "^3.0.0",
-    "urijs": "1.19.7",
+    "urijs": "1.19.9",
     "uuid": "3.0.1",
     "yargonaut": "1.1.2",
     "yargs": "6.6.0"
