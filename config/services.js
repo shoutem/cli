@@ -11,8 +11,8 @@ const envValues = {
     appBuilder: 'https://builder.dev.sauros.hr',
   },
   qa: {
-    host: 'api.qa.sauros.hr',
-    appBuilder: 'https://builder.qa.sauros.hr',
+    host: 'api.qa.shoutm.net',
+    appBuilder: 'https://builder.qa.shoutm.net',
   },
   local: {
     host: process.env.SHOUTEM_CLI_HOST || 'shoutem.local',
