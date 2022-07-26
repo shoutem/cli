@@ -1,5 +1,6 @@
 import { exec } from 'child-process-promise';
 import fs, { pathExists, copy } from 'fs-extra';
+import mkdirp from 'mkdirp-promise';
 import path from 'path';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';
@@ -7,7 +8,7 @@ import targz from 'tar.gz';
 import { buildNodeProject } from './node';
 import { writeJsonFile, readJsonFile } from './data';
 import { spinify } from './spinner';
-import move from 'glob-move';
+import rmrf from 'rmfr';
 import decompress from 'decompress';
 import { loadExtensionJson } from './extension';
 import {
@@ -45,37 +46,45 @@ async function packageManagerPack(dir, destinationDir) {
   }
 }
 
-export async function packageManagerUnpack(tgzFile, destinationDir) {
+export async function packageManagerUnpack(tgzFile, destinationDir, skipCopy) {
   if (!(await pathExists(tgzFile))) {
     return [];
   }
 
-  const tmpDir = (await tmp.dir()).path;
-  await decompress(tgzFile, tmpDir);
-  return await move(path.join(tmpDir, 'package', '*'), destinationDir, {
-    dot: true,
-  });
+  if (!(await pathExists(destinationDir))) {
+    await mkdirp(destinationDir);
+  }
+
+  await decompress(tgzFile, destinationDir);
+  const decompressDestination = path.join(destinationDir, 'package');
+
+  if (!skipCopy) {
+    fs.copySync(decompressDestination, destinationDir);
+  }
 }
 
-export async function shoutemUnpack(tgzFile, destinationDir) {
-  const tmpDir = (await tmp.dir()).path;
-  await packageManagerUnpack(tgzFile, tmpDir);
+export async function shoutemUnpack(tgzFile, destinationDir, tmpDir) {
+  await packageManagerUnpack(tgzFile, tmpDir, true);
 
-  await packageManagerUnpack(
-    path.join(tmpDir, 'app.tgz'),
-    path.join(destinationDir, 'app'),
-  );
-  await packageManagerUnpack(
-    path.join(tmpDir, 'server.tgz'),
-    path.join(destinationDir, 'server'),
-  );
-  if (await pathExists(path.join(tmpDir, 'cloud.tgz'))) {
-    await packageManagerUnpack(
-      path.join(tmpDir, 'cloud.tgz'),
-      path.join(destinationDir, 'cloud'),
-    );
+  const appSegment = path.join(destinationDir, 'app');
+  const appTgzPath = path.join(tmpDir, 'package', 'app.tgz');
+  await packageManagerUnpack(appTgzPath, appSegment);
+
+  const serverSegment = path.join(destinationDir, 'server');
+  const serverTgzPath = path.join(tmpDir, 'package', 'server.tgz');
+  await packageManagerUnpack(serverTgzPath, serverSegment);
+
+  const cloudSegment = path.join(destinationDir, 'cloud');
+  const cloudTgzPath = path.join(tmpDir, 'package', 'cloud.tgz');
+
+  if (await pathExists(cloudTgzPath)) {
+    await packageManagerUnpack(cloudTgzPath, cloudSegment);
   }
-  await move(path.join(tmpDir, 'extension.json'), destinationDir);
+
+  fs.copySync(
+    path.join(tmpDir, 'package', 'extension.json'),
+    path.join(destinationDir, 'extension.json'),
+  );
 }
 
 function hasExtensionsJson(dir) {
