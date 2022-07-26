@@ -51,7 +51,6 @@
     "fetch-everywhere": "1.0.5",
     "form-data": "2.1.4",
     "fs-extra": "3.0.1",
-    "glob-move": "1.0.1",
     "glob-promise": "3.1.0",
     "inquirer": "1.0.3",
     "ip": "1.1.5",
