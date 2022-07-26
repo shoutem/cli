@@ -43,7 +43,7 @@ async function getExtensionUrl(extId) {
 
 async function pullExtension(destinationDir, { extension, canonicalName }) {
   let pullError = null;
-  for (let i = 0; i < 1; i++) {
+  for (let i = 0; i < 4; i++) {
     const tgzDir = (await tmp.dir()).path;
 
     try {
@@ -57,7 +57,7 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
       }
 
       await shoutemUnpack(
-        path.join(tgzDir, 'extension.tgz'), 
+        path.join(tgzDir, 'extension.tgz'),
         extensionDir,
         tgzDir,
       );
