@@ -44,21 +44,34 @@ async function getExtensionUrl(extId) {
 async function pullExtension(destinationDir, { extension, canonicalName }) {
   let pullError = null;
   for (let i = 0; i < 4; i++) {
+    const tgzDir = (await tmp.dir()).path;
+
     try {
       const url = await getExtensionUrl(extension);
-      const tgzDir = (await tmp.dir()).path;
       await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
+
+      const extensionDir = path.join(destinationDir, canonicalName);
+
+      if (!(await pathExists(extensionDir))) {
+        await mkdirp(extensionDir);
+      }
+
       await shoutemUnpack(
         path.join(tgzDir, 'extension.tgz'),
-        path.join(destinationDir, canonicalName),
+        extensionDir,
+        tgzDir,
       );
 
       pullError = null;
+      await rmrf(tgzDir);
+
       return;
     } catch (error) {
       if (error.code !== 'ENOTEMPTY') {
         pullError = error;
       }
+
+      await rmrf(tgzDir);
     }
   }
 
@@ -76,7 +89,7 @@ export async function pullExtensions(appId, destinationDir) {
     i++;
     await spinify(
       pullExtension(destinationDir, inst),
-      `Downloading extension ${i}/${n}: ${inst.canonicalName}...`,
+      `Downloading extension ${i}/${n}: ${inst.canonicalName} to ${destinationDir}...`,
     );
   }
 }
@@ -204,7 +217,13 @@ export async function clone(opts, destinationDir) {
     });
   }
 
-  await pullExtensions(opts.appId, path.join(appDir, 'extensions'));
+  const extensionsDir = path.join(appDir, 'extensions');
+
+  if (!(await pathExists(extensionsDir))) {
+    await mkdirp(extensionsDir);
+  }
+
+  await pullExtensions(opts.appId, extensionsDir);
 
   await fixPlatform(appDir, opts.appId);
 
