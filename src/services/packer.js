@@ -46,43 +46,53 @@ async function packageManagerPack(dir, destinationDir) {
   }
 }
 
-export async function packageManagerUnpack(tgzFile, destinationDir, skipCopy) {
+export async function packageManagerUnpack(
+  tgzFile,
+  decompressPath,
+) {
   if (!(await pathExists(tgzFile))) {
     return [];
   }
 
-  if (!(await pathExists(destinationDir))) {
-    await mkdirp(destinationDir);
+  if (!(await pathExists(decompressPath))) {
+    await mkdirp(decompressPath);
   }
 
-  await decompress(tgzFile, destinationDir);
-  const decompressDestination = path.join(destinationDir, 'package');
+  await decompress(tgzFile, decompressPath);
 
-  if (!skipCopy) {
-    fs.copySync(decompressDestination, destinationDir);
-  }
+  return path.join(decompressPath, 'package');
 }
 
-export async function shoutemUnpack(tgzFile, destinationDir, tmpDir) {
-  await packageManagerUnpack(tgzFile, tmpDir, true);
+export async function shoutemUnpack(tgzDir, destinationDir) {
+  const tgzFile = path.join(tgzDir, 'extension.tgz');
 
-  const appSegment = path.join(destinationDir, 'app');
-  const appTgzPath = path.join(tmpDir, 'package', 'app.tgz');
-  await packageManagerUnpack(appTgzPath, appSegment);
+  // Extracts extension.tgz into same directory, which then contains:
+  // app.tgz, server.tgz, extension.json and optional cloud.tgz
+  const extDecompressPath = await packageManagerUnpack(tgzFile, tgzDir)
+  const segments = ['app', 'cloud', 'server'];
 
-  const serverSegment = path.join(destinationDir, 'server');
-  const serverTgzPath = path.join(tmpDir, 'package', 'server.tgz');
-  await packageManagerUnpack(serverTgzPath, serverSegment);
+  await segments.forEach(async segment => {
+    const tgzPath = path.join(extDecompressPath, `${segment}.tgz`);
 
-  const cloudSegment = path.join(destinationDir, 'cloud');
-  const cloudTgzPath = path.join(tmpDir, 'package', 'cloud.tgz');
+    if (await pathExists(tgzPath)) {
+      const decompressPath = path.join(extDecompressPath, segment);
+      const segmentPath = await packageManagerUnpack(tgzPath, decompressPath);
+      const segmentDestinationPath = path.join(destinationDir, segment);
 
-  if (await pathExists(cloudTgzPath)) {
-    await packageManagerUnpack(cloudTgzPath, cloudSegment);
-  }
+      if (!(await pathExists(segmentDestinationPath))) {
+        await mkdirp(segmentDestinationPath);
+      }
+
+      fs.copySync(segmentPath, segmentDestinationPath);
+
+      // We delete the 'package' decompress directory so that we don't mix
+      // segment files.
+      await rmrf(decompressPath);
+    }
+  });
 
   fs.copySync(
-    path.join(tmpDir, 'package', 'extension.json'),
+    path.join(extDecompressPath, 'extension.json'),
     path.join(destinationDir, 'extension.json'),
   );
 }
