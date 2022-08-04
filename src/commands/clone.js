@@ -28,6 +28,8 @@ import 'colors';
 
 const downloadFile = Promise.promisify(require('download-file'));
 
+const tmpPaths = [];
+
 function removeTrailingSlash(str) {
   return str.replace(/\/$/, '');
 }
@@ -45,6 +47,7 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
   let pullError = null;
   for (let i = 0; i < 4; i++) {
     const tgzDir = (await tmp.dir()).path;
+    tmpPaths.push(tgzDir);
 
     try {
       const url = await getExtensionUrl(extension);
@@ -56,22 +59,15 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
         await mkdirp(extensionDir);
       }
 
-      await shoutemUnpack(
-        path.join(tgzDir, 'extension.tgz'),
-        extensionDir,
-        tgzDir,
-      );
+      await shoutemUnpack(tgzDir, extensionDir);
 
       pullError = null;
-      await rmrf(tgzDir);
 
       return;
     } catch (error) {
       if (error.code !== 'ENOTEMPTY') {
         pullError = error;
       }
-
-      await rmrf(tgzDir);
     }
   }
 
@@ -82,6 +78,7 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
 }
 
 export async function pullExtensions(appId, destinationDir) {
+  console.time('Extension download took');
   const installations = await appManager.getInstallations(appId);
   const n = installations.length;
   let i = 0;
@@ -89,9 +86,18 @@ export async function pullExtensions(appId, destinationDir) {
     i++;
     await spinify(
       pullExtension(destinationDir, inst),
-      `Downloading extension ${i}/${n}: ${inst.canonicalName} to ${destinationDir}...`,
+      `Downloading extension ${i}/${n}: ${inst.canonicalName}...`,
     );
   }
+  console.timeEnd('Extension download took');
+
+
+  // Cleanup of temporary directories created for downloading extensions.
+  console.time('Temp file cleanup took')
+  await tmpPaths.forEach(async tmpPath => {
+    await rmrf(tmpPath);
+  });
+  console.timeEnd('Temp file cleanup took')
 }
 
 function ensurePlatformCompatibility(platform) {
