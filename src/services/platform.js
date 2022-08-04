@@ -93,17 +93,8 @@ export async function setPlatformConfig(platformDir, mobileConfig) {
 }
 
 export async function configurePlatform(platformDir) {
-  const config = await readJson(
-    path.join(platformDir, 'config.json'),
-  );
-  const { nativeBuildOs = 'ios' } = config;
-
   await reactNative.ensureInstalled();
-  if (
-    process.platform === 'darwin' &&
-    nativeBuildOs === 'ios' &&
-    !(await commandExists('pod'))
-  ) {
+  if (process.platform === 'darwin' && !(await commandExists('pod'))) {
     throw new Error(
       'Missing `pods` command. Please install cocoapods and run `shoutem configure` in the ' +
       `${platformDir} directory`,
