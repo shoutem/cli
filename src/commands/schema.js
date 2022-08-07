@@ -44,10 +44,6 @@ export function saveSchemaToExtJson(schemaName, callback) {
 }
 
 export function createSchema(schemaName, callback) {
-  if (!schemaName) {
-    console.log('derp');
-  }
-
   const root = ensureInExtensionDir();
   let schemaPath;
 
@@ -55,7 +51,12 @@ export function createSchema(schemaName, callback) {
     [
       done => saveSchemaToExtJson(schemaName, done),
 
-      done => fs.mkdir(path.join(root, 'server', 'data-schemas'), { recursive: true }, done),
+      done =>
+        fs.mkdir(
+          path.join(root, 'server', 'data-schemas'),
+          { recursive: true },
+          done,
+        ),
 
       done => {
         const template = load('./schema/schema.json.template', { schemaName });

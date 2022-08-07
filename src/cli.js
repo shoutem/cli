@@ -3,6 +3,8 @@ require('yargonaut')
   .errorsStyle('red.bold');
 
 import 'colors';
+import './fetch-polyfill';
+
 import yargs from 'yargs';
 import { version } from '../package.json';
 import apiUrls from '../config/services';
@@ -36,7 +38,7 @@ analytics.setArgv(process.argv);
   }
   await authorizeRequests(await getRefreshToken());
 
-  const { hideBin } = require('yargs/helpers')
+  const { hideBin } = require('yargs/helpers');
 
   const cli = yargs(process.argv.splice(2))
     .usage('Usage: shoutem [command] [-h]')
