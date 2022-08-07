@@ -2,12 +2,11 @@ import _ from 'lodash';
 import path from 'path';
 import { diffLines } from 'diff';
 import fs from 'fs-extra';
-import mkdirp from 'mkdirp-promise';
 
 export async function applyDiffLog(diffLog) {
   await Promise.all(
     _.map(diffLog, async (newValue, filePath) => {
-      await mkdirp(path.join(filePath, '..'));
+      fs.mkdirSync(path.join(filePath, '..'), { recursive: true });
       await fs.writeFile(filePath, newValue, 'utf8');
     }),
   );

@@ -3,7 +3,6 @@ require('yargonaut')
   .errorsStyle('red.bold');
 
 import 'colors';
-import 'fetch-everywhere';
 import yargs from 'yargs';
 import { version } from '../package.json';
 import apiUrls from '../config/services';

@@ -1,9 +1,8 @@
-import fs from 'fs';
+import fs from 'fs-extra';
 import path from 'path';
 
 import _ from 'lodash';
 import async from 'async';
-import mkdirp from 'mkdirp';
 
 import {
   loadExtensionJsonCallback,
@@ -52,7 +51,7 @@ export function createSchema(schemaName, callback) {
     [
       done => saveSchemaToExtJson(schemaName, done),
 
-      done => mkdirp(path.join(root, 'server', 'data-schemas'), done),
+      done => fs.mkdir(path.join(root, 'server', 'data-schemas'), { recursive: true }, done),
 
       done => {
         const template = load('./schema/schema.json.template', { schemaName });

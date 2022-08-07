@@ -1,7 +1,7 @@
 import url from 'url';
 import path from 'path';
 import fs from 'fs-extra';
-import request from 'request';
+import request from 'request-promise';
 import Promise from 'bluebird';
 
 import { getHttpErrorMessage } from './get-http-error-message';

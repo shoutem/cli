@@ -1,11 +1,13 @@
+import fs from 'fs-extra';
 import path from 'path';
-import mkdirp from 'mkdirp-promise';
 import { readJsonFile, writeJsonFile } from './data';
 import { getLocalStoragePath } from '../clients/cli-paths';
 
 async function getCacheFilePath(key) {
   const cacheDir = path.join(await getLocalStoragePath(), 'cache');
-  await mkdirp(cacheDir);
+
+  fs.mkdirSync(cacheDir, { recursive: true });
+
   return path.join(
     cacheDir,
     encodeURIComponent(typeof key === 'string' ? key : JSON.stringify(key)),

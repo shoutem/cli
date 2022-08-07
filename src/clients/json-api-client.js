@@ -1,3 +1,4 @@
+import fetch from 'node-fetch';
 import { Deserializer } from 'jsonapi-serializer';
 import * as logger from '../services/logger';
 

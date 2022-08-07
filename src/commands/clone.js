@@ -1,6 +1,5 @@
 import Promise from 'bluebird';
 import _ from 'lodash';
-import mkdirp from 'mkdirp-promise';
 import tmp from 'tmp-promise';
 import rmrf from 'rmfr';
 import path from 'path';
@@ -56,7 +55,7 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
       const extensionDir = path.join(destinationDir, canonicalName);
 
       if (!(await pathExists(extensionDir))) {
-        await mkdirp(extensionDir);
+        fs.mkdirSync(extensionDir);
       }
 
       await shoutemUnpack(tgzDir, extensionDir);
@@ -200,7 +199,7 @@ export async function clone(opts, destinationDir) {
     );
   }
 
-  await mkdirp(appDir);
+  fs.mkdirSync(appDir, { recursive: true });
 
   console.log(`Cloning \`${name}\` to \`${directoryName}\`...`);
 
@@ -226,7 +225,7 @@ export async function clone(opts, destinationDir) {
   const extensionsDir = path.join(appDir, 'extensions');
 
   if (!(await pathExists(extensionsDir))) {
-    await mkdirp(extensionsDir);
+    fs.mkdirSync(extensionsDir);
   }
 
   await pullExtensions(opts.appId, extensionsDir);

@@ -1,10 +1,9 @@
 import { exec } from 'child-process-promise';
 import fs, { pathExists, copy } from 'fs-extra';
-import mkdirp from 'mkdirp-promise';
 import path from 'path';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';
-import targz from 'tar.gz';
+import tar from 'tar';
 import { buildNodeProject } from './node';
 import { writeJsonFile, readJsonFile } from './data';
 import { spinify } from './spinner';
@@ -46,16 +45,13 @@ async function packageManagerPack(dir, destinationDir) {
   }
 }
 
-export async function packageManagerUnpack(
-  tgzFile,
-  decompressPath,
-) {
+export async function packageManagerUnpack(tgzFile, decompressPath) {
   if (!(await pathExists(tgzFile))) {
     return [];
   }
 
   if (!(await pathExists(decompressPath))) {
-    await mkdirp(decompressPath);
+    fs.mkdirSync(decompressPath, { recursive: true });
   }
 
   await decompress(tgzFile, decompressPath);
@@ -68,7 +64,7 @@ export async function shoutemUnpack(tgzDir, destinationDir) {
 
   // Extracts extension.tgz into same directory, which then contains:
   // app.tgz, server.tgz, extension.json and optional cloud.tgz
-  const extDecompressPath = await packageManagerUnpack(tgzFile, tgzDir)
+  const extDecompressPath = await packageManagerUnpack(tgzFile, tgzDir);
   const segments = ['app', 'cloud', 'server'];
 
   await segments.forEach(async segment => {
@@ -80,7 +76,7 @@ export async function shoutemUnpack(tgzDir, destinationDir) {
       const segmentDestinationPath = path.join(destinationDir, segment);
 
       if (!(await pathExists(segmentDestinationPath))) {
-        await mkdirp(segmentDestinationPath);
+        fs.mkdirSync(segmentDestinationPath, { recursive: true });
       }
 
       fs.copySync(segmentPath, segmentDestinationPath);
@@ -200,16 +196,16 @@ export default async function shoutemPack(dir, options) {
       const extensionJsonPathDest = path.join(packageDir, 'extension.json');
       await copy(extensionJsonPathSrc, extensionJsonPathDest);
 
-      const destinationDirectory = path.join(
+      const targzDestination = path.join(
         options.packToTempDir ? tmpDir : dir,
         'extension.tgz',
       );
-      await targz().compress(packageDir, destinationDirectory);
+      await tar.c({ file: targzDestination }, [packageDir]);
 
       return {
         packedDirs: dirsToPack,
         allDirs: packedDirectories,
-        package: destinationDirectory,
+        package: targzDestination,
       };
     },
     'Packing extension...',

@@ -15,17 +15,17 @@
     "lint": "eslint ./ --ignore-pattern build --ignore-pattern templates",
     "prepare": "npm run build",
     "shoutem": "node build/shoutem.js",
-    "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\""
+    "test": "mocha -R spec --compilers js:babel-core/register \"src/**/*spec.js\""
   },
   "license": "ISC",
   "dependencies": {
-    "@babel/eslint-parser": "7.16.3",
     "@babel/preset-react": "7.16.0",
     "@babel/core": "7.16.0",
     "@shoutem/eslint-config-base": "^1.0.2",
     "@shoutem/fetch-token-intercept": "0.3.0",
-    "@shoutem/fork-terminal": "1.0.0",
+    "archiver": "5.3.1",
     "async": "2.0.0-rc.3",
+    "babel-eslint": "10.1.0",
     "babel-plugin-transform-object-rest-spread": "6.22.0",
     "babel-preset-env": "^1.6.0",
     "babel-register": "6.24.0",
@@ -36,33 +36,33 @@
     "command-exists": "~1.2.4",
     "decamelize": "^1.2.0",
     "decompress": "4.2.1",
+    "depcheck": "1.4.3",
     "diff": "^3.3.1",
     "download-cached": "1.0.8",
-    "download-file": "latest",
-    "eslint": "^7.5.0",
-    "eslint-plugin-import": "^2.24.2",
+    "download-file": "0.1.5",
+    "eslint": "6.8.0",
+    "eslint-plugin-import": "2.25.4",
     "eslint-plugin-jsx-a11y": "1.5.3",
-    "eslint-plugin-mocha": "2.2.0",
-    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-mocha": "6.3.0",
+    "eslint-plugin-prettier": "3.1.3",
     "eslint-plugin-react": "5.2.2",
     "eslint-plugin-react-native": "1.0.2",
     "eslint-import-resolver-babel-module": "^5.1.2",
     "exit-code": "1.0.2",
-    "fetch-everywhere": "1.0.5",
     "form-data": "2.1.4",
     "fs-extra": "3.0.1",
-    "glob-promise": "3.1.0",
+    "glob": "8.0.3",
+    "glob-promise": "5.0.0",
+    "ignore": "5.2.0",
     "inquirer": "1.0.3",
-    "ip": "1.1.5",
     "json-stringify-safe": "5.0.1",
     "jsonapi-serializer": "3.5.3",
     "linklocal": "^2.8.1",
     "lodash": "4.17.21",
     "lodash-get-or-set": "^1.0.2",
-    "mkdirp": "0.5.1",
-    "mkdirp-promise": "3.0.1",
     "mustache": "2.2.1",
     "mv": "2.1.1",
+    "node-fetch": "2.6.7",
     "opn": "^5.1.0",
     "prettyjson": "1.2.1",
     "progress": "2.0.0",
@@ -73,24 +73,50 @@
     "semver": "5.3.0",
     "slugify": "^1.2.1",
     "streamsearch": "0.1.2",
-    "tar.gz": "1.0.2",
+    "tar": "6.1.11",
     "tmp-promise": "1.0.2",
     "universal-analytics": "0.4.13",
     "uppercamelcase": "^3.0.0",
     "urijs": "1.19.11",
     "uuid": "3.0.1",
     "yargonaut": "1.1.2",
-    "yargs": "6.6.0"
+    "yargs": "17.5.1"
   },
   "devDependencies": {
-    "babel-cli": "6.8.0",
+    "babel-cli": "6.26.0",
     "babel-plugin-rewire": "1.0.0-rc-2",
     "chai": "3.5.0",
-    "dos2unix-cli": "1.0.1",
-    "mocha": "2.4.5",
-    "nock": "8.0.0",
-    "prettier": "^1.19.1",
-    "sinon": "1.17.4"
+    "prettier": "1.19.1"
+  },
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "extends": "@shoutem/base",
+    "env": {
+      "mocha": true
+    },
+    "parserOptions": {
+      "ecmaVersion": 7,
+      "sourceType": "module",
+      "ecmaFeatures": {
+        "experimentalObjectRestSpread": true
+      }
+    },
+    "rules": {
+      "no-empty-label": 0,
+      "space-before-keywords": 0,
+      "space-after-keywords": 0,
+      "space-return-throw-case": 0,
+      "no-iterator": 0,
+      "no-shadow": 0,
+      "no-console": 0,
+      "global-require": 0
+    }
+  },
+  "prettier": {
+    "bracketSpacing": true,
+    "jsxBracketSameLine": false,
+    "singleQuote": true,
+    "trailingComma": "all"
   },
   "babel": {
     "presets": [
