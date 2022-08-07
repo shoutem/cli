@@ -94,6 +94,9 @@
     "env": {
       "mocha": true
     },
+    "ignorePattern": [
+      "./fetch-polyfill.js"
+    ],
     "parserOptions": {
       "ecmaVersion": 7,
       "sourceType": "module",

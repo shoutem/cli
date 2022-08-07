@@ -1,7 +1,7 @@
 import Promise from 'bluebird';
 import { createSchema } from '../../commands/schema';
 import msg from '../../user_messages';
-import { ensureVariableName } from '../../services/cli-parsing';
+import { ensureVariableName, validateArgumentCount } from '../../services/cli-parsing';
 import { handleError } from '../../services/error-handler';
 
 const createSchemaAsync = Promise.promisify(createSchema);

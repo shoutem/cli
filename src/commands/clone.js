@@ -1,4 +1,5 @@
 import Promise from 'bluebird';
+import fs from 'fs-extra';
 import _ from 'lodash';
 import tmp from 'tmp-promise';
 import rmrf from 'rmfr';

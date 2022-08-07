@@ -1,4 +1,5 @@
-import fetch from 'node-fetch';
+import '../fetch-polyfill';
+
 import { Deserializer } from 'jsonapi-serializer';
 import * as logger from '../services/logger';
 

@@ -36,12 +36,11 @@ analytics.setArgv(process.argv);
   }
   await authorizeRequests(await getRefreshToken());
 
-  const cli = yargs
+  const { hideBin } = require('yargs/helpers')
+
+  const cli = yargs(process.argv.splice(2))
     .usage('Usage: shoutem [command] [-h]')
-    .option('version', {
-      alias: 'v',
-      description: 'Shows version number.',
-    })
+    .version()
     .commandDir('cli')
     .strict()
     .help()
@@ -52,11 +51,9 @@ analytics.setArgv(process.argv);
     .alias('help', 'h');
 
   const argv = cli.argv;
-  if (argv.version) {
-    console.log(version);
-  } else if (argv._.length === 0) {
+  if (argv.length === 0) {
     cli.showHelp();
   }
 
-  analytics.setCommandName(argv._[0]);
+  analytics.setCommandName(argv[0]);
 })();

@@ -9,7 +9,7 @@ const production = {
   command: 'production',
   description: 'Switches to the Shoutem production environment.',
   async handler() {
-    await setHostEnvName('production');
+    setHostEnvName('production');
     console.log(msg.use.complete('production', await getValue('developer')));
   },
 };
@@ -18,7 +18,7 @@ const dev = {
   command: 'dev',
   description: 'Switches to the Shoutem dev environment.',
   async handler() {
-    await setHostEnvName('dev');
+    setHostEnvName('dev');
     console.log(msg.use.complete('dev', await getValue('developer')));
   },
 };
@@ -28,7 +28,7 @@ const local = {
   description:
     'Switches to the local environment, using endpoints set in OS environment variables.',
   async handler() {
-    await setHostEnvName('local');
+    setHostEnvName('local');
     console.log(msg.use.complete('local', await getValue('developer')));
   },
 };
@@ -37,7 +37,7 @@ const qa = {
   command: 'qa',
   description: 'Switches to the Shoutem QA environment.',
   async handler() {
-    await setHostEnvName('qa');
+    setHostEnvName('qa');
     console.log(msg.use.complete('qa', await getValue('developer')));
   },
 };

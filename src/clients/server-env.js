@@ -12,6 +12,6 @@ export function getHostEnvName() {
   }
 }
 
-export async function setHostEnvName(name) {
-  await fs.writeFile(serverEnvNamePath, name);
+export function setHostEnvName(name) {
+  fs.writeFileSync(serverEnvNamePath, name);
 }

@@ -44,6 +44,10 @@ export function saveSchemaToExtJson(schemaName, callback) {
 }
 
 export function createSchema(schemaName, callback) {
+  if (!schemaName) {
+    console.log('derp');
+  }
+
   const root = ensureInExtensionDir();
   let schemaPath;
 
