@@ -22,13 +22,13 @@
     "@babel/eslint-parser": "7.22.10",
     "@babel/preset-react": "7.22.5",
     "@babel/core": "7.22.10",
+    "@babel/plugin-proposal-object-rest-spread": "7.20.7",
+    "@babel/preset-env": "7.22.10",
+    "@babel/register": "7.22.5",
     "@shoutem/eslint-config-base": "^1.0.2",
     "@shoutem/fetch-token-intercept": "0.3.0",
     "@shoutem/fork-terminal": "1.0.0",
     "async": "2.0.0-rc.3",
-    "babel-plugin-transform-object-rest-spread": "6.22.0",
-    "babel-preset-env": "^1.6.0",
-    "babel-register": "6.24.0",
     "bluebird": "3.4.6",
     "child-process-promise": "2.2.0",
     "cli-spinner": "0.2.6",
@@ -82,8 +82,8 @@
     "yargs": "6.6.0"
   },
   "devDependencies": {
-    "babel-cli": "6.8.0",
-    "babel-plugin-rewire": "1.0.0-rc-2",
+    "@babel/cli": "7.22.10",
+    "babel-plugin-rewire": "1.2.0",
     "chai": "3.5.0",
     "dos2unix-cli": "1.0.1",
     "mocha": "2.4.5",
@@ -94,7 +94,7 @@
   "babel": {
     "presets": [
       [
-        "env",
+        "@babel/preset-env",
         {
           "targets": {
             "node": "current"
@@ -103,7 +103,7 @@
       ]
     ],
     "plugins": [
-      "transform-object-rest-spread"
+      "@babel/plugin-proposal-object-rest-spread"
     ],
     "only": [
       "config",
