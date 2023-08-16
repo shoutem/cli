@@ -3,7 +3,7 @@ import path from 'path';
 
 import _ from 'lodash';
 import async from 'async';
-import mkdirp from 'mkdirp';
+import { mkdirp } from 'mkdirp'
 
 import {
   loadExtensionJsonCallback,

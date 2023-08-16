@@ -1,5 +1,5 @@
 import path from 'path';
-import mkdirp from 'mkdirp-promise';
+import { mkdirp } from 'mkdirp'
 import { readJsonFile, writeJsonFile } from './data';
 import { getLocalStoragePath } from '../clients/cli-paths';
 
