@@ -3,7 +3,7 @@ import analytics from 'universal-analytics';
 import { v4 as uuid } from 'uuid';
 import _ from 'lodash';
 import { getValue } from './cache-env';
-import { analyticsTrackingId } from '../../config/services';
+import { analyticsTrackingId } from '../config/services';
 import * as logger from './logger';
 
 const reportData = {

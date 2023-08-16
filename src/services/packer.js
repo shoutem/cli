@@ -204,7 +204,7 @@ export default async function shoutemPack(dir, options) {
         options.packToTempDir ? tmpDir : dir,
         'extension.tgz',
       );
-      await tar.c({ file: destinationDirectory }, packageDir);
+      await tar.c({ file: destinationDirectory }, [packageDir]);
 
 
       return {

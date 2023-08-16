@@ -1,5 +1,5 @@
 import URI from 'urijs';
-import { extensionManager } from '../../config/services';
+import { extensionManager } from '../config/services';
 import { listenStream } from '../services/stream-listener';
 import * as jsonApi from './json-api-client';
 import FormData from 'form-data';

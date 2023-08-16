@@ -5,7 +5,7 @@ import replace from 'replace-in-file';
 import * as appManager from '../clients/app-manager';
 import * as authService from '../clients/auth-service';
 import decompressUri from './decompress';
-import cliUrls from '../../config/services';
+import cliUrls from '../config/services';
 import { writeJsonFile, readJsonFile } from './data';
 import * as packageManager from './package-manager-service';
 import * as reactNative from './react-native';

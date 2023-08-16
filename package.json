@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.14.5-rc.0",
+  "version": "0.14.5-beta.2",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -13,7 +13,7 @@
     "build": "babel ./src --ignore ./src/templates --out-dir build --source-maps inline --copy-files",
     "extlint": "eslint",
     "lint": "eslint ./ --ignore-pattern build --ignore-pattern templates",
-    "preinstall": "npm run build",
+    "prepare": "npm run build",
     "shoutem": "node build/shoutem.js",
     "test": "mocha -R spec --require fetch-everywhere --compilers js:babel-core/register \"src/**/*spec.js\""
   },
@@ -37,7 +37,6 @@
     "decamelize": "^1.2.0",
     "decompress": "4.2.1",
     "diff": "^3.3.1",
-    "download-cached": "1.0.8",
     "download-file": "latest",
     "eslint": "^7.5.0",
     "eslint-plugin-import": "^2.24.2",
@@ -94,7 +93,7 @@
   "babel": {
     "presets": [
       [
-        "@babel/preset-env",
+        "@babel/env",
         {
           "targets": {
             "node": "current"
@@ -106,8 +105,7 @@
       "@babel/plugin-proposal-object-rest-spread"
     ],
     "only": [
-      "config",
-      "src"
+      "./src"
     ]
   }
 }
