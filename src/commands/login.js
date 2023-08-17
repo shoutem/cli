@@ -104,6 +104,8 @@ export async function loginUser(args) {
     ...developer,
     email: credentials.email,
   });
+
+  return developer;
 }
 
 /**
