@@ -1,4 +1,4 @@
-import { mkdirp } from 'mkdirp'
+import { mkdirp } from 'mkdirp';
 import getHomeDir from '../home-dir';
 
 export async function getLocalStoragePath() {

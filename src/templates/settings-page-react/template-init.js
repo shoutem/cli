@@ -1,14 +1,14 @@
-import decamelize from 'decamelize';
-import _ from 'lodash';
-import getOrSet from 'lodash-get-or-set';
-import pascalize from 'uppercamelcase';
-import { instantiateExtensionTemplate } from '../../services/extension-template';
+const decamelize = require('decamelize');
+const _ = require('lodash');
+const getOrSet = require('lodash-get-or-set');
+const pascalize = require('uppercamelcase');
+const { instantiateExtensionTemplate } = require('../../services/extension-template');
 
-export function isReactPage({ type, path }) {
+function isReactPage({ type, path }) {
   return type === 'react-page' || _.includes(path, 'server/build');
 }
 
-export async function before(context) {
+async function before(context) {
   const { extJson, name } = context;
 
   const pages = getOrSet(extJson, 'pages', []);
@@ -30,7 +30,7 @@ export async function before(context) {
   _.merge(context, { pageDirectoryName, pageClassName });
 }
 
-export async function after(context) {
+async function after(context) {
   if (context.extensionScope) {
     await instantiateExtensionTemplate(
       'settings-page-react-extension',
@@ -41,3 +41,9 @@ export async function after(context) {
   }
   await instantiateExtensionTemplate('settings-page-react-bin', context);
 }
+
+module.exports = {
+  before,
+  after,
+  isReactPage,
+};

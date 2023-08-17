@@ -1,6 +1,6 @@
 import { exec } from 'child-process-promise';
 import fs, { pathExists, copy } from 'fs-extra';
-import { mkdirp } from 'mkdirp'
+import { mkdirp } from 'mkdirp';
 import path from 'path';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';

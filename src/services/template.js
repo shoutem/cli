@@ -4,7 +4,7 @@ import getOrSet from 'lodash-get-or-set';
 import Mustache from 'mustache';
 import path from 'path';
 
-const templatesDirectory = path.join(__dirname, '../..', 'src/templates');
+const templatesDirectory = path.join(__dirname, '../', 'templates');
 
 export function load(pathWithSlashes, templateContext) {
   const p = path.join(templatesDirectory, ...pathWithSlashes.split('/'));

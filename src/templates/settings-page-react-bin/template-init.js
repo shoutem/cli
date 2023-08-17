@@ -1,13 +1,13 @@
 /* eslint prettier/prettier: 0 */
-import _ from 'lodash';
-import path from 'path';
-import getOrSet from 'lodash-get-or-set';
-import { stringify } from '../../services/data';
-import {
+const _ = require('lodash');
+const path = require('path');
+const getOrSet = require('lodash-get-or-set');
+const { stringify } = require('../../services/data');
+const {
   getPackageJson,
   install,
   packageManager,
-} from '../../services/package-manager-service';
+} = require('../../services/package-manager-service');
 
 const pkgJsonTemplate = {
   "scripts": {
@@ -88,13 +88,13 @@ const pkgJsonTemplate = {
   }
 };
 
-export async function before(context) {
+async function before(context) {
   const { extensionPath } = context;
   const serverPath = path.join(extensionPath, 'server');
   context.serverJsonString = stringify(_.merge(await getPackageJson(serverPath), pkgJsonTemplate));
 }
 
-export async function after(context) {
+async function after(context) {
   const { extensionPath } = context;
 
   getOrSet(context, 'postRunActions', [])
@@ -104,3 +104,8 @@ export async function after(context) {
       console.log(`${packageManager} install... [${'OK'.green.bold}]`)
     });
 }
+
+module.exports = {
+  before,
+  after,
+};
