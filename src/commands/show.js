@@ -1,5 +1,5 @@
 import { getHostEnvName } from '../clients/server-env';
-import apisConfig from '../../config/services';
+import apisConfig from '../config/services';
 import msg from '../user_messages';
 import { getValue } from '../services/cache-env';
 import getHomeDir from '../home-dir';

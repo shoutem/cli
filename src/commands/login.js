@@ -3,7 +3,7 @@ import _ from 'lodash';
 import { authorizeRequests, getRefreshToken } from '../clients/auth-service';
 import { getDeveloper, createDeveloper } from '../clients/extension-manager';
 import msg from '../user_messages';
-import urls from '../../config/services';
+import urls from '../config/services';
 import * as logger from '../services/logger';
 import * as cache from '../services/cache-env';
 
@@ -104,6 +104,8 @@ export async function loginUser(args) {
     ...developer,
     email: credentials.email,
   });
+
+  return developer;
 }
 
 /**

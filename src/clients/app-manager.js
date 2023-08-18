@@ -1,6 +1,6 @@
 import URI from 'urijs';
 import * as jsonApi from './json-api-client';
-import { appManager } from '../../config/services';
+import { appManager } from '../config/services';
 
 const appManagerUri = new URI(appManager);
 

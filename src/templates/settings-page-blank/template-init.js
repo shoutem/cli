@@ -1,3 +1,5 @@
-import * as htmlSettingsPage from '../settings-page-html/template-init';
+const htmlSettingsPage = require('../settings-page-html/template-init');
 
-export const before = htmlSettingsPage.before;
+module.exports = {
+  before: htmlSettingsPage.before,
+};

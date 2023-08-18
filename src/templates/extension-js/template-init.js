@@ -1,6 +1,6 @@
-import _ from 'lodash';
-import decamelize from 'decamelize';
-import { isReactPage } from '../settings-page-react/template-init';
+const _ = require('lodash');
+const decamelize = require('decamelize');
+const { isReactPage } = require('../settings-page-react/template-init');
 
 function importStatements(names, path, directoriesNames = names) {
   return names
@@ -16,7 +16,7 @@ function indentedNamesList(names) {
  * Generate app/extension.js file within the extension.
  * This file is used to export extension's themes and screens.
  */
-export async function before(context) {
+async function before(context) {
   const { extJson } = context;
 
   const screensNamesList = _.map(extJson.screens, 'name');
@@ -50,3 +50,7 @@ export async function before(context) {
     extJsonString,
   });
 }
+
+module.exports = {
+  before,
+};

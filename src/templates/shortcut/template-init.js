@@ -1,5 +1,9 @@
-import { addShortcut } from '../../services/shortcut';
+const { addShortcut } = require('../../services/shortcut');
 
-export async function before(context) {
+async function before(context) {
   addShortcut(context.extJson, context);
 }
+
+module.exports = {
+  before,
+};

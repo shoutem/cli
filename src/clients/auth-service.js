@@ -1,6 +1,6 @@
 import URI from 'urijs';
 import { post } from './json-api-client';
-import services from '../../config/services';
+import services from '../config/services';
 import * as cache from '../services/cache-env';
 import * as logger from '../services/logger';
 
