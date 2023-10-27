@@ -71,7 +71,7 @@ export async function shoutemUnpack(tgzDir, destinationDir) {
   const extDecompressPath = await packageManagerUnpack(tgzFile, tgzDir)
   const segments = ['app', 'cloud', 'server'];
 
-  await segments.forEach(async segment => {
+  await Promise.all(segments, async segment => {
     const tgzPath = path.join(extDecompressPath, `${segment}.tgz`);
 
     if (await pathExists(tgzPath)) {
@@ -89,7 +89,7 @@ export async function shoutemUnpack(tgzDir, destinationDir) {
       // segment files.
       await rmrf(decompressPath);
     }
-  });
+  })
 
   fs.copySync(
     path.join(extDecompressPath, 'extension.json'),

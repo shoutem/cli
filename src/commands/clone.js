@@ -34,6 +34,14 @@ function removeTrailingSlash(str) {
   return str.replace(/\/$/, '');
 }
 
+function getDownloadExtensionConcurrency() {
+  if (process.env.DOWNLOAD_EXTENSION_CONCURRENCY) {
+    return parseInt(process.env.DOWNLOAD_EXTENSION_CONCURRENCY)
+  }
+
+  return 1;
+}
+
 async function getExtensionUrl(extId) {
   const resp = await getExtension(extId);
   const {
@@ -78,25 +86,22 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
 }
 
 export async function pullExtensions(appId, destinationDir) {
+  const concurrency = getDownloadExtensionConcurrency();
+  console.log(`Download concurrency: ${concurrency}`)
+
   console.time('Extension download took');
   const installations = await appManager.getInstallations(appId);
-  const n = installations.length;
-  let i = 0;
-  for (const inst of installations) {
-    i++;
-    await spinify(
-      pullExtension(destinationDir, inst),
-      `Downloading extension ${i}/${n}: ${inst.canonicalName}...`,
-    );
-  }
-  console.timeEnd('Extension download took');
 
+  await Promise.map(installations, inst => spinify(
+    pullExtension(destinationDir, inst),
+    `Downloading extension: ${inst.canonicalName}...`,
+  ), { concurrency });
+ 
+  console.timeEnd('Extension download took');
 
   // Cleanup of temporary directories created for downloading extensions.
   console.time('Temp file cleanup took')
-  await tmpPaths.forEach(async tmpPath => {
-    await rmrf(tmpPath);
-  });
+  await Promise.map(tmpPaths, tmpPath => rmrf(tmpPath));
   console.timeEnd('Temp file cleanup took')
 }
 
