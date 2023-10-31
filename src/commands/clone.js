@@ -42,40 +42,36 @@ function getDownloadExtensionConcurrency() {
   return 1;
 }
 
-async function getExtensionUrl(extId) {
-  const resp = await getExtension(extId);
-  const {
-    location: { extension },
-  } = resp;
-
-  return `${removeTrailingSlash(extension.package)}/extension.tgz`;
+function getExtensionUrlFromInstallation(installation) {
+  const extensionPackage = _.get(installation, 'location.extension.package');
+  return `${removeTrailingSlash(extensionPackage)}/extension.tgz`;
 }
 
-async function pullExtension(destinationDir, { extension, canonicalName }) {
+async function pullExtension(destinationDir, installation) {
+  const { canonicalName } = installation
   let pullError = null;
-  for (let i = 0; i < 4; i++) {
-    const tgzDir = (await tmp.dir()).path;
-    tmpPaths.push(tgzDir);
+  
+  const tgzDir = (await tmp.dir()).path;
+  tmpPaths.push(tgzDir);
 
-    try {
-      const url = await getExtensionUrl(extension);
-      await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
+  try {
+    const url = getExtensionUrlFromInstallation(installation)
+    await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
 
-      const extensionDir = path.join(destinationDir, canonicalName);
+    const extensionDir = path.join(destinationDir, canonicalName);
 
-      if (!(await pathExists(extensionDir))) {
-        await mkdirp(extensionDir);
-      }
+    if (!(await pathExists(extensionDir))) {
+      await mkdirp(extensionDir);
+    }
 
-      await shoutemUnpack(tgzDir, extensionDir);
+    await shoutemUnpack(tgzDir, extensionDir);
 
-      pullError = null;
+    pullError = null;
 
-      return;
-    } catch (error) {
-      if (error.code !== 'ENOTEMPTY') {
-        pullError = error;
-      }
+    return;
+  } catch (error) {
+    if (error.code !== 'ENOTEMPTY') {
+      pullError = error;
     }
   }
 
@@ -87,7 +83,7 @@ async function pullExtension(destinationDir, { extension, canonicalName }) {
 
 export async function pullExtensions(appId, destinationDir) {
   const concurrency = getDownloadExtensionConcurrency();
-  console.log(`Download concurrency: ${concurrency}`)
+  console.log(`Download extensions concurrency: ${concurrency}`)
 
   console.time('Extension download took');
   const installations = await appManager.getInstallations(appId);
