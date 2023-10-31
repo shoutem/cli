@@ -73,7 +73,7 @@ export async function pullExtensions(appId, destinationDir) {
   const concurrency = getDownloadExtensionConcurrency();
   console.log(`Download extensions concurrency: ${concurrency}`)
 
-  console.time('Extension download took');
+  console.time('Extensions download');
   const installations = await appManager.getInstallations(appId);
 
   await Promise.map(installations, inst => spinify(
@@ -81,7 +81,7 @@ export async function pullExtensions(appId, destinationDir) {
     `Downloading extension: ${inst.canonicalName}...`,
   ), { concurrency });
  
-  console.timeEnd('Extension download took');
+  console.timeEnd('Extensions download');
 }
 
 function ensurePlatformCompatibility(platform) {
