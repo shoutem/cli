@@ -35,7 +35,7 @@ function getDownloadExtensionConcurrency() {
     return parseInt(process.env.DOWNLOAD_EXTENSION_CONCURRENCY)
   }
 
-  return 1;
+  return 10;
 }
 
 function getExtensionUrl(installation) {
