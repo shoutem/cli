@@ -22,9 +22,19 @@ const yarn = {
   },
 };
 
+const bun = {
+  command: 'bun',
+  description: "Sets 'bun' as your default package manager.",
+  async handler() {
+    setDefaultPackageManager('bun');
+    console.log(msg.packageManager.complete('bun'));
+  },
+};
+
 export function builder(packageManager) {
   return packageManager
     .command(npm)
     .command(yarn)
+    .command(bun)
     .strict();
 }
