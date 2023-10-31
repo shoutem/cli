@@ -6,7 +6,9 @@ import rmrf from 'rmfr';
 import path from 'path';
 import semver from 'semver';
 import inquirer from 'inquirer';
-import { getExtension } from '../clients/extension-manager';
+import slugify from 'slugify';
+import 'colors';
+import Downloader from 'nodejs-file-downloader';
 import * as appManager from '../clients/app-manager';
 import { shoutemUnpack } from '../services/packer';
 import { getApp } from '../clients/legacy-service';
@@ -23,12 +25,6 @@ import { ensureUserIsLoggedIn } from './login';
 import { createProgressHandler } from '../services/progress-bar';
 import { spinify } from '../services/spinner';
 import commandExists from '../services/command-exists';
-import slugify from 'slugify';
-import 'colors';
-
-const downloadFile = Promise.promisify(require('download-file'));
-
-const tmpPaths = [];
 
 function removeTrailingSlash(str) {
   return str.replace(/\/$/, '');
@@ -42,42 +38,34 @@ function getDownloadExtensionConcurrency() {
   return 1;
 }
 
-function getExtensionUrlFromInstallation(installation) {
+function getExtensionUrl(installation) {
   const extensionPackage = _.get(installation, 'location.extension.package');
   return `${removeTrailingSlash(extensionPackage)}/extension.tgz`;
 }
 
 async function pullExtension(destinationDir, installation) {
   const { canonicalName } = installation
-  let pullError = null;
-  
   const tgzDir = (await tmp.dir()).path;
-  tmpPaths.push(tgzDir);
 
   try {
-    const url = getExtensionUrlFromInstallation(installation)
-    await downloadFile(url, { directory: tgzDir, filename: 'extension.tgz' });
+    const downloader = new Downloader({
+      url: getExtensionUrl(installation),
+      directory: tgzDir,
+      fileName: 'extension.tgz', 
+      maxAttempts: 5
+    });
+    await downloader.download();
 
     const extensionDir = path.join(destinationDir, canonicalName);
-
     if (!(await pathExists(extensionDir))) {
       await mkdirp(extensionDir);
     }
 
     await shoutemUnpack(tgzDir, extensionDir);
-
-    pullError = null;
-
-    return;
+    await rmrf(tgzDir)
   } catch (error) {
-    if (error.code !== 'ENOTEMPTY') {
-      pullError = error;
-    }
-  }
-
-  if (!_.isEmpty(pullError)) {
-    pullError.message = `Could not fetch extension ${canonicalName}.`;
-    throw pullError;
+    await rmrf(tgzDir)
+    throw new Error(`Could not fetch extension ${canonicalName}.`);
   }
 }
 
@@ -94,11 +82,6 @@ export async function pullExtensions(appId, destinationDir) {
   ), { concurrency });
  
   console.timeEnd('Extension download took');
-
-  // Cleanup of temporary directories created for downloading extensions.
-  console.time('Temp file cleanup took')
-  await Promise.map(tmpPaths, tmpPath => rmrf(tmpPath));
-  console.timeEnd('Temp file cleanup took')
 }
 
 function ensurePlatformCompatibility(platform) {
@@ -242,7 +225,9 @@ export async function clone(opts, destinationDir) {
   if (opts.noconfigure) {
     console.log('Skipping configure step due to --noconfigure flag');
   } else {
+    console.time('platform download took');
     await configurePlatform(appDir, config);
+    console.timeEnd('platform download took');
   }
 
   console.log('Done.\n'.green.bold);
