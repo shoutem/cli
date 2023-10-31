@@ -225,9 +225,7 @@ export async function clone(opts, destinationDir) {
   if (opts.noconfigure) {
     console.log('Skipping configure step due to --noconfigure flag');
   } else {
-    console.time('platform download took');
     await configurePlatform(appDir, config);
-    console.timeEnd('platform download took');
   }
 
   console.log('Done.\n'.green.bold);
