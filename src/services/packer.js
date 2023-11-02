@@ -71,7 +71,7 @@ export async function shoutemUnpack(tgzDir, destinationDir) {
   const extDecompressPath = await packageManagerUnpack(tgzFile, tgzDir)
   const segments = ['app', 'cloud', 'server'];
 
-  await Promise.all(segments, async segment => {
+  await Promise.map(segments, async segment => {
     const tgzPath = path.join(extDecompressPath, `${segment}.tgz`);
 
     if (await pathExists(tgzPath)) {
@@ -83,7 +83,7 @@ export async function shoutemUnpack(tgzDir, destinationDir) {
         await mkdirp(segmentDestinationPath);
       }
 
-      fs.copySync(segmentPath, segmentDestinationPath);
+      await fs.copy(segmentPath, segmentDestinationPath);
 
       // We delete the 'package' decompress directory so that we don't mix
       // segment files.
