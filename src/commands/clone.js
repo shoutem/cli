@@ -162,7 +162,9 @@ export async function clone(opts, destinationDir) {
   let appDir = path.join(destinationDir, directoryName);
 
   if (opts.force) {
+    console.time('Destroying directory');
     await spinify(rmrf(appDir), `Destroying directory ${directoryName}...`);
+    console.timeEnd('Destroying directory');
   }
 
   if (await pathExists(appDir)) {
