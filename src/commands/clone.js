@@ -30,20 +30,12 @@ function removeTrailingSlash(str) {
   return str.replace(/\/$/, '');
 }
 
-function getDownloadExtensionConcurrency() {
-  if (process.env.DOWNLOAD_EXTENSION_CONCURRENCY) {
-    return parseInt(process.env.DOWNLOAD_EXTENSION_CONCURRENCY)
-  }
-
-  return 10;
-}
-
 function getExtensionUrl(installation) {
   const extensionPackage = _.get(installation, 'location.extension.package');
   return `${removeTrailingSlash(extensionPackage)}/extension.tgz`;
 }
 
-async function pullExtension(destinationDir, installation) {
+async function pullExtension(destinationDir, installation, extSegments) {
   const { canonicalName } = installation
   const tgzDir = (await tmp.dir()).path;
 
@@ -52,7 +44,7 @@ async function pullExtension(destinationDir, installation) {
       url: getExtensionUrl(installation),
       directory: tgzDir,
       fileName: 'extension.tgz', 
-      maxAttempts: 5
+      maxAttempts: 10
     });
     await downloader.download();
 
@@ -61,7 +53,7 @@ async function pullExtension(destinationDir, installation) {
       await mkdirp(extensionDir);
     }
 
-    await shoutemUnpack(tgzDir, extensionDir);
+    await shoutemUnpack(tgzDir, extensionDir, extSegments);
     await rmrf(tgzDir)
   } catch (error) {
     await rmrf(tgzDir)
@@ -69,17 +61,14 @@ async function pullExtension(destinationDir, installation) {
   }
 }
 
-export async function pullExtensions(appId, destinationDir) {
-  const concurrency = getDownloadExtensionConcurrency();
-  console.log(`Download extensions concurrency: ${concurrency}`)
-
+export async function pullExtensions(appId, destinationDir, extSegments) {
   console.time('Extensions download');
   const installations = await appManager.getInstallations(appId);
 
   await Promise.map(installations, inst => spinify(
-    pullExtension(destinationDir, inst),
+    pullExtension(destinationDir, inst, extSegments),
     `Downloading extension: ${inst.canonicalName}...`,
-  ), { concurrency });
+  ));
  
   console.timeEnd('Extensions download');
 }
@@ -215,7 +204,7 @@ export async function clone(opts, destinationDir) {
     await mkdirp(extensionsDir);
   }
 
-  await pullExtensions(opts.appId, extensionsDir);
+  await pullExtensions(opts.appId, extensionsDir, opts.segments);
 
   await fixPlatform(appDir, opts.appId);
 
