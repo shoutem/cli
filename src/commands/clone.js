@@ -69,7 +69,7 @@ export async function pullExtensions(appId, destinationDir, extSegments) {
     Promise.map(installations, inst =>
       pullExtension(destinationDir, inst, extSegments),
     ),
-    'Downloading extension...',
+    'Downloading extensions...',
   );
 
   console.timeEnd('Extensions download');
