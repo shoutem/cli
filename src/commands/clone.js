@@ -65,11 +65,13 @@ export async function pullExtensions(appId, destinationDir, extSegments) {
   console.time('Extensions download');
   const installations = await appManager.getInstallations(appId);
 
-  await Promise.map(installations, inst => spinify(
-    pullExtension(destinationDir, inst, extSegments),
-    `Downloading extension: ${inst.canonicalName}...`,
-  ));
- 
+  await spinify(
+    Promise.map(installations, inst =>
+      pullExtension(destinationDir, inst, extSegments),
+    ),
+    'Downloading extension...',
+  );
+
   console.timeEnd('Extensions download');
 }
 
