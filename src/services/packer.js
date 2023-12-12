@@ -2,6 +2,7 @@ import { exec } from 'child-process-promise';
 import fs, { pathExists, copy } from 'fs-extra';
 import mkdirp from 'mkdirp-promise';
 import path from 'path';
+import _ from 'lodash';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';
 import targz from 'tar.gz';
@@ -63,15 +64,20 @@ export async function packageManagerUnpack(
   return path.join(decompressPath, 'package');
 }
 
-export async function shoutemUnpack(tgzDir, destinationDir) {
+export async function shoutemUnpack(tgzDir, destinationDir, extSegments) {
   const tgzFile = path.join(tgzDir, 'extension.tgz');
 
   // Extracts extension.tgz into same directory, which then contains:
   // app.tgz, server.tgz, extension.json and optional cloud.tgz
   const extDecompressPath = await packageManagerUnpack(tgzFile, tgzDir)
-  const segments = ['app', 'cloud', 'server'];
+  
+  let segments = ['app', 'cloud', 'server'];
+  // custome ext segments
+  if (!_.isEmpty(extSegments)) {
+    segments = _.split(extSegments, ',');
+  }
 
-  await segments.forEach(async segment => {
+  await Promise.map(segments, async segment => {
     const tgzPath = path.join(extDecompressPath, `${segment}.tgz`);
 
     if (await pathExists(tgzPath)) {
@@ -83,13 +89,13 @@ export async function shoutemUnpack(tgzDir, destinationDir) {
         await mkdirp(segmentDestinationPath);
       }
 
-      fs.copySync(segmentPath, segmentDestinationPath);
+      await fs.copy(segmentPath, segmentDestinationPath);
 
       // We delete the 'package' decompress directory so that we don't mix
       // segment files.
       await rmrf(decompressPath);
     }
-  });
+  })
 
   fs.copySync(
     path.join(extDecompressPath, 'extension.json'),

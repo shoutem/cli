@@ -114,8 +114,13 @@ export async function configurePlatform(platformDir) {
     throw new Error('Missing config.json file');
   }
 
+  console.time('Platform installation');
   await packageManager.install(path.join(platformDir, 'scripts'));
+  console.timeEnd('Platform installation');
+
+  console.time('Platform configure');
   await packageManager.run(platformDir, 'configure');
+  console.timeEnd('Platform configure');
 }
 
 export async function fixPlatform(platformDir, appId) {
