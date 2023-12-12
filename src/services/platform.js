@@ -93,11 +93,20 @@ export async function setPlatformConfig(platformDir, mobileConfig) {
 }
 
 export async function configurePlatform(platformDir) {
+  const config = await readJson(
+    path.join(platformDir, 'config.json'),
+  );
+  const { nativeBuildOs = 'ios' } = config;
+
   await reactNative.ensureInstalled();
-  if (process.platform === 'darwin' && !(await commandExists('pod'))) {
+  if (
+    process.platform === 'darwin' &&
+    nativeBuildOs === 'ios' &&
+    !(await commandExists('pod'))
+  ) {
     throw new Error(
       'Missing `pods` command. Please install cocoapods and run `shoutem configure` in the ' +
-        `${platformDir} directory`,
+      `${platformDir} directory`,
     );
   }
 
@@ -105,8 +114,13 @@ export async function configurePlatform(platformDir) {
     throw new Error('Missing config.json file');
   }
 
+  console.time('Platform installation');
   await packageManager.install(path.join(platformDir, 'scripts'));
+  console.timeEnd('Platform installation');
+
+  console.time('Platform configure');
   await packageManager.run(platformDir, 'configure');
+  console.timeEnd('Platform configure');
 }
 
 export async function fixPlatform(platformDir, appId) {
@@ -156,7 +170,7 @@ export async function fixPlatform(platformDir, appId) {
 export async function downloadApp(appId, destinationDir, options = {}) {
   analytics.setAppId(appId);
 
-  const versionCheck = options.versionCheck || (() => {});
+  const versionCheck = options.versionCheck || (() => { });
 
   const { mobileAppVersion } = await appManager.getApplicationPlatform(appId);
   await versionCheck(mobileAppVersion);

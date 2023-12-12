@@ -24,6 +24,10 @@ export const builder = yargs => {
         description: 'Destroys destination directory if it already exists.',
         type: 'boolean',
       },
+      segments: {
+        description: 'Specifies which extension segments will be unpacked (app,server,cloud).',
+        requiresArg: true,
+      },
     })
     .usage(`shoutem ${command} \n\n${description}`);
 };
