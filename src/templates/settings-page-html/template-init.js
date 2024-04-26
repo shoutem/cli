@@ -1,13 +1,15 @@
-import decamelize from 'decamelize';
-import _ from 'lodash';
-import getOrSet from 'lodash-get-or-set';
-import { instantiateExtensionTemplate } from '../../services/extension-template';
+const decamelize = require('decamelize');
+const _ = require('lodash');
+const getOrSet = require('lodash-get-or-set');
+const {
+  instantiateExtensionTemplate,
+} = require('../../services/extension-template');
 
 function isHtmlPage({ type, path }) {
   return type === 'html' && !_.includes(path, 'server/build');
 }
 
-export async function before(context) {
+async function before(context) {
   const { extJson, name, extensionScope } = context;
   const pages = getOrSet(extJson, 'pages', []);
 
@@ -37,3 +39,7 @@ export async function before(context) {
     await instantiateExtensionTemplate('settings-page-html-shortcut', context);
   }
 }
+
+module.exports = {
+  before,
+};

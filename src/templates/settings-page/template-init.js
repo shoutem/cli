@@ -1,8 +1,12 @@
-import getOrSet from 'lodash-get-or-set';
-import { instantiateExtensionTemplate } from '../../services/extension-template';
-import { linkSettingsPageWithExistingScreen } from '../../services/shortcut';
+const getOrSet = require('lodash-get-or-set');
+const {
+  instantiateExtensionTemplate,
+} = require('../../services/extension-template');
+const {
+  linkSettingsPageWithExistingScreen,
+} = require('../../services/shortcut');
 
-export async function after(context) {
+async function after(context) {
   const {
     type,
     extensionScope,
@@ -41,3 +45,7 @@ export async function after(context) {
     }
   }
 }
+
+module.exports = {
+  after,
+};
