@@ -1,4 +1,4 @@
-const { getHostEnvName } = require('../src/clients/server-env');
+const { getHostEnvName } = require('../clients/server-env');
 
 const envValues = {
   production: {

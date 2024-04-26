@@ -25,7 +25,8 @@ export const builder = yargs => {
         type: 'boolean',
       },
       segments: {
-        description: 'Specifies which extension segments will be unpacked (app,server,cloud).',
+        description:
+          'Specifies which extension segments will be unpacked (app,server,cloud).',
         requiresArg: true,
       },
     })

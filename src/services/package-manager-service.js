@@ -1,7 +1,7 @@
 import path from 'path';
 import Promise from 'bluebird';
 import { readJson } from 'fs-extra';
-import { spawn } from 'child-process-promise';
+import { spawn } from 'promisify-child-process';
 import { getDefaultPackageManager } from '../clients/default-package-manager';
 import { writeJsonFile } from './data';
 const linkLocal = Promise.promisify(require('linklocal'));

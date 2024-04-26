@@ -6,7 +6,7 @@ import 'colors';
 import 'fetch-everywhere';
 import yargs from 'yargs';
 import { version } from '../package.json';
-import apiUrls from '../config/services';
+import apiUrls from './config/services';
 import autoUpdate from './commands/update-cli';
 import * as analytics from './services/analytics';
 import { isAscii, containsSpace } from './services/validation';

@@ -45,6 +45,7 @@ function ensureRequiredFilesExist(dir, extTitle) {
 export async function promptPublishableVersion(extJson) {
   const dev = await ensureUserIsLoggedIn();
 
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     const { name, version } = extJson;
     const canonical = getExtensionCanonicalName(dev.name, name, version);

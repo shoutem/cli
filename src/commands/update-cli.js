@@ -1,13 +1,13 @@
+import 'colors';
+import apiUrls from '../config/services';
 import { isLatest } from '../services/npmjs';
-import apiUrls from '../../config/services';
 import msg from '../user_messages';
-import { spawn } from 'child-process-promise';
+import { spawn } from 'promisify-child-process';
 import { version } from '../../package.json';
 import { getDefaultPackageManager } from '../clients/default-package-manager';
 import confirm from '../services/confirmer';
 import * as cache from '../services/cache';
 import { spinify } from '../services/spinner';
-import 'colors';
 
 const packageManager = getDefaultPackageManager();
 
