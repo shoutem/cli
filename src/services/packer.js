@@ -1,4 +1,4 @@
-import { exec } from 'child-process-promise';
+import { exec } from 'promisify-child-process';
 import fs, { pathExists, copy } from 'fs-extra';
 import mkdirp from 'mkdirp-promise';
 import path from 'path';
@@ -47,10 +47,7 @@ async function packageManagerPack(dir, destinationDir) {
   }
 }
 
-export async function packageManagerUnpack(
-  tgzFile,
-  decompressPath,
-) {
+export async function packageManagerUnpack(tgzFile, decompressPath) {
   if (!(await pathExists(tgzFile))) {
     return [];
   }
@@ -69,8 +66,8 @@ export async function shoutemUnpack(tgzDir, destinationDir, extSegments) {
 
   // Extracts extension.tgz into same directory, which then contains:
   // app.tgz, server.tgz, extension.json and optional cloud.tgz
-  const extDecompressPath = await packageManagerUnpack(tgzFile, tgzDir)
-  
+  const extDecompressPath = await packageManagerUnpack(tgzFile, tgzDir);
+
   let segments = ['app', 'cloud', 'server'];
   // custome ext segments
   if (!_.isEmpty(extSegments)) {
@@ -95,7 +92,7 @@ export async function shoutemUnpack(tgzDir, destinationDir, extSegments) {
       // segment files.
       await rmrf(decompressPath);
     }
-  })
+  });
 
   fs.copySync(
     path.join(extDecompressPath, 'extension.json'),

@@ -1,9 +1,9 @@
-import * as cache from './cache';
 import analytics from 'universal-analytics';
 import uuid from 'uuid/v4';
 import _ from 'lodash';
+import { analyticsTrackingId } from '../config/services';
+import * as cache from './cache';
 import { getValue } from './cache-env';
-import { analyticsTrackingId } from '../../config/services';
 import * as logger from './logger';
 
 const reportData = {

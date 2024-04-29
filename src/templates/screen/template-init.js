@@ -1,8 +1,8 @@
-import _ from 'lodash';
-import getOrSet from 'lodash-get-or-set';
-import * as shortcut from '../../services/shortcut';
+const _ = require('lodash');
+const getOrSet = require('lodash-get-or-set');
+const shortcut = require('../../services/shortcut');
 
-export async function before(context) {
+async function before(context) {
   const { extJson, name } = context;
 
   const screens = getOrSet(extJson, 'screens', []);
@@ -22,3 +22,7 @@ export async function before(context) {
     shortcut.addShortcutForScreen(extJson, context, context.newShortcut);
   }
 }
+
+module.exports = {
+  before,
+};

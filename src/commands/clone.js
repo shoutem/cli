@@ -36,15 +36,15 @@ function getExtensionUrl(installation) {
 }
 
 async function pullExtension(destinationDir, installation, extSegments) {
-  const { canonicalName } = installation
+  const { canonicalName } = installation;
   const tgzDir = (await tmp.dir()).path;
 
   try {
     const downloader = new Downloader({
       url: getExtensionUrl(installation),
       directory: tgzDir,
-      fileName: 'extension.tgz', 
-      maxAttempts: 10
+      fileName: 'extension.tgz',
+      maxAttempts: 10,
     });
     await downloader.download();
 
@@ -54,9 +54,9 @@ async function pullExtension(destinationDir, installation, extSegments) {
     }
 
     await shoutemUnpack(tgzDir, extensionDir, extSegments);
-    await rmrf(tgzDir)
+    await rmrf(tgzDir);
   } catch (error) {
-    await rmrf(tgzDir)
+    await rmrf(tgzDir);
     throw new Error(`Could not fetch extension ${canonicalName}.`);
   }
 }

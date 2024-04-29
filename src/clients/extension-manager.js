@@ -1,8 +1,8 @@
+import FormData from 'form-data';
 import URI from 'urijs';
-import { extensionManager } from '../../config/services';
+import { extensionManager } from '../config/services';
 import { listenStream } from '../services/stream-listener';
 import * as jsonApi from './json-api-client';
-import FormData from 'form-data';
 
 const extensionManagerUri = new URI(extensionManager);
 
@@ -43,9 +43,14 @@ export async function uploadExtension(
     contentType: 'application/gzip',
   });
 
+  const formHeaders = form.getHeaders();
+
   const { id } = await jsonApi.put(uri, null, {
     body: form,
-    headers: form.getHeaders(),
+    headers: {
+      // forsing header to be in upper case so that it doesn't get overriden by jsonApi.put
+      'Content-Type': formHeaders['content-type'],
+    },
   });
 
   return id;

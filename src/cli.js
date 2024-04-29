@@ -3,15 +3,27 @@ require('yargonaut')
   .errorsStyle('red.bold');
 
 import 'colors';
-import 'fetch-everywhere';
+import nodeFetch from 'node-fetch';
 import yargs from 'yargs';
 import { version } from '../package.json';
-import apiUrls from '../config/services';
+import apiUrls from './config/services';
 import autoUpdate from './commands/update-cli';
 import * as analytics from './services/analytics';
 import { isAscii, containsSpace } from './services/validation';
 import getHomeDir from './home-dir';
 import { authorizeRequests, getRefreshToken } from './clients/auth-service';
+
+// always use node-fetch instead of native fetch
+// native fetch doesn't handle form-data correctly when uploading extension
+global.fetch = function(url, options) {
+  if (/^\/\//.test(url)) {
+    url = `https:${url}`;
+  }
+  return nodeFetch.call(this, url, options);
+};
+global.Response = nodeFetch.Response;
+global.Headers = nodeFetch.Headers;
+global.Request = nodeFetch.Request;
 
 const cliReferenceUrl =
   'https://shoutem.github.io/docs/extensions/reference/cli';

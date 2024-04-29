@@ -22,6 +22,7 @@ While messy and harder to keep track of changes (since you can't see the diff di
 #### 3. Installing via git commit hash
 
 Prerequisites:
+
 - babel-cli v6.8.0 installed globally on your machine
 - commit should have `package.json` edited in such a way that the `prepare` script is replaced with a `preinstall` script
 
