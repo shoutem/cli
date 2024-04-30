@@ -1,4 +1,4 @@
-const getOrSet = require('lodash-get-or-set');
+const { getOrSet } = require('../../services/helpers');
 const {
   instantiateExtensionTemplate,
 } = require('../../services/extension-template');

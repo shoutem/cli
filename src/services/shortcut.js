@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import decamelize from 'decamelize';
 import { prompt } from 'inquirer';
-import getOrSet from 'lodash-get-or-set';
+import { getOrSet } from './helpers';
 import { isVariableName } from './cli-parsing';
 
 export function addShortcut(

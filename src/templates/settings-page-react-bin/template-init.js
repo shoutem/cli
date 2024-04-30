@@ -1,7 +1,7 @@
 /* eslint prettier/prettier: 0 */
 const _ = require('lodash');
 const path = require('path');
-const getOrSet = require('lodash-get-or-set');
+const { getOrSet } = require('../../services/helpers');
 const { stringify } = require('../../services/data');
 const {
   getPackageJson,

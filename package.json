@@ -1,6 +1,6 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.15.0-rc.1",
+  "version": "0.15.0-rc.2",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
@@ -56,7 +56,6 @@
     "jsonapi-serializer": "3.5.3",
     "linklocal": "^2.8.1",
     "lodash": "4.17.21",
-    "lodash-get-or-set": "^1.0.2",
     "mkdirp": "^3.0.1",
     "mustache": "2.2.1",
     "mv": "2.1.1",

@@ -1,7 +1,7 @@
 const decamelize = require('decamelize');
 const _ = require('lodash');
-const getOrSet = require('lodash-get-or-set');
 const pascalize = require('uppercamelcase');
+const { getOrSet } = require('../../services/helpers');
 const {
   instantiateExtensionTemplate,
 } = require('../../services/extension-template');

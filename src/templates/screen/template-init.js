@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const getOrSet = require('lodash-get-or-set');
+const { getOrSet } = require('../../services/helpers');
 const shortcut = require('../../services/shortcut');
 
 async function before(context) {
