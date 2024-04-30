@@ -1,7 +1,7 @@
 import path from 'path';
 import decompress from 'decompress';
-import downloadCached from 'download-cached';
 import getHomeDir from '../home-dir';
+import downloadCached from './download-cached';
 
 const cacheDir = path.join(getHomeDir(), 'cache', 'cached-requests');
 const download = downloadCached(cacheDir, downloadCached.fetchGet(fetch));
