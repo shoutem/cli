@@ -1,11 +1,11 @@
 import { exec } from 'promisify-child-process';
 import fs, { pathExists, copy } from 'fs-extra';
-import mkdirp from 'mkdirp-promise';
+import { mkdirp } from 'mkdirp';
 import path from 'path';
 import _ from 'lodash';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';
-import targz from 'tar.gz';
+import tar from 'tar';
 import { buildNodeProject } from './node';
 import { writeJsonFile, readJsonFile } from './data';
 import { spinify } from './spinner';
@@ -207,7 +207,7 @@ export default async function shoutemPack(dir, options) {
         options.packToTempDir ? tmpDir : dir,
         'extension.tgz',
       );
-      await targz().compress(packageDir, destinationDirectory);
+      await tar.c({ file: destinationDirectory }, [packageDir]);
 
       return {
         packedDirs: dirsToPack,
