@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+require('@babel/register');
 
 require('colors');
 const path = require('path');
@@ -34,5 +35,4 @@ if (semver.lt(nodeVer, '6.0.0')) {
 const babelCachePath = path.join(homeDir, 'cache', 'babel-cache');
 process.env.BABEL_CACHE_PATH = process.env.BABEL_CACHE_PATH || babelCachePath;
 
-require('babel-register')(packageJson.babel);
 require('./cli');

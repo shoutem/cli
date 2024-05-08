@@ -1,7 +1,7 @@
 import URI from 'urijs';
-import { legacyService } from '../../config/services';
-import * as jsonApi from './json-api-client';
+import { legacyService } from '../config/services';
 import * as logger from '../services/logger';
+import * as jsonApi from './json-api-client';
 
 const legacyServiceUri = new URI(legacyService);
 

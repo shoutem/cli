@@ -1,4 +1,4 @@
-import services from '../../config/services';
+import services from '../config/services';
 import {
   createNewApp,
   ensureApp,

@@ -2,10 +2,10 @@ import url from 'url';
 import path from 'path';
 import _ from 'lodash';
 import replace from 'replace-in-file';
+import cliUrls from '../config/services';
 import * as appManager from '../clients/app-manager';
 import * as authService from '../clients/auth-service';
 import decompressUri from './decompress';
-import cliUrls from '../../config/services';
 import { writeJsonFile, readJsonFile } from './data';
 import * as packageManager from './package-manager-service';
 import * as reactNative from './react-native';
@@ -93,9 +93,7 @@ export async function setPlatformConfig(platformDir, mobileConfig) {
 }
 
 export async function configurePlatform(platformDir) {
-  const config = await readJson(
-    path.join(platformDir, 'config.json'),
-  );
+  const config = await readJson(path.join(platformDir, 'config.json'));
   const { nativeBuildOs = 'ios' } = config;
 
   await reactNative.ensureInstalled();
@@ -106,7 +104,7 @@ export async function configurePlatform(platformDir) {
   ) {
     throw new Error(
       'Missing `pods` command. Please install cocoapods and run `shoutem configure` in the ' +
-      `${platformDir} directory`,
+        `${platformDir} directory`,
     );
   }
 
@@ -170,7 +168,7 @@ export async function fixPlatform(platformDir, appId) {
 export async function downloadApp(appId, destinationDir, options = {}) {
   analytics.setAppId(appId);
 
-  const versionCheck = options.versionCheck || (() => { });
+  const versionCheck = options.versionCheck || (() => {});
 
   const { mobileAppVersion } = await appManager.getApplicationPlatform(appId);
   await versionCheck(mobileAppVersion);

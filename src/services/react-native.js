@@ -1,5 +1,5 @@
 import Promise from 'bluebird';
-import { spawn } from 'child-process-promise';
+import { spawn } from 'promisify-child-process';
 import msg from '../user_messages';
 import commandExists from './command-exists';
 import streamMatcher from './stream-matcher';

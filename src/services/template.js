@@ -1,10 +1,10 @@
 import Promise from 'bluebird';
 import fs from 'fs-extra';
-import getOrSet from 'lodash-get-or-set';
 import Mustache from 'mustache';
 import path from 'path';
+import { getOrSet } from './helpers';
 
-const templatesDirectory = path.join(__dirname, '../..', 'src/templates');
+const templatesDirectory = path.join(__dirname, '../', 'templates');
 
 export function load(pathWithSlashes, templateContext) {
   const p = path.join(templatesDirectory, ...pathWithSlashes.split('/'));

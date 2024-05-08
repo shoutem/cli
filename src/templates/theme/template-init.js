@@ -1,7 +1,7 @@
-import _ from 'lodash';
-import getOrSet from 'lodash-get-or-set';
+const _ = require('lodash');
+const { getOrSet } = require('../../services/helpers');
 
-export async function before({ title, themeName, description, extJson }) {
+async function before({ title, themeName, description, extJson }) {
   const themes = getOrSet(extJson, 'themes', []);
   if (_.find(themes, { name: themeName })) {
     throw new Error(
@@ -26,3 +26,7 @@ export async function before({ title, themeName, description, extJson }) {
     `server/themes/${themeName}Variables.js`,
   ];
 }
+
+module.exports = {
+  before,
+};

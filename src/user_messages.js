@@ -51,7 +51,7 @@ export default {
     },
   },
   publish: {
-    alreadyPublished: extJson => 
+    alreadyPublished: extJson =>
       `Version ${extJson.version.cyan} of ${extJson.name.cyan} has already been published.`,
     complete: extJson =>
       `Version ${extJson.version.cyan} of ${extJson.name.cyan} extension was published!`,

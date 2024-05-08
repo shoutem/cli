@@ -1,5 +1,5 @@
 import opn from 'opn';
-import services from '../../config/services';
+import services from '../config/services';
 import { getPlatformConfig } from '../services/platform';
 import { executeAndHandleError } from '../services/error-handler';
 

@@ -5,16 +5,19 @@ import path from 'path';
 import { canPublish } from '../clients/extension-manager';
 import { getHostEnvName } from '../clients/server-env';
 import { handleError } from '../services/error-handler';
-import { getExtensionCanonicalName, loadExtensionJson } from '../services/extension';
-import { spinify, startSpinner } from '../services/spinner';
+import {
+  getExtensionCanonicalName,
+  loadExtensionJson,
+} from '../services/extension';
+import { spinify } from '../services/spinner';
 import { uploadExtension } from '../commands/push';
 import msg from '../user_messages';
 import { ensureUserIsLoggedIn } from './login';
 
 export async function pushAll(args) {
   const dev = await ensureUserIsLoggedIn();
-  const extPaths = await bluebird.filter(args.paths, f => 
-    pathExists(path.join(f, 'extension.json'))
+  const extPaths = await bluebird.filter(args.paths, f =>
+    pathExists(path.join(f, 'extension.json')),
   );
 
   if (extPaths.length === 0) {
@@ -47,7 +50,7 @@ export async function pushAll(args) {
 
     const canonical = getExtensionCanonicalName(dev.name, name, version);
     const canExtensionBePublished = await spinify(
-      canPublish(canonical), 
+      canPublish(canonical),
       `Checking if version ${version} can be published...`,
     );
 

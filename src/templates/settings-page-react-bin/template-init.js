@@ -1,13 +1,13 @@
 /* eslint prettier/prettier: 0 */
-import _ from 'lodash';
-import path from 'path';
-import getOrSet from 'lodash-get-or-set';
-import { stringify } from '../../services/data';
-import {
+const _ = require('lodash');
+const path = require('path');
+const { getOrSet } = require('../../services/helpers');
+const { stringify } = require('../../services/data');
+const {
   getPackageJson,
   install,
   packageManager,
-} from '../../services/package-manager-service';
+} = require('../../services/package-manager-service');
 
 const pkgJsonTemplate = {
   "scripts": {
@@ -24,8 +24,8 @@ const pkgJsonTemplate = {
     "@babel/preset-env": "^7.8.4",
     "@babel/preset-react": "^7.8.3",
     "@shoutem/eslint-config-react": "^1.0.5",
-    "babel-loader": "^8.0.6",
     "babel-eslint": "^10.1.0",
+    "babel-loader": "^8.0.6",
     "cross-env": "^4.0.0",
     "css-loader": "^3.4.2",
     "cssnano": "^4.1.10",
@@ -43,11 +43,11 @@ const pkgJsonTemplate = {
     "mini-css-extract-plugin": "0.9.0",
     "optimize-css-assets-webpack-plugin": "5.0.3",
     "terser-webpack-plugin": "2.3.5",
-    "node-sass": "^6.0.1",
     "path": "^0.12.7",
     "postcss-loader": "^3.0.0",
     "prettier": "1.19.1",
     "rimraf": "^3.0.2",
+    "sass": "1.54.1",
     "sass-loader": "10.2.0",
     "style-loader": "^1.1.3",
     "url-loader": "^3.0.0",
@@ -88,13 +88,13 @@ const pkgJsonTemplate = {
   }
 };
 
-export async function before(context) {
+ async function before(context) {
   const { extensionPath } = context;
   const serverPath = path.join(extensionPath, 'server');
   context.serverJsonString = stringify(_.merge(await getPackageJson(serverPath), pkgJsonTemplate));
 }
 
-export async function after(context) {
+ async function after(context) {
   const { extensionPath } = context;
 
   getOrSet(context, 'postRunActions', [])
@@ -104,3 +104,8 @@ export async function after(context) {
       console.log(`${packageManager} install... [${'OK'.green.bold}]`)
     });
 }
+
+module.exports = {
+  before,
+  after,
+};
