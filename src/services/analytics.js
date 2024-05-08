@@ -1,5 +1,5 @@
 import analytics from 'universal-analytics';
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 import _ from 'lodash';
 import { analyticsTrackingId } from '../config/services';
 import * as cache from './cache';

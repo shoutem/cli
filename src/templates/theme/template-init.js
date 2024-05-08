@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const getOrSet = require('lodash-get-or-set');
+const { getOrSet } = require('../../services/helpers');
 
 async function before({ title, themeName, description, extJson }) {
   const themes = getOrSet(extJson, 'themes', []);
