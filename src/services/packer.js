@@ -5,7 +5,7 @@ import path from 'path';
 import _ from 'lodash';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';
-import tar from 'tar';
+import targz from 'tar.gz';
 import { buildNodeProject } from './node';
 import { writeJsonFile, readJsonFile } from './data';
 import { spinify } from './spinner';
@@ -207,7 +207,7 @@ export default async function shoutemPack(dir, options) {
         options.packToTempDir ? tmpDir : dir,
         'extension.tgz',
       );
-      await tar.c({ file: destinationDirectory }, [packageDir]);
+      await targz().compress(packageDir, destinationDirectory);
 
       return {
         packedDirs: dirsToPack,
