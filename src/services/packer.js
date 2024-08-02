@@ -26,17 +26,22 @@ function hasPackageJson(dir) {
 }
 
 async function packageManagerPack(dir, destinationDir) {
-  const resultFilename = path.join(destinationDir, `${path.basename(dir)}.tgz`);
-  const packageJsonPath = path.join(dir, 'package.json');
+  const component = path.basename(dir);
+  const resultFilename = path.join(destinationDir, `${component}.tgz`);
+  const isWeb = component === 'web';
+  const appDir = isWeb ? dir.replace('web', 'app'): dir;
+  
+  const packageJsonPath = path.join(appDir, 'package.json');
 
   const originalFileContent = await fs.readFile(packageJsonPath);
   const packageJson = await readJsonFile(packageJsonPath);
 
   const timestamp = new Date().getTime();
   packageJson.version = `${packageJson.version}-build${timestamp}`;
+  packageJson.dependencies = isWeb ? packageJson.webDependencies : packageJson.dependencies;
 
   await writeJsonFile(packageJson, packageJsonPath);
-  const { stdout } = await exec(`${packageManager} pack`, { cwd: dir });
+  const { stdout } = await exec(`${packageManager} pack`, { cwd: appDir });
   const packageFilename = stdout.replace(/\n$/, '');
   const packagePath = path.join(dir, packageFilename);
 
@@ -104,6 +109,18 @@ function hasExtensionsJson(dir) {
   return pathExists(path.join(dir, 'extension.json'));
 }
 
+async function hasWebDependencies(dir) {
+  const packageJsonPath = path.join(dir, 'app' , 'package.json');
+
+  const packageJson = await readJsonFile(packageJsonPath);
+
+  if (!packageJson.webDependencies) {
+    return false;
+  }
+
+  return true;
+}
+
 function hasCloudComponent(dir) {
   return hasPackageJson(path.join(dir, 'cloud'));
 }
@@ -161,6 +178,12 @@ export default async function shoutemPack(dir, options) {
 
   if (hasCloud) {
     components.push('cloud');
+  }
+
+  const hasWeb = await hasWebDependencies(dir);
+
+  if (hasWeb) {
+    components.push('web');
   }
 
   const packedDirectories = components.map(d => path.join(dir, d));
