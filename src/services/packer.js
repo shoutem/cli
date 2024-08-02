@@ -32,8 +32,8 @@ async function packageManagerPack(dir, destinationDir) {
   const component = path.basename(dir);
   const resultFilename = path.join(destinationDir, `${component}.tgz`);
   const isWeb = component === 'web';
-  const appDir = isWeb ? dir.replace('web', 'app'): dir;
-  
+  const appDir = isWeb ? dir.replace('web', 'app') : dir;
+
   const packageJsonPath = path.join(appDir, 'package.json');
 
   const originalFileContent = await fs.readFile(packageJsonPath);
@@ -41,7 +41,9 @@ async function packageManagerPack(dir, destinationDir) {
 
   const timestamp = new Date().getTime();
   packageJson.version = `${packageJson.version}-build${timestamp}`;
-  packageJson.dependencies = isWeb ? packageJson.webDependencies : packageJson.dependencies;
+  packageJson.dependencies = isWeb
+    ? packageJson.webDependencies
+    : packageJson.dependencies;
 
   await writeJsonFile(packageJson, packageJsonPath);
   const { stdout } = await exec(`${resolvedPacker} pack`, { cwd: appDir });
@@ -113,7 +115,7 @@ function hasExtensionsJson(dir) {
 }
 
 async function hasWebDependencies(dir) {
-  const packageJsonPath = path.join(dir, 'app' , 'package.json');
+  const packageJsonPath = path.join(dir, 'app', 'package.json');
 
   const packageJson = await readJsonFile(packageJsonPath);
 
@@ -203,7 +205,15 @@ export default async function shoutemPack(dir, options) {
   const packageDir = path.join(tmpDir, 'package');
   await fs.mkdir(packageDir);
 
-  const dirsToPack = await Promise.filter(packedDirectories, hasPackageJson);
+  const filteredDirsToPack = await Promise.filter(
+    packedDirectories,
+    hasPackageJson,
+  );
+  // We still want to pack the web segment even though it uses package.json
+  // from the app segment
+  const dirsToPack = hasWeb
+    ? [...filteredDirsToPack, path.join(dir, 'web')]
+    : filteredDirsToPack;
 
   if (options.nobuild) {
     console.error('Skipping build step due to --nobuild flag.');
