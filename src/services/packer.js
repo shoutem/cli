@@ -48,7 +48,7 @@ async function packageManagerPack(dir, destinationDir) {
   await writeJsonFile(packageJson, packageJsonPath);
   const { stdout } = await exec(`${resolvedPacker} pack`, { cwd: appDir });
   const packageFilename = stdout.replace(/\n$/, '');
-  const packagePath = path.join(dir, packageFilename);
+  const packagePath = path.join(appDir, packageFilename);
 
   await mv(packagePath, resultFilename);
 
