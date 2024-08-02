@@ -21,9 +21,6 @@ import { ensureUserIsLoggedIn } from '../commands/login';
 import confirmer from './confirmer';
 const mv = Promise.promisify(require('mv'));
 
-// BUN doesn't support pack at the moment, so in that case we default to npm
-const resolvedPacker = packageManager === 'bun' ? 'npm' : packageManager;
-
 function hasPackageJson(dir) {
   return pathExists(path.join(dir, 'package.json'));
 }
@@ -46,7 +43,7 @@ async function packageManagerPack(dir, destinationDir) {
     : packageJson.dependencies;
 
   await writeJsonFile(packageJson, packageJsonPath);
-  const { stdout } = await exec(`${resolvedPacker} pack`, { cwd: appDir });
+  const { stdout } = await exec(`${packageManager} pack`, { cwd: appDir });
   const packageFilename = stdout.replace(/\n$/, '');
   const packagePath = path.join(appDir, packageFilename);
 
