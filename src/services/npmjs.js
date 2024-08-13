@@ -2,25 +2,26 @@ import request from 'request-promise-native';
 import semver from 'semver';
 import * as cache from './cache';
 
-export async function getRepoData(npmUrl) {
-  return await request({ uri: npmUrl, json: true });
+const NPM_LATEST_VERSION = 'npm-latest-version';
+
+async function getLatestData(npmUrl) {
+  return await request({ uri: `${npmUrl}/latest`, json: true });
 }
 
-async function getNpmjsVersion(npmUrl, tag) {
-  const repo = await getRepoData(npmUrl);
-
-  return repo['dist-tags'][tag];
+async function getLatestNpmjsVersion(npmUrl) {
+  const latestData = await getLatestData(npmUrl);
+  return latestData.version;
 }
 
-export async function getVersion(npmUrl, tag) {
-  return await cache.get({ npmUrl, tag }, 3600 * 48, () =>
-    getNpmjsVersion(npmUrl, tag),
+async function getLatestVersion(npmUrl, tag) {
+  return await cache.get(NPM_LATEST_VERSION, 3600 * 48, () =>
+    getLatestNpmjsVersion(npmUrl, tag),
   );
 }
 
 export async function isLatest(npmUrl, currentVersion) {
   try {
-    const latestVersion = await getVersion(npmUrl, 'latest');
+    const latestVersion = await getLatestVersion(npmUrl);
     return semver.gte(currentVersion, latestVersion);
   } catch (err) {
     // to allow usage of CLI if npmjs is down
