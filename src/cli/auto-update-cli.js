@@ -9,12 +9,12 @@ export const builder = yargs => {
     .options({
       enable: {
         alias: 'e',
-        description: 'Enables automatic check if CLI should be updated.',
+        description: 'Enables automatic CLI update check.',
         type: 'boolean',
       },
       disable: {
         alias: 'd',
-        description: 'Disables automatic check if CLI should be updated.',
+        description: 'Disables automatic CLI update check.',
         type: 'boolean',
       },
     })
