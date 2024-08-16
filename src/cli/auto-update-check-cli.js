@@ -1,9 +1,9 @@
 import { executeAndHandleError } from '../services/error-handler';
-import { autoUpdateCli } from '../commands/auto-update-cli';
+import { autoUpdateCheckCli } from '../commands/auto-update-check-cli';
 
 export const description = 'Automatically check if CLI should be updated.';
 
-export const command = 'auto-update-cli';
+export const command = 'auto-update-check-cli';
 export const builder = yargs => {
   return yargs
     .options({
@@ -22,5 +22,5 @@ export const builder = yargs => {
 };
 
 export async function handler(args) {
-  await executeAndHandleError(() => autoUpdateCli(args, process.cwd()));
+  await executeAndHandleError(() => autoUpdateCheckCli(args, process.cwd()));
 }
