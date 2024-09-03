@@ -7,7 +7,7 @@ import nodeFetch from 'node-fetch';
 import yargs from 'yargs';
 import { version } from '../package.json';
 import apiUrls from './config/services';
-import autoUpdate from './commands/update-cli';
+import { autoUpdate } from './commands/auto-update-check-cli';
 import * as analytics from './services/analytics';
 import { isAscii, containsSpace } from './services/validation';
 import getHomeDir from './home-dir';
