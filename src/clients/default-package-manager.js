@@ -13,7 +13,12 @@ export function setDefaultPackageManager(name) {
 
 export function getDefaultPackageManager() {
   try {
-    return fs.readFileSync(defaultPackageManagerFilePath, 'utf8');
+    // Disable bun in favour of npm for the time being
+    const resolvedManager = fs.readFileSync(
+      defaultPackageManagerFilePath,
+      'utf8',
+    );
+    return resolvedManager === 'bun' ? 'npm' : resolvedManager;
   } catch (err) {
     setDefaultPackageManager('npm');
     return 'npm';
