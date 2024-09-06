@@ -72,11 +72,11 @@ export async function shoutemUnpack(tgzDir, destinationDir, extSegments) {
   const tgzFile = path.join(tgzDir, 'extension.tgz');
 
   // Extracts extension.tgz into same directory, which then contains:
-  // app.tgz, server.tgz, extension.json and optional cloud.tgz
+  // app.tgz, server.tgz, extension.json and optional cloud.tgz and web.tgz
   const extDecompressPath = await packageManagerUnpack(tgzFile, tgzDir);
 
-  let segments = ['app', 'cloud', 'server'];
-  // custome ext segments
+  let segments = ['app', 'cloud', 'server', 'web'];
+  // custom ext segments
   if (!_.isEmpty(extSegments)) {
     segments = _.split(extSegments, ',');
   }

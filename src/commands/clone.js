@@ -62,14 +62,15 @@ async function pullExtension(destinationDir, installation, extSegments) {
 }
 
 export async function pullExtensions(appId, destinationDir, extSegments) {
-  console.time('Extensions download');
+  console.time('Fetching installations');
   const installations = await appManager.getInstallations(appId);
+  console.timeEnd('Fetching installations');
 
-  await spinify(
-    Promise.map(installations, inst =>
-      pullExtension(destinationDir, inst, extSegments),
-    ),
-    'Downloading extensions...',
+  console.time('Extensions download');
+  console.log('Downloading extensions...');
+
+  await Promise.map(installations, inst =>
+    pullExtension(destinationDir, inst, extSegments),
   );
 
   console.timeEnd('Extensions download');
@@ -154,14 +155,18 @@ export async function clone(opts, destinationDir) {
 
   if (opts.force) {
     console.time('Destroying directory');
-    await spinify(rmrf(appDir), `Destroying directory ${directoryName}...`);
+    console.log(`Destroying directory ${directoryName}...`);
+    await rmrf(appDir);
     console.timeEnd('Destroying directory');
   }
 
   if (await pathExists(appDir)) {
     const action = await queryPathExistsAction(destinationDir, directoryName);
     if (action.type === 'overwrite') {
-      await spinify(rmrf(appDir), `Destroying directory ${directoryName}...`);
+      console.time('Destroying directory');
+      console.log(`Destroying directory ${directoryName}...`);
+      await rmrf(appDir);
+      console.timeEnd('Destroying directory');
     } else if (action.type === 'abort') {
       console.log('Clone aborted.'.bold.yellow);
       return;
