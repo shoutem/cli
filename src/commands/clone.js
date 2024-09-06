@@ -62,18 +62,17 @@ async function pullExtension(destinationDir, installation, extSegments) {
 }
 
 export async function pullExtensions(appId, destinationDir, extSegments) {
+  console.log('Fetching installations...');
   console.time('Fetching installations');
   const installations = await appManager.getInstallations(appId);
   console.timeEnd('Fetching installations');
 
-  console.time('Extensions download');
   console.log('Downloading extensions...');
-
+  console.time('Downloading extensions');
   await Promise.map(installations, inst =>
     pullExtension(destinationDir, inst, extSegments),
   );
-
-  console.timeEnd('Extensions download');
+  console.timeEnd('Downloading extensions');
 }
 
 function ensurePlatformCompatibility(platform) {
@@ -154,8 +153,8 @@ export async function clone(opts, destinationDir) {
   let appDir = path.join(destinationDir, directoryName);
 
   if (opts.force) {
-    console.time('Destroying directory');
     console.log(`Destroying directory ${directoryName}...`);
+    console.time('Destroying directory');
     await rmrf(appDir);
     console.timeEnd('Destroying directory');
   }
@@ -163,8 +162,8 @@ export async function clone(opts, destinationDir) {
   if (await pathExists(appDir)) {
     const action = await queryPathExistsAction(destinationDir, directoryName);
     if (action.type === 'overwrite') {
-      console.time('Destroying directory');
       console.log(`Destroying directory ${directoryName}...`);
+      console.time('Destroying directory');
       await rmrf(appDir);
       console.timeEnd('Destroying directory');
     } else if (action.type === 'abort') {
