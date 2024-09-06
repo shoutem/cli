@@ -42,8 +42,15 @@ async function packageManagerPack(dir, destinationDir) {
     ? packageJson.webDependencies
     : packageJson.dependencies;
 
+  // Bun has no pack capability, so we default to npm
+
+  const resolvedPackageManager =
+    packageManager === 'bun' ? 'npm' : packageManager;
+
   await writeJsonFile(packageJson, packageJsonPath);
-  const { stdout } = await exec(`${packageManager} pack`, { cwd: appDir });
+  const { stdout } = await exec(`${resolvedPackageManager} pack`, {
+    cwd: appDir,
+  });
   const packageFilename = stdout.replace(/\n$/, '');
   const packagePath = path.join(appDir, packageFilename);
 
