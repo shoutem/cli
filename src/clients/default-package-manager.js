@@ -18,7 +18,7 @@ export function getDefaultPackageManager() {
       defaultPackageManagerFilePath,
       'utf8',
     );
-    return resolvedManager === 'bun' ? 'npm' : resolvedManager;
+    return resolvedManager;
   } catch (err) {
     setDefaultPackageManager('npm');
     return 'npm';
