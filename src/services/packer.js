@@ -6,11 +6,11 @@ import _ from 'lodash';
 import Promise from 'bluebird';
 import tmp from 'tmp-promise';
 import targz from 'tar.gz';
+import rmrf from 'rmfr';
+import decompress from 'decompress';
 import { buildNodeProject } from './node';
 import { writeJsonFile, readJsonFile } from './data';
 import { spinify } from './spinner';
-import rmrf from 'rmfr';
-import decompress from 'decompress';
 import { loadExtensionJson } from './extension';
 import {
   packageManager,
@@ -19,6 +19,7 @@ import {
 } from './package-manager-service';
 import { ensureUserIsLoggedIn } from '../commands/login';
 import confirmer from './confirmer';
+
 const mv = Promise.promisify(require('mv'));
 
 function hasPackageJson(dir) {
@@ -29,7 +30,7 @@ async function packageManagerPack(dir, destinationDir) {
   const component = path.basename(dir);
   const resultFilename = path.join(destinationDir, `${component}.tgz`);
   const isWeb = component === 'web';
-  const appDir = isWeb ? dir.replace('web', 'app') : dir;
+  const appDir = isWeb ? dir.replace('/web', '/app') : dir;
 
   const packageJsonPath = path.join(appDir, 'package.json');
 
