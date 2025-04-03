@@ -2,6 +2,7 @@ import url from 'url';
 import path from 'path';
 import _ from 'lodash';
 import replace from 'replace-in-file';
+import { pathExists, readJson, readFile, writeFile } from 'fs-extra';
 import cliUrls from '../config/services';
 import * as appManager from '../clients/app-manager';
 import * as authService from '../clients/auth-service';
@@ -10,7 +11,6 @@ import { writeJsonFile, readJsonFile } from './data';
 import * as packageManager from './package-manager-service';
 import * as reactNative from './react-native';
 import * as analytics from './analytics';
-import { pathExists, readJson, readFile, writeFile } from 'fs-extra';
 import commandExists from './command-exists';
 
 async function isPlatformDirectory(dir) {
@@ -168,12 +168,9 @@ export async function fixPlatform(platformDir, appId) {
 export async function downloadApp(appId, destinationDir, options = {}) {
   analytics.setAppId(appId);
 
-  const versionCheck = options.versionCheck || (() => {});
+  const { version } = await appManager.getApplicationPlatform(appId);
 
-  const { mobileAppVersion } = await appManager.getApplicationPlatform(appId);
-  await versionCheck(mobileAppVersion);
-
-  await pullPlatform(mobileAppVersion, destinationDir, options);
+  await pullPlatform(version, destinationDir, options);
 
   if (!(await pathExists(destinationDir))) {
     throw new Error(
