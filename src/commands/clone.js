@@ -9,10 +9,10 @@ import inquirer from 'inquirer';
 import slugify from 'slugify';
 import 'colors';
 import Downloader from 'nodejs-file-downloader';
+import { pathExists, copy } from 'fs-extra';
 import * as appManager from '../clients/app-manager';
 import { shoutemUnpack } from '../services/packer';
 import { getApp } from '../clients/legacy-service';
-import { pathExists, copy } from 'fs-extra';
 import selectApp from '../services/app-selector';
 import {
   downloadApp,
@@ -110,7 +110,8 @@ async function queryPathExistsAction(destinationDir, oldDirectoryName) {
 
   if (action === 'overwrite') {
     return { type: 'overwrite' };
-  } else if (action === 'abort') {
+  }
+  if (action === 'abort') {
     return { type: 'abort' };
   }
 
@@ -189,14 +190,6 @@ export async function clone(opts, destinationDir) {
     await downloadApp(opts.appId, appDir, {
       progress: createProgressHandler({ msg: 'Downloading shoutem platform.' }),
       useCache: !opts.force,
-
-      versionCheck: mobileAppVersion => {
-        if (!semver.gte(mobileAppVersion, '0.58.9')) {
-          throw new Error(
-            'This version of CLI only supports platforms containing mobile app 0.58.9 or higher.',
-          );
-        }
-      },
     });
   }
 
