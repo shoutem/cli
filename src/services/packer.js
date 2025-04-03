@@ -39,9 +39,12 @@ async function packageManagerPack(dir, destinationDir) {
 
   const timestamp = new Date().getTime();
   packageJson.version = `${packageJson.version}-build${timestamp}`;
-  packageJson.dependencies = isWeb
-    ? packageJson.webDependencies
-    : packageJson.dependencies;
+
+  if (isWeb && packageJson.webDependencies) {
+    packageJson.dependencies = isWeb
+      ? packageJson.webDependencies
+      : packageJson.dependencies;
+  }
 
   // Bun has no pack capability, so we default to npm
 
