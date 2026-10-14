@@ -4,10 +4,10 @@
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
-    "url": "https://github.com/shoutem/cli"
+    "url": "git+https://github.com/shoutem/cli.git"
   },
   "bin": {
-    "shoutem": "./build/shoutem.js"
+    "shoutem": "build/shoutem.js"
   },
   "scripts": {
     "prebuild": "npm run build:clean",
@@ -16,6 +16,8 @@
     "extlint": "eslint",
     "lint": "eslint ./ --ignore-pattern build --ignore-pattern templates",
     "prepare": "npm run build",
+    "release": "npm publish --access public --tag latest",
+    "release-rc": "npm publish --access public --tag rc",
     "shoutem": "node build/shoutem.js",
     "test": "mocha -R spec --require fetch-everywhere --compilers js:@babel/register \"src/**/*spec.js\""
   },
