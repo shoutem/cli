@@ -94,10 +94,17 @@ export async function setPlatformConfig(platformDir, mobileConfig) {
 
 export async function configurePlatform(platformDir) {
   const config = await readJson(path.join(platformDir, 'config.json'));
-  const { nativeBuildOs = 'ios' } = config;
+  const { nativeBuildOs = 'ios', platform } = config;
+  // web builds (`platform: web`, set by the build system) never run the
+  // react-native CLI or CocoaPods, so don't install or require them
+  const isWeb = platform === 'web';
 
-  await reactNative.ensureInstalled();
+  if (!isWeb) {
+    await reactNative.ensureInstalled();
+  }
+
   if (
+    !isWeb &&
     process.platform === 'darwin' &&
     nativeBuildOs === 'ios' &&
     !(await commandExists('pod'))
@@ -168,9 +175,13 @@ export async function fixPlatform(platformDir, appId) {
 export async function downloadApp(appId, destinationDir, options = {}) {
   analytics.setAppId(appId);
 
-  const { version } = await appManager.getApplicationPlatform(appId);
+  // callers that already fetched the app's platform pass its version, which
+  // saves a second request to the app manager
+  const { platformVersion, ...downloadOptions } = options;
+  const version =
+    platformVersion || (await appManager.getApplicationPlatform(appId)).version;
 
-  await pullPlatform(version, destinationDir, options);
+  await pullPlatform(version, destinationDir, downloadOptions);
 
   if (!(await pathExists(destinationDir))) {
     throw new Error(

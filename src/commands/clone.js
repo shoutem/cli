@@ -190,6 +190,7 @@ export async function clone(opts, destinationDir) {
     await downloadApp(opts.appId, appDir, {
       progress: createProgressHandler({ msg: 'Downloading shoutem platform.' }),
       useCache: !opts.force,
+      platformVersion: platform.version,
     });
   }
 

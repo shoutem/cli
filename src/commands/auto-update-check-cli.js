@@ -18,7 +18,22 @@ export async function autoUpdateCheckCli(opts) {
   await cache.setValue(AUTO_UPDATE_CHECK_CLI_CACHE_KEY, true);
 }
 
+// The update check ends in an inquirer prompt, which can't be answered on CI or
+// with redirected input: without a terminal it crashes the command
+// (ERR_USE_AFTER_CLOSE) before it runs. Build machines also install a pinned
+// CLI version on purpose, so the check is skipped there.
+function isInteractive() {
+  const { CI } = process.env;
+  const isCi = !!CI && CI !== 'false' && CI !== '0';
+
+  return !isCi && !!process.stdin.isTTY && !!process.stdout.isTTY;
+}
+
 export async function autoUpdate() {
+  if (!isInteractive()) {
+    return false;
+  }
+
   const shouldAutoUpdate = await cache.getValue(
     AUTO_UPDATE_CHECK_CLI_CACHE_KEY,
   );
