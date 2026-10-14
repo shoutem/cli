@@ -11,7 +11,7 @@ import 'colors';
 import Downloader from 'nodejs-file-downloader';
 import { pathExists, copy } from 'fs-extra';
 import * as appManager from '../clients/app-manager';
-import { shoutemUnpack } from '../services/packer';
+import { shoutemUnpack, unpackSegment } from '../services/packer';
 import { getApp } from '../clients/legacy-service';
 import selectApp from '../services/app-selector';
 import {
@@ -35,25 +35,59 @@ function getExtensionUrl(installation) {
   return `${removeTrailingSlash(extensionPackage)}/extension.tgz`;
 }
 
+async function download(url, directory, fileName) {
+  const downloader = new Downloader({
+    url,
+    directory,
+    fileName,
+    maxAttempts: 10,
+  });
+  await downloader.download();
+
+  return path.join(directory, fileName);
+}
+
+// With `--segments app` (builds), each extension needs only its app segment.
+// The extension manager also publishes that segment on its own as
+// location.app.package (the same app.tgz that is inside extension.tgz), so
+// only that is downloaded instead of the whole extension.tgz, whose server
+// segment is usually far bigger. extension.json is skipped too: neither the
+// platform nor the extensions' build hooks read it. Extensions without
+// location.app.package still get extension.tgz.
+function isAppSegmentOnly(extSegments, installation) {
+  return (
+    _.isEqual(_.split(extSegments, ','), ['app']) &&
+    !!_.get(installation, 'location.app.package')
+  );
+}
+
+async function pullAppSegment(extensionDir, installation, tgzDir) {
+  const appTgzPath = await download(
+    _.get(installation, 'location.app.package'),
+    tgzDir,
+    'app.tgz',
+  );
+
+  await unpackSegment(appTgzPath, path.join(extensionDir, 'app'));
+}
+
 async function pullExtension(destinationDir, installation, extSegments) {
   const { canonicalName } = installation;
   const tgzDir = (await tmp.dir()).path;
+  const extensionDir = path.join(destinationDir, canonicalName);
 
   try {
-    const downloader = new Downloader({
-      url: getExtensionUrl(installation),
-      directory: tgzDir,
-      fileName: 'extension.tgz',
-      maxAttempts: 10,
-    });
-    await downloader.download();
-
-    const extensionDir = path.join(destinationDir, canonicalName);
     if (!(await pathExists(extensionDir))) {
       await mkdirp(extensionDir);
     }
 
-    await shoutemUnpack(tgzDir, extensionDir, extSegments);
+    if (isAppSegmentOnly(extSegments, installation)) {
+      await pullAppSegment(extensionDir, installation, tgzDir);
+    } else {
+      await download(getExtensionUrl(installation), tgzDir, 'extension.tgz');
+      await shoutemUnpack(tgzDir, extensionDir, extSegments);
+    }
+
     await rmrf(tgzDir);
   } catch (error) {
     await rmrf(tgzDir);
