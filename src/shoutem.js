@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-require('@babel/register');
-
 require('colors');
 const path = require('path');
 const semver = require('semver');
@@ -32,7 +30,16 @@ if (semver.lt(nodeVer, '6.0.0')) {
   process.exit(1);
 }
 
-const babelCachePath = path.join(homeDir, 'cache', 'babel-cache');
-process.env.BABEL_CACHE_PATH = process.env.BABEL_CACHE_PATH || babelCachePath;
+// build/ is compiled ahead of time, so Babel is only needed when running
+// straight from src/ during development, from ./cli on. Loading it anyway cost
+// every command ~60 ms and made the whole Babel toolchain a runtime dependency.
+if (path.basename(__dirname) === 'src') {
+  // set before @babel/register loads, which is when it reads the cache path
+  process.env.BABEL_CACHE_PATH =
+    process.env.BABEL_CACHE_PATH || path.join(homeDir, 'cache', 'babel-cache');
+  // a devDependency on purpose: only needed when running from src/
+  // eslint-disable-next-line global-require, import/no-extraneous-dependencies
+  require('@babel/register');
+}
 
 require('./cli');
