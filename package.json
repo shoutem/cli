@@ -1,13 +1,13 @@
 {
   "name": "@shoutem/cli",
-  "version": "0.16.4",
+  "version": "0.16.5",
   "description": "Command-line tools for Shoutem applications",
   "repository": {
     "type": "git",
-    "url": "https://github.com/shoutem/cli"
+    "url": "git+https://github.com/shoutem/cli.git"
   },
   "bin": {
-    "shoutem": "./build/shoutem.js"
+    "shoutem": "build/shoutem.js"
   },
   "scripts": {
     "prebuild": "npm run build:clean",
@@ -16,17 +16,13 @@
     "extlint": "eslint",
     "lint": "eslint ./ --ignore-pattern build --ignore-pattern templates",
     "prepare": "npm run build",
+    "release": "npm publish --access public --tag latest",
+    "release-rc": "npm publish --access public --tag rc",
     "shoutem": "node build/shoutem.js",
     "test": "mocha -R spec --require fetch-everywhere --compilers js:@babel/register \"src/**/*spec.js\""
   },
   "license": "ISC",
   "dependencies": {
-    "@babel/cli": "7.24.1",
-    "@babel/core": "7.24.4",
-    "@babel/plugin-proposal-object-rest-spread": "7.20.7",
-    "@babel/preset-env": "7.24.4",
-    "@babel/preset-react": "7.16.0",
-    "@babel/register": "7.23.7",
     "@shoutem/fetch-token-intercept": "0.3.0",
     "@shoutem/fork-terminal": "1.0.0",
     "async": "2.0.0-rc.3",
@@ -40,11 +36,6 @@
     "diff": "^3.3.1",
     "download-file": "latest",
     "eslint": "^6.8.0",
-    "eslint-import-resolver-babel-module": "^5.1.2",
-    "eslint-plugin-import": "^2.24.2",
-    "eslint-plugin-jsx-a11y": "1.5.3",
-    "eslint-plugin-prettier": "^3.1.3",
-    "eslint-plugin-react": "5.2.2",
     "eslint-plugin-react-native": "1.0.2",
     "exit-code": "1.0.2",
     "form-data": "2.1.4",
@@ -82,11 +73,22 @@
     "yargs": "6.6.0"
   },
   "devDependencies": {
+    "@babel/cli": "7.24.1",
+    "@babel/core": "7.24.4",
+    "@babel/plugin-proposal-object-rest-spread": "7.20.7",
+    "@babel/preset-env": "7.24.4",
+    "@babel/preset-react": "7.16.0",
+    "@babel/register": "7.23.7",
     "@shoutem/eslint-config-base": "^1.0.2",
     "babel-cli": "6.8.0",
     "babel-plugin-rewire": "1.0.0-rc-2",
     "chai": "3.5.0",
     "dos2unix-cli": "1.0.1",
+    "eslint-import-resolver-babel-module": "^5.1.2",
+    "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-jsx-a11y": "1.5.3",
+    "eslint-plugin-prettier": "^3.1.3",
+    "eslint-plugin-react": "5.2.2",
     "mocha": "2.4.5",
     "nock": "8.0.0",
     "prettier": "^1.19.1",

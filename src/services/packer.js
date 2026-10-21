@@ -79,6 +79,26 @@ export async function packageManagerUnpack(tgzFile, decompressPath) {
   return path.join(decompressPath, 'package');
 }
 
+// Unpacks a segment tgz (app.tgz, server.tgz or cloud.tgz, packed under
+// package/) next to itself and copies its contents to destinationDir.
+export async function unpackSegment(tgzPath, destinationDir) {
+  const decompressPath = path.join(
+    path.dirname(tgzPath),
+    path.basename(tgzPath, '.tgz'),
+  );
+  const segmentPath = await packageManagerUnpack(tgzPath, decompressPath);
+
+  if (!(await pathExists(destinationDir))) {
+    await mkdirp(destinationDir);
+  }
+
+  await fs.copy(segmentPath, destinationDir);
+
+  // We delete the 'package' decompress directory so that we don't mix
+  // segment files.
+  await rmrf(decompressPath);
+}
+
 export async function shoutemUnpack(tgzDir, destinationDir, extSegments) {
   const tgzFile = path.join(tgzDir, 'extension.tgz');
 
@@ -96,19 +116,7 @@ export async function shoutemUnpack(tgzDir, destinationDir, extSegments) {
     const tgzPath = path.join(extDecompressPath, `${segment}.tgz`);
 
     if (await pathExists(tgzPath)) {
-      const decompressPath = path.join(extDecompressPath, segment);
-      const segmentPath = await packageManagerUnpack(tgzPath, decompressPath);
-      const segmentDestinationPath = path.join(destinationDir, segment);
-
-      if (!(await pathExists(segmentDestinationPath))) {
-        await mkdirp(segmentDestinationPath);
-      }
-
-      await fs.copy(segmentPath, segmentDestinationPath);
-
-      // We delete the 'package' decompress directory so that we don't mix
-      // segment files.
-      await rmrf(decompressPath);
+      await unpackSegment(tgzPath, path.join(destinationDir, segment));
     }
   });
 
